@@ -2444,11 +2444,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\New folder\\medical_insurance\\api\\api.csproj",
+      "projectUniqueName": "C:\\mazin\\MedicalInsurance\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "C:\\New folder\\medical_insurance\\api\\api.csproj",
+      "projectPath": "C:\\mazin\\MedicalInsurance\\api\\api.csproj",
       "packagesPath": "C:\\Users\\Zaher\\.nuget\\packages\\",
-      "outputPath": "C:\\New folder\\medical_insurance\\api\\obj\\",
+      "outputPath": "C:\\mazin\\MedicalInsurance\\api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Zaher\\AppData\\Roaming\\NuGet\\NuGet.Config"

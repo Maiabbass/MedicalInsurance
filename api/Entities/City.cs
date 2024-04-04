@@ -24,5 +24,7 @@ namespace api.Entities
 
 
         public ICollection<Hospital>Hospitals{get; set;}
+        //hfjd
+        //gfg
     }
 }
