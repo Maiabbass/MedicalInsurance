@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "otpV8o+X4Is70G22ix+y6Q3oKaRhIZwrH8q9qOUx3hpVJlehozN4TkL2KNOLTC2YWuGmtjAgOqHO1JD5hjpHLw==",
+  "dgSpecHash": "6DvUpjRxeHeatgkHQ1LeQZQmnYAVENI8sUAO35LmqYGPKy7DqwlCdcT/+7U+SG+jb44OG59nwNEs6idNBSsaPQ==",
   "success": true,
-  "projectFilePath": "C:\\mazin\\MedicalInsurance\\api\\api.csproj",
+  "projectFilePath": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Zaher\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\Zaher\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\mazin\\MedicalInsurance\\api\\api.csproj": {}
+    "C:\\midpro\\MedicalInsurance\\api\\api.csproj": {}
   },
   "projects": {
-    "C:\\mazin\\MedicalInsurance\\api\\api.csproj": {
+    "C:\\midpro\\MedicalInsurance\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\mazin\\MedicalInsurance\\api\\api.csproj",
+        "projectUniqueName": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "C:\\mazin\\MedicalInsurance\\api\\api.csproj",
+        "projectPath": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
         "packagesPath": "C:\\Users\\Zaher\\.nuget\\packages\\",
-        "outputPath": "C:\\mazin\\MedicalInsurance\\api\\obj\\",
+        "outputPath": "C:\\midpro\\MedicalInsurance\\api\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Zaher\\AppData\\Roaming\\NuGet\\NuGet.Config"
