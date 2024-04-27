@@ -22,7 +22,7 @@ namespace api.Entities
 
         public int Number  { get; set; }
 
-        public Engineere Engineere{ get; set;}
+      //  public Engineere Engineere{ get; set;}
 
         public ICollection<AnnualData>AnnualDatas { get; set;}
 

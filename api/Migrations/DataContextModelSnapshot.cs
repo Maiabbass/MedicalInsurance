@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using api.Data;
 
 #nullable disable
 
-namespace api.Data.Migrations
+namespace api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240402094615_InitialCreat")]
-    partial class InitialCreat
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,21 +30,17 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("CardPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("FromYear")
+                        .HasColumnType("int");
 
-                    b.Property<string>("FromYear")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TheAmount")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("TheAmount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ToYear")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ToYear")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -61,45 +55,70 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Amount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("EngineereId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EngineeringUnitsId")
+                    b.Property<int?>("EngineeringUnitsId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExAmount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("ExAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PayMethodId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WorkPlaceId")
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("WorkPlaceId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Year")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineereId")
-                        .IsUnique();
+                    b.HasIndex("EngineereId");
 
-                    b.HasIndex("EngineeringUnitsId")
-                        .IsUnique();
+                    b.HasIndex("EngineeringUnitsId");
 
-                    b.HasIndex("PayMethodId")
-                        .IsUnique();
+                    b.HasIndex("PayMethodId");
 
-                    b.HasIndex("WorkPlaceId")
-                        .IsUnique();
+                    b.HasIndex("WorkPlaceId");
 
                     b.ToTable("AnnualDatas");
+                });
+
+            modelBuilder.Entity("api.Entities.AnnualDataDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("AnnualDataId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEngineer")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnnualDataId");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("AnnualDataDetails");
                 });
 
             modelBuilder.Entity("api.Entities.City", b =>
@@ -127,13 +146,11 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("AdditionalPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("AdditionalPrice")
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ApprovedPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("ApprovedPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("EnduranceRatio")
                         .IsRequired()
@@ -146,9 +163,8 @@ namespace api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Hospital")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("HospitalId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("LoginDate")
                         .HasColumnType("datetime2");
@@ -157,11 +173,15 @@ namespace api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TotalPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Trust")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HospitalId");
 
                     b.ToTable("Claims");
                 });
@@ -169,26 +189,15 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Engineere", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("EngNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EngineeringUnitsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
 
                     b.Property<int>("SpecializationId")
                         .HasColumnType("int");
 
                     b.Property<string>("SubNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WorkPlaceId")
@@ -199,20 +208,11 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineeringUnitsId")
-                        .IsUnique();
+                    b.HasIndex("SpecializationId");
 
-                    b.HasIndex("PersonId")
-                        .IsUnique();
+                    b.HasIndex("WorkPlaceId");
 
-                    b.HasIndex("SpecializationId")
-                        .IsUnique();
-
-                    b.HasIndex("WorkPlaceId")
-                        .IsUnique();
-
-                    b.HasIndex("statusId")
-                        .IsUnique();
+                    b.HasIndex("statusId");
 
                     b.ToTable("Engineeres");
                 });
@@ -236,10 +236,7 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Gender", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -273,8 +270,7 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CityId")
-                        .IsUnique();
+                    b.HasIndex("CityId");
 
                     b.ToTable("Hospitals");
                 });
@@ -282,10 +278,7 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.PayMethod", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("NameMethod")
                         .IsRequired()
@@ -305,7 +298,6 @@ namespace api.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Affiliate")
@@ -318,35 +310,28 @@ namespace api.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EnsuranceNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FatherName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GenderId")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotherName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NationalId")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Subscrib")
@@ -354,8 +339,7 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GenderId")
-                        .IsUnique();
+                    b.HasIndex("GenderId");
 
                     b.ToTable("Persons");
                 });
@@ -372,21 +356,36 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
+                    b.Property<int>("RelationTypeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineereId")
-                        .IsUnique();
+                    b.HasIndex("EngineereId");
 
-                    b.HasIndex("PersonId")
-                        .IsUnique();
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("RelationTypeId");
 
                     b.ToTable("Relations");
+                });
+
+            modelBuilder.Entity("api.Entities.RelationType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RelationTypes");
                 });
 
             modelBuilder.Entity("api.Entities.Specialization", b =>
@@ -409,10 +408,7 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Status", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -421,53 +417,6 @@ namespace api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Statuses");
-                });
-
-            modelBuilder.Entity("api.Entities.TemporaryClaims", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("AdditionalPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ApprovedPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EnduranceRatio")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ExitDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Hospital")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LoginDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SurgicalPro")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TotalPrice")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TemporaryClaims");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
@@ -491,8 +440,7 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineeringUnitsId")
-                        .IsUnique();
+                    b.HasIndex("EngineeringUnitsId");
 
                     b.ToTable("WorkPlaces");
                 });
@@ -500,28 +448,26 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.AnnualData", b =>
                 {
                     b.HasOne("api.Entities.Engineere", "Engineere")
-                        .WithOne("AnnualData")
-                        .HasForeignKey("api.Entities.AnnualData", "EngineereId")
+                        .WithMany("AnnualDatas")
+                        .HasForeignKey("EngineereId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Entities.EngineeringUnits", "EngineeringUnits")
-                        .WithOne("AnnualData")
-                        .HasForeignKey("api.Entities.AnnualData", "EngineeringUnitsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("AnnualDatas")
+                        .HasForeignKey("EngineeringUnitsId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("api.Entities.PayMethod", "PayMethod")
-                        .WithOne("AnnualData")
-                        .HasForeignKey("api.Entities.AnnualData", "PayMethodId")
+                        .WithMany("AnnualDatas")
+                        .HasForeignKey("PayMethodId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
-                        .WithOne("AnnualData")
-                        .HasForeignKey("api.Entities.AnnualData", "WorkPlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("AnnualDatas")
+                        .HasForeignKey("WorkPlaceId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Engineere");
 
@@ -532,39 +478,61 @@ namespace api.Data.Migrations
                     b.Navigation("WorkPlace");
                 });
 
-            modelBuilder.Entity("api.Entities.Engineere", b =>
+            modelBuilder.Entity("api.Entities.AnnualDataDetail", b =>
                 {
-                    b.HasOne("api.Entities.EngineeringUnits", "EngineeringUnits")
-                        .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "EngineeringUnitsId")
+                    b.HasOne("api.Entities.AnnualData", "AnnualData")
+                        .WithMany("AnnualDataDetails")
+                        .HasForeignKey("AnnualDataId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Entities.Person", "Person")
-                        .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "PersonId")
+                        .WithMany("AnnualDataDetails")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AnnualData");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("api.Entities.Claims", b =>
+                {
+                    b.HasOne("api.Entities.Hospital", "Hospital")
+                        .WithMany("Claims")
+                        .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("api.Entities.Specialization", "Specialization")
+                    b.Navigation("Hospital");
+                });
+
+            modelBuilder.Entity("api.Entities.Engineere", b =>
+                {
+                    b.HasOne("api.Entities.Person", "Person")
                         .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "SpecializationId")
+                        .HasForeignKey("api.Entities.Engineere", "Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("api.Entities.Specialization", "Specialization")
+                        .WithMany("Engineeres")
+                        .HasForeignKey("SpecializationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
-                        .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "WorkPlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Engineeres")
+                        .HasForeignKey("WorkPlaceId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("api.Entities.Status", "Status")
-                        .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "statusId")
+                        .WithMany("Engineeres")
+                        .HasForeignKey("statusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("EngineeringUnits");
 
                     b.Navigation("Person");
 
@@ -578,8 +546,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Hospital", b =>
                 {
                     b.HasOne("api.Entities.City", "City")
-                        .WithOne("Hospital")
-                        .HasForeignKey("api.Entities.Hospital", "CityId")
+                        .WithMany("Hospitals")
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -589,8 +557,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Person", b =>
                 {
                     b.HasOne("api.Entities.Gender", "Gender")
-                        .WithOne("Person")
-                        .HasForeignKey("api.Entities.Person", "GenderId")
+                        .WithMany("Persons")
+                        .HasForeignKey("GenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -600,100 +568,109 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Relation", b =>
                 {
                     b.HasOne("api.Entities.Engineere", "Engineere")
-                        .WithOne("Relation")
-                        .HasForeignKey("api.Entities.Relation", "EngineereId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("Relations")
+                        .HasForeignKey("EngineereId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("api.Entities.Person", "Person")
-                        .WithOne("Relation")
-                        .HasForeignKey("api.Entities.Relation", "PersonId")
+                        .WithMany("Relations")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("api.Entities.RelationType", "RelationType")
+                        .WithMany("Relations")
+                        .HasForeignKey("RelationTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Engineere");
 
                     b.Navigation("Person");
+
+                    b.Navigation("RelationType");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
                 {
                     b.HasOne("api.Entities.EngineeringUnits", "EngineeringUnits")
-                        .WithOne("WorkPlace")
-                        .HasForeignKey("api.Entities.WorkPlace", "EngineeringUnitsId")
+                        .WithMany("WorkPlaces")
+                        .HasForeignKey("EngineeringUnitsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("EngineeringUnits");
                 });
 
+            modelBuilder.Entity("api.Entities.AnnualData", b =>
+                {
+                    b.Navigation("AnnualDataDetails");
+                });
+
             modelBuilder.Entity("api.Entities.City", b =>
                 {
-                    b.Navigation("Hospital")
-                        .IsRequired();
+                    b.Navigation("Hospitals");
                 });
 
             modelBuilder.Entity("api.Entities.Engineere", b =>
                 {
-                    b.Navigation("AnnualData")
-                        .IsRequired();
+                    b.Navigation("AnnualDatas");
 
-                    b.Navigation("Relation")
-                        .IsRequired();
+                    b.Navigation("Relations");
                 });
 
             modelBuilder.Entity("api.Entities.EngineeringUnits", b =>
                 {
-                    b.Navigation("AnnualData")
-                        .IsRequired();
+                    b.Navigation("AnnualDatas");
 
-                    b.Navigation("Engineere")
-                        .IsRequired();
-
-                    b.Navigation("WorkPlace")
-                        .IsRequired();
+                    b.Navigation("WorkPlaces");
                 });
 
             modelBuilder.Entity("api.Entities.Gender", b =>
                 {
-                    b.Navigation("Person")
-                        .IsRequired();
+                    b.Navigation("Persons");
+                });
+
+            modelBuilder.Entity("api.Entities.Hospital", b =>
+                {
+                    b.Navigation("Claims");
                 });
 
             modelBuilder.Entity("api.Entities.PayMethod", b =>
                 {
-                    b.Navigation("AnnualData")
-                        .IsRequired();
+                    b.Navigation("AnnualDatas");
                 });
 
             modelBuilder.Entity("api.Entities.Person", b =>
                 {
-                    b.Navigation("Engineere")
-                        .IsRequired();
+                    b.Navigation("AnnualDataDetails");
 
-                    b.Navigation("Relation")
-                        .IsRequired();
+                    b.Navigation("Engineere");
+
+                    b.Navigation("Relations");
+                });
+
+            modelBuilder.Entity("api.Entities.RelationType", b =>
+                {
+                    b.Navigation("Relations");
                 });
 
             modelBuilder.Entity("api.Entities.Specialization", b =>
                 {
-                    b.Navigation("Engineere")
-                        .IsRequired();
+                    b.Navigation("Engineeres");
                 });
 
             modelBuilder.Entity("api.Entities.Status", b =>
                 {
-                    b.Navigation("Engineere")
-                        .IsRequired();
+                    b.Navigation("Engineeres");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
                 {
-                    b.Navigation("AnnualData")
-                        .IsRequired();
+                    b.Navigation("AnnualDatas");
 
-                    b.Navigation("Engineere")
-                        .IsRequired();
+                    b.Navigation("Engineeres");
                 });
 #pragma warning restore 612, 618
         }

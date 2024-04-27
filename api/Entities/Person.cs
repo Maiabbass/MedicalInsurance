@@ -7,28 +7,22 @@ using System.Threading.Tasks;
 
 namespace api.Entities
 {
+
+   
     public class Person
     {
 
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Person(int id, string fatherName, string lastName, string nationalId, string ensuranceNumber, string phone, bool subscrib, bool beneficiary, int genderId , int relationId)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        #nullable disable
+        public Person()
 
         {
-            this.Id = id;
-    this.FatherName = fatherName;
-    this.LastName = lastName;
-    this.NationalId = nationalId;
-    this.EnsuranceNumber = ensuranceNumber;
-    this.Phone = phone;
-    this.Subscrib = subscrib;
-    this.Beneficiary = beneficiary;
-    this.GenderId = genderId;
-    this.RelationId=relationId;
-   
+            
         }
-                public int Id {get;set;}
+
+
+       
+       public int Id {get;set;}
         public string FirstName { get; set; }
         public string FatherName { get; set; }
 
@@ -56,11 +50,15 @@ namespace api.Entities
         
         public Engineere Engineere { get; set; }
 
-        public int RelationId{ get ; set ;}
-        public Relation Relation{get; set; }
+       // public int RelationId{ get ; set ;}
+      //  public Relation Relation{get; set; }
 
         public int GenderId {get; set;}
         public Gender Gender{ get; set;}
+
+       public ICollection<Relation>Relations{get ; set ;}
+
+         public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }
 
     }
 }
