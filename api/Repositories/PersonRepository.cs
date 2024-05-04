@@ -43,7 +43,12 @@ namespace api.Repositories
               return newperson.Id;
              
         }
-        
+
+        public Task<int> Add(City city)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Person?> Get(int Id)
         {
             return await _dataContext.Persons.Where(x=>x.Id==Id).FirstOrDefaultAsync();

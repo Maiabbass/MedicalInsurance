@@ -8,6 +8,10 @@ namespace api.Services
 {
     public interface IPersonService
     {
-         Task <Response> Add (PersonEditDTO  personEditDTO);
+        object Person { get; }
+
+        Task <Response> Add (PersonEditDTO  personEditDTO);
+        Task GetAll();
+       
     }
 }

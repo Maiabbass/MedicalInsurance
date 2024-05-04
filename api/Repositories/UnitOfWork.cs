@@ -26,11 +26,16 @@ namespace api.Repositories
 
         public IAgeSegmentsRepository AgeSegmentsRepository=>new AgeSegmentsRepository(_dataContext);
         
+        public ICityRepository CityRepository=>new CityRepository(_dataContext);
+        public IHospitalRepository HospitalRepository=>new HospitalRepository(_dataContext);
+        public IWorkplaceRepository WorkplaceRepository=>new WorkplaceRepository(_dataContext);
+        public IEngineeringUnitsRepository EngineeringUnitsRepository=>new EngineeringUnitsRepository(_dataContext);
 
-        public async Task<bool> Complete()
+        
+
+        public Task<bool> Complete()
         {
-            return await _dataContext.SaveChangesAsync()>0;
+            throw new NotImplementedException();
         }
-
     }
 }

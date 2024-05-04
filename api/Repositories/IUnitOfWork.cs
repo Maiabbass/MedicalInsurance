@@ -17,6 +17,12 @@ namespace api.Repositories
         IAnnualDataRepository AnnualDataRepository{get;}
 
         IAgeSegmentsRepository AgeSegmentsRepository{get;}
+        ICityRepository CityRepository { get; }
+        IHospitalRepository HospitalRepository { get; }
+
+        IWorkplaceRepository WorkplaceRepository{get;}
+
+        IEngineeringUnitsRepository EngineeringUnitsRepository{get;}
 
         Task<bool> Complete();
     }

@@ -21,6 +21,9 @@ namespace api.Services
          {
             _unitOfWork=unitOfWork;
          }
+
+        public object Person => throw new NotImplementedException();
+
         public async Task<Response> Add(PersonEditDTO personEditDTO)
         {
             Response response =new Response ();
@@ -77,5 +80,13 @@ namespace api.Services
                 response.InsertedId  =insertedId;
              return response;
         }
+
+        public Task  GetAll()
+        {
+            return   _unitOfWork.PersonRepository.GetAll() ;
+        }
+
+     
+        
     }
 }

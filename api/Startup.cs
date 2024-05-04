@@ -46,6 +46,10 @@ namespace API
               services.AddScoped<IPersonService,PersonService>();
 
               services.AddScoped<IAnnualDataService,AnnualDataService>();
+              services.AddScoped<ICityService,CityService>();
+              services.AddScoped<IHospitalService,HospitalService>();
+              services.AddScoped<IWorkplaceService,WorkPlaceService>();
+              services.AddScoped<IEngineeringUnitsService,EngineeringUnitsService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });

@@ -42,6 +42,7 @@ namespace api.Entities
         public int WorkPlaceId{ get; set;}
         public WorkPlace WorkPlace { get; set;}
 
-        public ICollection< AnnualData> AnnualDatas { get; set;}
+        public ICollection< AnnualData> AnnualDatas{ get; set;}
+        public ICollection<Claims> Claims { get ; set;}
     }
 }

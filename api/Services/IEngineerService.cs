@@ -10,6 +10,8 @@ namespace api.Services
     public interface IEngineerService
     {
          Task <Response> Add (EngineerPersonEditDTO engineerPersonEditDTO);
+
+          Task <IEnumerable<Engineere>> GetAll();
          
     }
 }

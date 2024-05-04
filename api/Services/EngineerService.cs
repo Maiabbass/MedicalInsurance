@@ -29,7 +29,7 @@ namespace api.Services
                 using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
                 {
                         // add person data 
-                        Person person =new Person ()
+                        Person person =new Person()
            {
           
              FirstName = engineerPersonEditDTO.FirstName,
@@ -61,6 +61,7 @@ namespace api.Services
                 statusId = engineerPersonEditDTO.statusId,
                 SpecializationId = engineerPersonEditDTO.SpecializationId,
                 WorkPlaceId =engineerPersonEditDTO.WorkPlaceId
+               
                 
                };
 
@@ -81,8 +82,9 @@ namespace api.Services
             
         }
 
-    
-          
-
+        public Task<IEnumerable<Engineere>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

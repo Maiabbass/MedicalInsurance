@@ -13,8 +13,6 @@ namespace api.Repositories
         Task <Person?> Get(int Id);
 
         Task <int> Add (Person person);
-
-        
-
+        Task<int> Add(City city);
     }
 }
