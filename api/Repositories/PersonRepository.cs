@@ -44,20 +44,39 @@ namespace api.Repositories
              
         }
 
-        public Task<int> Add(City city)
-        {
-            throw new NotImplementedException();
-        }
-
+     
         public async Task<Person?> Get(int Id)
         {
             return await _dataContext.Persons.Where(x=>x.Id==Id).FirstOrDefaultAsync();
-            
         }
 
         public async Task<IEnumerable<Person>> GetAll()
         {
             return await _dataContext.Persons.ToListAsync();
+        }
+        public void   Delete(int Id)
+        {
+            
+            var rest = _dataContext.Persons.FirstOrDefault(x=>x.Id==Id);
+            if(rest!=null)
+            {
+                _dataContext.Persons.Remove(rest);
+                _dataContext.SaveChanges();
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        public Task<int> Add(City city)
+        {
+            throw new NotImplementedException();
         }
     }
 }

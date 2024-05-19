@@ -13,6 +13,10 @@ namespace api.Services
          Task <Response> Add (WorkplaceEditDTO workplaceEditDTO);
 
           Task <IEnumerable<WorkPlace>> GetAll();
+          Task<WorkPlace?> Get (int id);
+
+          public bool Delete(int Id);
+          public bool Update(int Id, Dictionary<string, object> updateFields);
          
     
     }

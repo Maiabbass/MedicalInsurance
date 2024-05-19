@@ -35,39 +35,48 @@ public class Persons : ControllerBase
                 return StatusCode(StatusCodes.Status500InternalServerError,
                    new Response {  ErrorMessage =response.ErrorMessage});
            }
+        
            return Ok (response);
 
     }
-
-    public Task<List<Person>> GetData()
-    {
-        return GetData(_personService);
-    }
-
-    [HttpGet]
-    public async Task <List<Person>> GetData(IPersonService _personService)
-    {
-           IEnumerable<Person> data = (IEnumerable<Person>)_personService.GetAll();
-
-            // إنشاء قائمة لتخزين البيانات
-            List<Person> dataList = new List<Person>();
-
-            // تكرار كل بيان في قائمة البيانات المسترجعة ووضعه في قائمة البيانات
-            foreach (var item in data)
-            {
-                dataList.Add(item);
-            }
-
-            // إرجاع قائمة البيانات المعالجة
-            return dataList;
-           
-           
-
-    }
-
-   
-      
     
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PersonForView>>> GetAll()
+    {
+         var Persons=await _personService.GetAll();
+        List<PersonForView> personForViews=new List<PersonForView> ();
+        foreach(var item in Persons)
+        {
+            PersonForView personForViewnewitem=new  PersonForView()
+            {
+              Id=item.Id,
+              FirstName=item.FirstName
+            };
+            personForViews.Add(personForViewnewitem);
+        }
+      return Ok(personForViews);
+    }
 
-
+[HttpGet("{Id}")]
+public async Task<ActionResult<Person?>>GetWithId( int Id){
+   return await _personService.GetWithId(Id);
 }
+
+
+
+[HttpDelete("{Id}")] 
+public ActionResult Delete(int Id){
+  try{
+     _personService.Delete(Id);
+    return NoContent();
+
+  }
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+                      new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
+  
+}
+
+

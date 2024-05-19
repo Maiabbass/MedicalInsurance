@@ -58,14 +58,43 @@ namespace api.Services
             
         }
 
-        public Task<IEnumerable<Hospital>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
+        
 
         Task<IEnumerable<Hospital>> IHospitalService.GetAll()
         {
             throw new NotImplementedException();
         }
+
+         public async Task<IEnumerable<Hospital>>GetAll()
+        {
+            return  await _unitOfWork.HospitalRepository.GetAll() ;
+        }
+
+              public async Task<Hospital?>Get(int Id)
+     {
+      return await _unitOfWork.HospitalRepository.Get(Id);
+     }
+      public bool Update(int Id, HospitalEditDTO hospital){
+           return _unitOfWork.HospitalRepository.Update(Id, hospital);
+        }
+
+        public bool Delete(int Id){
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+        _unitOfWork.HospitalRepository.DeleteByHospitalId(Id);
+      
+        _unitOfWork.HospitalRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException){
+                  return false;
+                 }}
+
+
+
     }
 }

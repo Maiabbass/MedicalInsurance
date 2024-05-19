@@ -29,5 +29,11 @@ namespace api.Repositories
 
            return  newRelation.Id;
         }
-    }
+
+        public void DeleteByPersonId(int PersonId)  {
+         var ras= _dataContext.Relations.Where(x=>x.PersonId==PersonId).ToList();
+         if(ras!=null){
+            _dataContext.Relations.RemoveRange(ras) ; 
+         }
+        }  }
 }

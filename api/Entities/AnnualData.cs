@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOS;
 
 namespace api.Entities
 {
@@ -44,5 +45,15 @@ namespace api.Entities
 
 
         public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }
+
+        internal object Select(Func<object, AnnualDataForView> value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static explicit operator List<object>(AnnualData? v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

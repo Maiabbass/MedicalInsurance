@@ -14,5 +14,10 @@ namespace api.Repositories
          Task <EngineeringUnits?> Get(int Id);
 
          Task <int> Add (EngineeringUnits person);
+         public void DeleteByEngineeringUnitsId(int EngineeringUnitsId);
+         public void DeleteByEngineeringUnitsId2(int EngineeringUnitsId);
+         public void Delete(int id);
+          public bool Update(int Id, string Name);
+
     } 
     }

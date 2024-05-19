@@ -6,6 +6,7 @@ using System.Transactions;
 using api.DTOS;
 using api.Entities;
 using api.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace api.Services
 {
@@ -81,12 +82,40 @@ namespace api.Services
              return response;
         }
 
-        public Task  GetAll()
+        public async Task<IEnumerable<Person>>  GetAll()
         {
-            return   _unitOfWork.PersonRepository.GetAll() ;
+            return  await _unitOfWork.PersonRepository.GetAll() ;
         }
 
-     
+     public async Task<Person?>GetWithId(int Id)
+     {
+      return await _unitOfWork.PersonRepository.Get(Id);
+     }
+
+
+
+     public bool Delete(int Id){
+
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+            _unitOfWork.AnnualDataRepository.DeleteByPersonId(Id);
+           _unitOfWork.RelationRepository.DeleteByPersonId(Id);
+      
+        _unitOfWork.PersonRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException)
+            {
+
+                  
+                  return false;
+                 }
+    
+     }
         
     }
 }

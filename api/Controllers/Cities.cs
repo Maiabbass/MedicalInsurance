@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.DTOS;
+using api.Entities;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,7 +40,47 @@ namespace api.Controllers
 
 
         }
+        [HttpPut("{Id}")]
+        public  ActionResult<bool> Update(int Id,[FromBody] CityEditDTO city){
+           bool result= _cityService.Update(Id,city);
+            if (result)
+            {
+return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
 
+        }
+
+
+[HttpGet("{Id}")]
+public async Task<ActionResult<City?>>Get( int Id){
+   return await _cityService.Get(Id);
+}
+
+
+
+[HttpGet]
+public async Task<ActionResult<City?>>GetAll(){
+   
+   var  data= await _cityService.GetAll();
+     return Ok(data);
+}
+
+
+   [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _cityService.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
 
         
     }

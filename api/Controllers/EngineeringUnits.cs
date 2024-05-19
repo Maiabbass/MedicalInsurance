@@ -37,6 +37,50 @@ namespace api.Controllers
 
 
         }
+
+        [HttpGet]
+        public async Task<ActionResult<EngineeringUnits?>>GetAll(){
+   
+          var  data= await _engineeringUnitsService.GetAll();
+     return Ok(data);
+}
+
+[HttpGet("{id}")]
+        public async Task<ActionResult<EngineeringUnits>>Get(int Id){
+   
+          var  data= await _engineeringUnitsService.Get(Id);
+     return Ok(data);
+}
+
+      [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _engineeringUnitsService.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
+
+
+   [HttpPut("{Id}")]
+         
+        public  ActionResult<bool> Update(int Id, string Name){
+           bool result= _engineeringUnitsService.Update(Id,Name);
+            if (result)
+            {
+            return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
+
+        }  
+
+
         
     }
 }

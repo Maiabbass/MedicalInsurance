@@ -8,6 +8,8 @@ using api.Entities;
 using api.Repositories;
 using api.Extensions;
 using api.Migrations;
+using static api.Repositories.AnnualDataRepository;
+using static api.DTOS.RegisterAnnualDataDTO;
 
 namespace api.Services
 {
@@ -16,7 +18,8 @@ namespace api.Services
 
          private readonly IUnitOfWork _unitOfWork;
 
-         public AnnualDataService(IUnitOfWork unitOfWork)
+
+        public AnnualDataService(IUnitOfWork unitOfWork)
          {
             _unitOfWork = unitOfWork;
          }
@@ -137,6 +140,61 @@ namespace api.Services
                  
             }
              return response;
+
+           
         }
+         
+
+        Task<Response> IAnnualDataService.Add(RegisterAnnualDataDTO registerAnnualDataDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+//data from tow tabel
+       public async Task<AnnualDataWithDetails?>Get(int AnnualDataId){
+        return await _unitOfWork.AnnualDataRepository.Get(AnnualDataId);
+       }
+
+       
+
+       
+
+       
+     public bool Delete(int Id){
+
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+        _unitOfWork.AnnualDataRepository.DeleteByAnnualDataId(Id);
+      
+        _unitOfWork.AnnualDataRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException)
+            {
+
+                  
+                  return false;
+                 }
+    
+     }
+     public bool Update(int Id,Dictionary<string, object> updateFields){
+           return _unitOfWork.AnnualDataRepository.Update(Id, updateFields);
+        }
+
+        public async Task<IEnumerable<AnnualDataWithDetails>> GetAll(){
+            return await _unitOfWork.AnnualDataRepository.GetAll();
+     
     }
-}
+     public bool Update(int Id,decimal Amount){
+           return _unitOfWork.AnnualDataRepository.Update(Id, Amount);
+        }
+    
+
+
+    }}

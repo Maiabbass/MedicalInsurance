@@ -13,6 +13,10 @@ namespace api.Services
          Task <Response> Add (CityEditDTO cityEditDTO);
 
           Task <IEnumerable<City>> GetAll();
+          Task<City?> Get (int id);
+          public bool Update(int Id, CityEditDTO city);
+          public bool Delete(int Id);
+
          
     }
 }

@@ -30,7 +30,7 @@ namespace api.Services
                         EngineeringUnits engineeringUnits =new EngineeringUnits()
            {
           
-            Number = engineeringUnitsEditDTO.Number,
+            Name = engineeringUnitsEditDTO.Name,
              
             
            };
@@ -55,14 +55,42 @@ namespace api.Services
             
         }
 
-        public Task<IEnumerable<EngineeringUnits>> GetAll()
+        public async Task<IEnumerable<EngineeringUnits>> GetAll()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.EngineeringUnitsRepository.GetAll();
+        }
+
+        public  async Task<EngineeringUnits?> Get(int Id){
+            return await _unitOfWork.EngineeringUnitsRepository.Get(Id);
         }
 
         Task<IEnumerable<EngineeringUnits>> IEngineeringUnitsService.GetAll()
         {
             throw new NotImplementedException();
+        }
+
+        public bool Delete(int Id){
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+        _unitOfWork.EngineeringUnitsRepository.DeleteByEngineeringUnitsId(Id);
+        _unitOfWork.EngineeringUnitsRepository.DeleteByEngineeringUnitsId2(Id);
+      
+        _unitOfWork.EngineeringUnitsRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException){
+                  return false;
+                 }}
+
+
+        public bool Update(int Id, string Name){
+             return _unitOfWork.EngineeringUnitsRepository.Update(Id, Name);
+
+
         }
     }
 } 

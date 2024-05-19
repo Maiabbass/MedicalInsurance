@@ -38,5 +38,48 @@ namespace api.Controllers
 
         }
 
+        [HttpGet("{Id}")]
+         public async Task<ActionResult<Workplaces?>>Get( int Id){
+            var data= await _workplaceService.Get(Id);
+            return Ok(data);
+}
+
+
+
+[HttpGet]
+public async Task<ActionResult<Workplaces?>>GetAll(){
+   
+   var  data= await _workplaceService.GetAll();
+     return Ok(data);
+}
+
+    [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _workplaceService.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
+
+
+     [HttpPut("{Id}")]
+         
+        public  ActionResult<bool> Update(int Id, Dictionary<string, object> updateFields){
+           bool result= _workplaceService.Update(Id,updateFields);
+            if (result)
+            {
+            return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
+
+        }  
+
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.DTOS;
+using api.Entities;
 
 namespace api.Services
 {
@@ -11,7 +12,11 @@ namespace api.Services
         object Person { get; }
 
         Task <Response> Add (PersonEditDTO  personEditDTO);
-        Task GetAll();
+        Task<IEnumerable<Person>> GetAll();
+
+        Task<Person?>GetWithId(int Id);
+
+        public bool Delete(int Id);
        
     }
 }

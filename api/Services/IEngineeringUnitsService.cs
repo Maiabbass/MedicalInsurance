@@ -13,6 +13,11 @@ namespace api.Services
          Task <Response> Add (EngineeringUnitsEditDTO  engineeringUnitsEditDTO );
 
           Task <IEnumerable<EngineeringUnits>> GetAll();
+          
+
+       Task<EngineeringUnits?> Get(int Id);
+       public bool Delete(int Id);
+        public bool Update(int Id, string Name);
          
     
     }

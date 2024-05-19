@@ -18,7 +18,7 @@ namespace api.Entities
         {
             this.Id = id;
             this.Name= name ; 
-            
+            Hospitals=new List<Hospital>();
    
         }
         public int Id { get; set; }

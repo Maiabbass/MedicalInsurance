@@ -9,7 +9,7 @@ namespace api.Entities
     public class Claims
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Claims(int id, string firstName  ,string fatherName,string matherName, string lastName, string surgicalPro, int hospitalId, DateTime loginDate, DateTime exitDate, decimal totalPrice, decimal additionalPrice, decimal approvedPrice, string enduranceRatio, bool trust)
+        public Claims(int id, string firstName  ,string fatherName,string matherName, string lastName, string surgicalName, int hospitalId, DateTime loginDate, DateTime exitDate, decimal totalPrice, decimal additionalPrice, decimal approvedPrice, string enduranceRatio, bool trust)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             this.Id = id;
@@ -17,7 +17,7 @@ namespace api.Entities
     this.FatherName = fatherName;
     this.MatherName = matherName;
     this.LastName = lastName;
-    this.SurgicalPro = surgicalPro;
+    this.SurgicalName = surgicalName;
     this.HospitalId = hospitalId;
     this.LoginDate = loginDate;
     this.ExitDate = exitDate;
@@ -35,7 +35,9 @@ namespace api.Entities
          public string LastName { get; set; }
         public string MatherName { get; set; }
 
-        public string SurgicalPro { get; set; }
+        public string SurgicalName { get; set; }
+
+         public string SurgicalType { get; set; }
 
 
         public DateTime LoginDate { get; set; }

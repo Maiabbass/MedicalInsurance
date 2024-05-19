@@ -14,5 +14,8 @@ namespace api.Repositories
          Task <WorkPlace?> Get(int Id);
 
          Task <int> Add (WorkPlace person);
+          public void DeleteByWorkPlaceId(int WorkPlaceId);
+          public void Delete (int Id);
+          public bool Update(int Id, Dictionary<string, object> updateFields);
     }
     }

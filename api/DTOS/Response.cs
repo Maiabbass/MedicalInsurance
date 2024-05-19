@@ -11,6 +11,6 @@ namespace api.DTOS
 
         public int? InsertedId { get; set; }
         public string? ErrorMessage { get; set; }
-
+        public string Status { get; internal set; }
     }
 }

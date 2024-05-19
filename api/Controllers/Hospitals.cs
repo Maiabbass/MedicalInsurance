@@ -39,7 +39,47 @@ namespace api.Controllers
 
 
         }
+[HttpGet("{Id}")]
+public async Task<ActionResult<Hospitals?>>Get( int Id){
+   var data= await _hospitalService.Get(Id);
+   return Ok(data);
+}
 
+
+
+[HttpGet()]
+public async Task<ActionResult<Hospitals?>>GetAll(){
+   
+   var  data= await _hospitalService.GetAll();
+     return Ok(data);
+}
+
+ [HttpPut("{Id}")]
+        public  ActionResult<bool> Update(int Id,[FromBody] HospitalEditDTO hospital){
+           bool result= _hospitalService.Update(Id,hospital);
+            if (result)
+            {
+return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
+
+        }
+
+
+         [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _hospitalService.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
 
         
     }

@@ -2444,11 +2444,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
+      "projectUniqueName": "c:\\midpro\\MedicalInsurance\\api\\api.csproj",
       "projectName": "api",
-      "projectPath": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
+      "projectPath": "c:\\midpro\\MedicalInsurance\\api\\api.csproj",
       "packagesPath": "C:\\Users\\Zaher\\.nuget\\packages\\",
-      "outputPath": "C:\\midpro\\MedicalInsurance\\api\\obj\\",
+      "outputPath": "c:\\midpro\\MedicalInsurance\\api\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Zaher\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2516,13 +2516,5 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.419\\RuntimeIdentifierGraph.json"
       }
     }
-  },
-  "logs": [
-    {
-      "code": "Undefined",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Problem reading the cache file C:\\midpro\\MedicalInsurance\\api\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
-    }
-  ]
+  }
 }

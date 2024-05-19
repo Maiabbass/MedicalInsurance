@@ -10,5 +10,6 @@ namespace api.Repositories
     {
         
         Task<int> Add (Relation relation);
+        public void DeleteByPersonId(int PersonId) ;
     }
 }

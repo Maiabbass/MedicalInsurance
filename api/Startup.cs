@@ -74,8 +74,9 @@ namespace API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
-            });
+              });
+
+            
         }
     }
 }

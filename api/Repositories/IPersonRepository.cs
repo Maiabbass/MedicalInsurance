@@ -14,5 +14,6 @@ namespace api.Repositories
 
         Task <int> Add (Person person);
         Task<int> Add(City city);
+        void Delete(int Id);
     }
 }

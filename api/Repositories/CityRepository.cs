@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.DTOS;
 using api.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,5 +42,36 @@ namespace api.Repositories
         {
              return await _dataContext.Cities.ToListAsync();
         }
+
+        public bool Update(int Id, CityEditDTO city)
+        {
+       var databaseEntity= _dataContext.Cities.FirstOrDefault(x=>x.Id==Id);
+       if(databaseEntity==null){
+        
+         return false;
+
+       }
+       databaseEntity.Name=city.Name;
+
+       return _dataContext.SaveChanges()>0;
+      
+        }
+
+          public void DeleteByCityId(int CityId){
+         var rest=   _dataContext.Hospitals.Where(x=>x.CityId==CityId).ToList();
+         if(rest!=null){
+            _dataContext.Hospitals.RemoveRange(rest);
+            _dataContext.SaveChanges();
+         }}
+
+         public void Delete(int Id){
+            var result = _dataContext.Cities.Where(x=>x.Id==Id).ToList();
+            if (result!=null){
+                 _dataContext.Cities.RemoveRange(result);
+                 _dataContext.SaveChanges();
+            }
+        }
+
+        
     }
 }

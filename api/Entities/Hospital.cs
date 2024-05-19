@@ -12,7 +12,7 @@ namespace api.Entities
         }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Hospital(int id, string name, bool enabled, bool inside,int cityId)
+        public Hospital(int id, string name, bool enabled, bool inside,int cityId, string address)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         {
@@ -21,12 +21,14 @@ namespace api.Entities
     this.Enabled = enabled;
     this.Inside= inside;
     this.CityId=cityId;
+    this.Address= address;
 
    
         }
         public int Id { get; set; }
         
         public string Name  { get; set; }
+        public string Address { get; set; }
 
         public bool Enabled { get; set; }
 

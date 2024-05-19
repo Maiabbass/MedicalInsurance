@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using api.Data;
 using api.DTOS;
 using api.Entities;
 using api.Repositories;
@@ -59,14 +60,42 @@ namespace api.Services
             
         }
 
-        public Task<IEnumerable<WorkPlace>> GetAll()
+        public async Task<IEnumerable<WorkPlace>> GetAll()
         {
-            throw new NotImplementedException();
+          return await _unitOfWork.WorkplaceRepository.GetAll();
         }
 
         Task<IEnumerable<WorkPlace>> IWorkplaceService.GetAll()
         {
             throw new NotImplementedException();
         }
+          public async Task<WorkPlace?> Get(int Id)
+        {
+              return await _unitOfWork.WorkplaceRepository.Get(Id);
+        }
+
+          public bool Delete(int Id){
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+        _unitOfWork.WorkplaceRepository.DeleteByWorkPlaceId(Id);
+      
+        _unitOfWork.WorkplaceRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException){
+                  return false;
+                 }}
+
+
+
+
+             public bool Update(int Id, Dictionary<string, object> updateFields) {
+             return _unitOfWork.WorkplaceRepository.Update(Id, updateFields);
+             }   
+
     }
 } 
