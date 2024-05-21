@@ -65,10 +65,12 @@ namespace api.Services
           return await _unitOfWork.WorkplaceRepository.GetAll();
         }
 
+/*
         Task<IEnumerable<WorkPlace>> IWorkplaceService.GetAll()
         {
             throw new NotImplementedException();
         }
+        */
           public async Task<WorkPlace?> Get(int Id)
         {
               return await _unitOfWork.WorkplaceRepository.Get(Id);

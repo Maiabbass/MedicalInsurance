@@ -7,7 +7,6 @@ using api.DTOS;
 using api.Entities;
 using api.Repositories;
 using api.Extensions;
-using api.Migrations;
 using static api.Repositories.AnnualDataRepository;
 using static api.DTOS.RegisterAnnualDataDTO;
 

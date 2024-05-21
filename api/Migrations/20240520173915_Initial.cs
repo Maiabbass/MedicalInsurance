@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace api.Migrations
 {
-    public partial class initialM01 : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,7 +44,7 @@ namespace api.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Number = table.Column<int>(type: "int", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,8 +119,9 @@ namespace api.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Stat = table.Column<bool>(type: "bit", nullable: false),
-                    Stat2 = table.Column<bool>(type: "bit", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Enabled = table.Column<bool>(type: "bit", nullable: false),
+                    Inside = table.Column<bool>(type: "bit", nullable: false),
                     CityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -187,34 +188,6 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Claims",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SurgicalPro = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoginDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExitDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AdditionalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    ApprovedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EnduranceRatio = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Trust = table.Column<bool>(type: "bit", nullable: false),
-                    HospitalId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Claims", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Claims_Hospitals_HospitalId",
-                        column: x => x.HospitalId,
-                        principalTable: "Hospitals",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Engineeres",
                 columns: table => new
                 {
@@ -261,10 +234,11 @@ namespace api.Migrations
                     Year = table.Column<int>(type: "int", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ExAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     EngineereId = table.Column<int>(type: "int", nullable: false),
                     PayMethodId = table.Column<int>(type: "int", nullable: false),
-                    WorkPlaceId = table.Column<int>(type: "int", nullable: false),
-                    EngineeringUnitsId = table.Column<int>(type: "int", nullable: false)
+                    WorkPlaceId = table.Column<int>(type: "int", nullable: true),
+                    EngineeringUnitsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -294,12 +268,52 @@ namespace api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Claims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SurgicalName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SurgicalType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LoginDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExitDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    AdditionalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ApprovedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EnduranceRatio = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Trust = table.Column<bool>(type: "bit", nullable: false),
+                    HospitalId = table.Column<int>(type: "int", nullable: false),
+                    EngId = table.Column<int>(type: "int", nullable: false),
+                    EngineereeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Claims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Claims_Engineeres_EngineereeId",
+                        column: x => x.EngineereeId,
+                        principalTable: "Engineeres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Claims_Hospitals_HospitalId",
+                        column: x => x.HospitalId,
+                        principalTable: "Hospitals",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Relations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EngineereId = table.Column<int>(type: "int", nullable: false),
                     PersonId = table.Column<int>(type: "int", nullable: false),
                     RelationTypeId = table.Column<int>(type: "int", nullable: false)
@@ -325,6 +339,43 @@ namespace api.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AnnualDataDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    AnnualDataId = table.Column<int>(type: "int", nullable: false),
+                    IsEngineer = table.Column<bool>(type: "bit", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnnualDataDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnnualDataDetails_AnnualDatas_AnnualDataId",
+                        column: x => x.AnnualDataId,
+                        principalTable: "AnnualDatas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnnualDataDetails_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnnualDataDetails_AnnualDataId",
+                table: "AnnualDataDetails",
+                column: "AnnualDataId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnnualDataDetails_PersonId",
+                table: "AnnualDataDetails",
+                column: "PersonId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AnnualDatas_EngineereId",
                 table: "AnnualDatas",
@@ -344,6 +395,11 @@ namespace api.Migrations
                 name: "IX_AnnualDatas_WorkPlaceId",
                 table: "AnnualDatas",
                 column: "WorkPlaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Claims_EngineereeId",
+                table: "Claims",
+                column: "EngineereeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Claims_HospitalId",
@@ -402,7 +458,7 @@ namespace api.Migrations
                 name: "AgeSegments");
 
             migrationBuilder.DropTable(
-                name: "AnnualDatas");
+                name: "AnnualDataDetails");
 
             migrationBuilder.DropTable(
                 name: "Claims");
@@ -411,16 +467,19 @@ namespace api.Migrations
                 name: "Relations");
 
             migrationBuilder.DropTable(
-                name: "PayMethods");
+                name: "AnnualDatas");
 
             migrationBuilder.DropTable(
                 name: "Hospitals");
 
             migrationBuilder.DropTable(
+                name: "RelationTypes");
+
+            migrationBuilder.DropTable(
                 name: "Engineeres");
 
             migrationBuilder.DropTable(
-                name: "RelationTypes");
+                name: "PayMethods");
 
             migrationBuilder.DropTable(
                 name: "Cities");

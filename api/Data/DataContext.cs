@@ -1,11 +1,13 @@
 
 
 using api.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext<User>
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public DataContext(DbContextOptions options) :base (options)
@@ -50,24 +52,24 @@ namespace api.Data
             .WithOne(ed => ed.Person)
             .HasForeignKey<Engineere>(ed => ed.Id);
 
-           builder.Entity<EngineeringUnits>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.EngineeringUnits).OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<EngineeringUnits>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.EngineeringUnits).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<WorkPlace>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Person>()
-    .HasOne(r => r.Engineere)
-    .WithOne(e => e.Person)
-    .OnDelete(DeleteBehavior.NoAction);
+            .HasOne(r => r.Engineere)
+            .WithOne(e => e.Person)
+            .OnDelete(DeleteBehavior.NoAction);
 
             
              builder.Entity<WorkPlace>().HasMany(tg=>tg.Engineeres).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
 
 
 
-              builder.Entity<Person>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
-              builder.Entity<Engineere>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Engineere).OnDelete(DeleteBehavior.NoAction);
+             builder.Entity<Person>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
+             builder.Entity<Engineere>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Engineere).OnDelete(DeleteBehavior.NoAction);
 
 
 
-                builder.Entity<Person>().HasMany(tg=>tg.AnnualDataDetails).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
+             builder.Entity<Person>().HasMany(tg=>tg.AnnualDataDetails).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
         }
 
 
