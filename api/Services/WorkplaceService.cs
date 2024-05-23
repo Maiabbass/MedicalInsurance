@@ -65,7 +65,16 @@ namespace api.Services
           return await _unitOfWork.WorkplaceRepository.GetAll();
         }
 
+<<<<<<< HEAD
         
+=======
+/*
+        Task<IEnumerable<WorkPlace>> IWorkplaceService.GetAll()
+        {
+            throw new NotImplementedException();
+        }
+        */
+>>>>>>> origin/backend2
           public async Task<WorkPlace?> Get(int Id)
         {
               return await _unitOfWork.WorkplaceRepository.Get(Id);

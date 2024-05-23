@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
-using api.Migrations;
 using Microsoft.EntityFrameworkCore;
 using static api.DTOS.RegisterAnnualDataDTO;
 

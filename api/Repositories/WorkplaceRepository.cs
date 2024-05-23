@@ -46,6 +46,12 @@ namespace api.Repositories
              return await _dataContext.WorkPlaces.ToListAsync();
         }
 
+        /*
+        Task<IEnumerable<WorkPlace>> IWorkplaceRepository.GetAll()
+        {
+            throw new NotImplementedException();
+        }
+        */
 
            public void DeleteByWorkPlaceId(int WorkPlaceId){
          var rest=   _dataContext.AnnualDatas.Where(x=>x.WorkPlaceId==WorkPlaceId).ToList();

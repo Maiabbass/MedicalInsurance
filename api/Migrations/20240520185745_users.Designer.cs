@@ -9,11 +9,11 @@ using api.Data;
 
 #nullable disable
 
-namespace api.Data.Migrations
+namespace api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240427090432_modified4")]
-    partial class modified4
+    [Migration("20240520185745_users")]
+    partial class users
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -158,20 +158,42 @@ namespace api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EngId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EngineereeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("ExitDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FullName")
+                    b.Property<string>("FatherName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("HospitalId")
                         .HasColumnType("int");
 
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("LoginDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SurgicalPro")
+                    b.Property<string>("MatherName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SurgicalName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SurgicalType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -182,6 +204,8 @@ namespace api.Data.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EngineereeId");
 
                     b.HasIndex("HospitalId");
 
@@ -227,8 +251,9 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("Number")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -257,18 +282,22 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CityId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Inside")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Stat")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Stat2")
-                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -501,11 +530,19 @@ namespace api.Data.Migrations
 
             modelBuilder.Entity("api.Entities.Claims", b =>
                 {
+                    b.HasOne("api.Entities.Engineere", "Engineeree")
+                        .WithMany("Claims")
+                        .HasForeignKey("EngineereeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("api.Entities.Hospital", "Hospital")
                         .WithMany("Claims")
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Engineeree");
 
                     b.Navigation("Hospital");
                 });
@@ -618,6 +655,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Engineere", b =>
                 {
                     b.Navigation("AnnualDatas");
+
+                    b.Navigation("Claims");
 
                     b.Navigation("Relations");
                 });
