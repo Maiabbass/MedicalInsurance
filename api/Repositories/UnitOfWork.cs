@@ -30,8 +30,9 @@ namespace api.Repositories
         public IHospitalRepository HospitalRepository=>new HospitalRepository(_dataContext);
         public IWorkplaceRepository WorkplaceRepository=>new WorkplaceRepository(_dataContext);
         public IEngineeringUnitsRepository EngineeringUnitsRepository=>new EngineeringUnitsRepository(_dataContext);
+        public IEngineeringeDeparRepositry EngineeringeDeparRepositry => new EngineeringeDeparRepositry(_dataContext);
 
-        
+        public ISurgicalProceduresRepository SurgicalProceduresRepository => new SurgicalProceduresRepository(_dataContext);
 
         public Task<bool> Complete()
         {

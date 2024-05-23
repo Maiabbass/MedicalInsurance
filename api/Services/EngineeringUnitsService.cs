@@ -64,16 +64,14 @@ namespace api.Services
             return await _unitOfWork.EngineeringUnitsRepository.Get(Id);
         }
 
-        Task<IEnumerable<EngineeringUnits>> IEngineeringUnitsService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
 
         public bool Delete(int Id){
       try
       {
          using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
          {
+            
+          
         _unitOfWork.EngineeringUnitsRepository.DeleteByEngineeringUnitsId(Id);
         _unitOfWork.EngineeringUnitsRepository.DeleteByEngineeringUnitsId2(Id);
       

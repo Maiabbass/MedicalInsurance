@@ -41,14 +41,27 @@ namespace api.Repositories
              return await _dataContext.EngineeringUnits.ToListAsync();
         }
 
-        
+
+
+       
+
 
            public void DeleteByEngineeringUnitsId(int EngineeringUnitsId){
-         var rest=   _dataContext.WorkPlaces.Where(x=>x.EngineeringUnitsId==EngineeringUnitsId).ToList();
-         if(rest!=null){
+              var engineers = _dataContext.Engineeres.Where(x => x.WorkPlace.EngineeringUnitsId == EngineeringUnitsId).ToList();
+             foreach (var engineer in engineers){
+               
+               engineer.WorkPlaceId = null;
+    
+             }
+               _dataContext.SaveChanges();
+   
+              var rest=   _dataContext.WorkPlaces.Where(x=>x.EngineeringUnitsId==EngineeringUnitsId).ToList();
+             if(rest!=null){
             _dataContext.WorkPlaces.RemoveRange(rest);
             _dataContext.SaveChanges();
          }}
+
+
 
            public void DeleteByEngineeringUnitsId2(int EngineeringUnitsId){
          var rest=   _dataContext.AnnualDatas.Where(x=>x.EngineeringUnitsId==EngineeringUnitsId).ToList();
@@ -57,6 +70,8 @@ namespace api.Repositories
             _dataContext.SaveChanges();
          }}
 
+
+
          public void Delete(int Id){
             var result = _dataContext.EngineeringUnits.Where(x=>x.Id==Id).ToList();
             if (result!=null){
@@ -64,6 +79,9 @@ namespace api.Repositories
                  _dataContext.SaveChanges();
             }
         }
+
+
+
 
         public bool Update(int Id, string Name)
         {
@@ -77,6 +95,11 @@ namespace api.Repositories
 
        return _dataContext.SaveChanges()>0;
       
+        }
+
+        public void DeleteByWorkPlaceId(int WorkPlaceId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -73,10 +73,32 @@ public ActionResult Delete(int Id){
   }
   catch (Exception ex){
     return StatusCode(StatusCodes.Status500InternalServerError,
-                      new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+                      new Response { Status = "Error", ErrorMessage = ex.Message }) ;}}
+
+
+
+
+
+
+      
+     [HttpPut("{Id}")]
+
+
+     public  ActionResult<bool> Update(int Id,[FromBody]  PersonEditDTO PersonEditDTO){
+           bool result= _personService.Update(Id,PersonEditDTO);
+            if (result)
+            {
+return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
+
+        }
     
   }
+
   
-}
+
 
 

@@ -116,6 +116,9 @@ namespace api.Services
                  }
     
      }
+      public bool Update(int Id, PersonEditDTO personEditDTO){
+           return _unitOfWork.PersonRepository.Update(Id, personEditDTO);
+        }
         
     }
 }

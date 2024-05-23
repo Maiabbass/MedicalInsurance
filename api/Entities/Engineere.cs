@@ -39,7 +39,7 @@ namespace api.Entities
         public int  SpecializationId{ get; set;}
         public Specialization Specialization{ get; set;}
 
-        public int WorkPlaceId{ get; set;}
+        public int? WorkPlaceId{ get; set;}
         public WorkPlace WorkPlace { get; set;}
 
         public ICollection< AnnualData> AnnualDatas{ get; set;}

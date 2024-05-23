@@ -62,11 +62,21 @@ public async Task<ActionResult<City?>>Get( int Id){
 
 
 [HttpGet]
-public async Task<ActionResult<City?>>GetAll(){
-   
-   var  data= await _cityService.GetAll();
-     return Ok(data);
-}
+public async Task<ActionResult<IEnumerable<CityEditDTO>>> GetAll()
+    {
+         var data=await _cityService.GetAll();
+        List<CityEditDTO> dataForViews=new List<CityEditDTO> ();
+        foreach(var item in data)
+        {
+            CityEditDTO ForViewnewitem=new  CityEditDTO()
+            {
+              Id=item.Id,
+              Name=item.Name,
+            };
+            dataForViews.Add(ForViewnewitem);
+        }
+      return Ok(dataForViews);
+    }
 
 
    [HttpDelete("{Id}")] 

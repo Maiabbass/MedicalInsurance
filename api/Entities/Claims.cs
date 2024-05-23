@@ -9,7 +9,7 @@ namespace api.Entities
     public class Claims
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Claims(int id, string firstName  ,string fatherName,string matherName, string lastName, string surgicalName, int hospitalId, DateTime loginDate, DateTime exitDate, decimal totalPrice, decimal additionalPrice, decimal approvedPrice, string enduranceRatio, bool trust)
+        public Claims(int id, string firstName  ,string fatherName,string matherName, string lastName, int ensuranceNumber, int hospitalId, DateTime loginDate, DateTime exitDate,decimal company_fees , decimal totalPrice,decimal non_AddForPerson, decimal non_Add, decimal approvedPrice, string enduranceRatio, bool trust)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             this.Id = id;
@@ -17,12 +17,15 @@ namespace api.Entities
     this.FatherName = fatherName;
     this.MatherName = matherName;
     this.LastName = lastName;
-    this.SurgicalName = surgicalName;
+   
     this.HospitalId = hospitalId;
+    this.Company_fees=company_fees ;
+    this.EnsuranceNumber=ensuranceNumber;
     this.LoginDate = loginDate;
     this.ExitDate = exitDate;
     this.TotalPrice = totalPrice;
-    this.AdditionalPrice = additionalPrice;
+    this.non_Add = non_Add;
+    this.non_AddForPerson=non_AddForPerson;
     this.ApprovedPrice = approvedPrice;
     this.EnduranceRatio = enduranceRatio;
     this.Trust= trust;
@@ -35,9 +38,8 @@ namespace api.Entities
          public string LastName { get; set; }
         public string MatherName { get; set; }
 
-        public string SurgicalName { get; set; }
-
-         public string SurgicalType { get; set; }
+       
+         public int EnsuranceNumber { get; set; }
 
 
         public DateTime LoginDate { get; set; }
@@ -50,11 +52,19 @@ namespace api.Entities
 
         [Column(TypeName = "decimal(18,2)")]
         
-        public decimal AdditionalPrice { get; set; }
+        public decimal Company_fees { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         
         public decimal ApprovedPrice { get; set; }
+
+         [Column(TypeName = "decimal(18,2)")]
+        
+        public decimal non_Add { get; set; }
+
+           [Column(TypeName = "decimal(18,2)")]
+        
+        public decimal non_AddForPerson { get; set; }
         
         public string EnduranceRatio { get; set; }
 
@@ -65,6 +75,10 @@ namespace api.Entities
 
         public int EngId {get ; set ;}
         public  Engineere Engineeree{ get ; set ;}
+
+        public int SurgicalProceduresId { get; set; }
+
+        public SurgicalProcedures SurgicalProcedures { get; set; }
 
 
         

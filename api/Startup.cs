@@ -50,6 +50,8 @@ namespace API
               services.AddScoped<IHospitalService,HospitalService>();
               services.AddScoped<IWorkplaceService,WorkPlaceService>();
               services.AddScoped<IEngineeringUnitsService,EngineeringUnitsService>();
+              services.AddScoped<IEngineeringeDeparServices,EngineeringeDeparServices>();
+              services.AddScoped<ISurgicalProceduresServices,SurgicalProceduresServices>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
@@ -74,6 +76,7 @@ namespace API
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
               });
 
             

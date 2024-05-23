@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOS;
 using api.Entities;
 
 namespace api.Repositories
@@ -16,6 +17,6 @@ namespace api.Repositories
          Task <int> Add (WorkPlace person);
           public void DeleteByWorkPlaceId(int WorkPlaceId);
           public void Delete (int Id);
-          public bool Update(int Id, Dictionary<string, object> updateFields);
-    }
-    }
+          public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO); }}
+    
+    

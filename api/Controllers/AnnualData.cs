@@ -129,9 +129,11 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
 
 
 
-   [HttpPut("{Id}")]
-        public  ActionResult<bool> Update(int Id, Dictionary<string, object> updateFields){
-           bool result= _AnnualDataService.Update(Id,updateFields);
+        [HttpPut]
+        [Route("UpdateAllFields/{Id}")]
+   
+        public  ActionResult<bool> UpdateAllFields(int Id,  AnnualDataForView annualDataForView){
+           bool result= _AnnualDataService.Update(Id,annualDataForView);
             if (result)
             {
             return  Ok(result);
@@ -145,10 +147,11 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
 
 
 
-         [HttpPut("{Id}")]
+          [HttpPut]
+          [Route("UpdateAmount/{Id}")]
          
-        public  ActionResult<bool> Update(int Id, decimal Amount){
-           bool result= _AnnualDataService.Update(Id,Amount);
+        public  ActionResult<bool> UpdateAmount(int Id, AnnualDataDetailForView annualDataDetailForView){
+           bool result= _AnnualDataService.Update(Id,annualDataDetailForView);
             if (result)
             {
             return  Ok(result);

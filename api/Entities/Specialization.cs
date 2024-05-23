@@ -23,5 +23,7 @@ namespace api.Entities
         public string Name { get; set; }
 
         public ICollection<Engineere>Engineeres{get; set;}
+
+        public ICollection<EngineeringeDepar>EngineeringeDepars { get; set; }
     }
 }

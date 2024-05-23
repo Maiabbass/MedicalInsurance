@@ -33,6 +33,9 @@ namespace api.Data
          public DbSet<RelationType> RelationTypes { get; set; }
 
          public DbSet<AnnualDataDetail> AnnualDataDetails{get;set;}
+         public DbSet<SurgicalProcedures> SurgicalProcedures { get; set; }
+         public DbSet<EngineeringeDepar> EngineeringeDepars { get; set;}
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

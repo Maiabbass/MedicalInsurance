@@ -17,6 +17,7 @@ namespace api.Services
         Task<Person?>GetWithId(int Id);
 
         public bool Delete(int Id);
+         public bool Update(int Id, PersonEditDTO personEditDTO);
        
     }
 }

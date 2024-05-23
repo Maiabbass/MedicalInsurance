@@ -48,19 +48,7 @@ namespace api.Repositories
         }
 
 
-        public bool Update(int Id, CityEditDTO city)
-        {
-       var databaseEntity= _dataContext.Cities.FirstOrDefault(x=>x.Id==Id);
-       if(databaseEntity==null){
-        
-         return false;
-
-       }
-       databaseEntity.Name=city.Name;
-
-       return _dataContext.SaveChanges()>0;
       
-        }
 
 
         public bool Update(int Id, HospitalEditDTO hospital)

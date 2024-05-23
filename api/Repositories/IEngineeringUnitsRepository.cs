@@ -16,6 +16,7 @@ namespace api.Repositories
          Task <int> Add (EngineeringUnits person);
          public void DeleteByEngineeringUnitsId(int EngineeringUnitsId);
          public void DeleteByEngineeringUnitsId2(int EngineeringUnitsId);
+         public void DeleteByWorkPlaceId(int WorkPlaceId);
          public void Delete(int id);
           public bool Update(int Id, string Name);
 

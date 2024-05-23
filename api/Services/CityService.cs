@@ -59,10 +59,7 @@ namespace api.Services
 
         
 
-        Task<IEnumerable<City>> ICityService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
+     
         public bool Update(int Id, CityEditDTO city){
            return _unitOfWork.CityRepository.Update(Id, city);
         }

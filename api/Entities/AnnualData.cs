@@ -34,7 +34,7 @@ namespace api.Entities
         public int EngineereId { get; set;}
         public Engineere Engineere {get; set;}
 
-        public int PayMethodId{ get; set;}
+        public int? PayMethodId{ get; set;}
         public PayMethod PayMethod { get; set;}
 
         public int? WorkPlaceId { get; set;}
