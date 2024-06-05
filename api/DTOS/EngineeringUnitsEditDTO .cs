@@ -10,5 +10,8 @@ namespace api.DTOS
         #nullable disable
         public  int  Id { get; set; }
         public string Name { get; set; }
+        public string Emailpresident{ get; set; }
+        public string Namepresident{ get; set; }
+        public string Phonepresident{ get; set; }
     }
 }

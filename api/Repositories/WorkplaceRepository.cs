@@ -25,6 +25,7 @@ namespace api.Repositories
                Name=workPlace.Name,
                Location=workPlace.Location,
                EngineeringUnitsId=workPlace.EngineeringUnitsId,
+               Phone=workPlace.Phone,
               
              };
 #pragma warning restore IDE0090 // Use 'new(...)'

@@ -27,6 +27,26 @@ public class Persons : ControllerBase
     [HttpPost]
     public async Task <ActionResult<Response>> AddPerson([FromBody] PersonEditDTO  personEditDTO)
     {
+
+            var existingPerson =await  _personService.GetEngId(personEditDTO.EngineereId);
+    
+            if (existingPerson == null){
+              personEditDTO.Subscrib=true;
+            }
+
+
+            else{
+              personEditDTO.Affiliate=true;
+            }
+
+            bool isInClaims = await _personService.IsEnsuranceNumberInClaimsAsync(personEditDTO.EnsuranceNumber);
+          if (isInClaims){
+            
+            personEditDTO.Beneficiary=true;
+          }
+   
+   
+    
      
            
             var response = await _personService.Add(personEditDTO);

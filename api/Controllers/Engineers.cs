@@ -29,9 +29,11 @@ namespace api.Controllers
          [HttpPost]
         public async Task <ActionResult<Response>> AddEngineer([FromBody] EngineerPersonEditDTO   engineerPersonEditDTO)
         {
+
+              engineerPersonEditDTO.PersonId = 0;
            
     
-                var response=  await _engineerService.Add(engineerPersonEditDTO);
+              var response=  await _engineerService.Add(engineerPersonEditDTO);
                if (response.ErrorMessage!=null)
                {
                     return StatusCode(StatusCodes.Status500InternalServerError,

@@ -8,15 +8,13 @@ namespace api.Entities
 {
     public class Claims
     {
+        internal object valueObject;
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public Claims(int id, string firstName  ,string fatherName,string matherName, string lastName, int ensuranceNumber, int hospitalId, DateTime loginDate, DateTime exitDate,decimal company_fees , decimal totalPrice,decimal non_AddForPerson, decimal non_Add, decimal approvedPrice, string enduranceRatio, bool trust)
+        public Claims(int id, string ensuranceNumber, int hospitalId, DateTime? loginDate, DateTime? exitDate,decimal company_fees , decimal totalPrice,decimal non_AddForPerson, decimal non_Add, decimal approvedPrice, decimal enduranceRatio, bool trust)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             this.Id = id;
-    this.FirstName = firstName;
-    this.FatherName = fatherName;
-    this.MatherName = matherName;
-    this.LastName = lastName;
+   
    
     this.HospitalId = hospitalId;
     this.Company_fees=company_fees ;
@@ -33,19 +31,13 @@ namespace api.Entities
         }
         public int Id { get; set; }
 
-        public string FirstName { get; set; }
-         public string FatherName { get; set; }
-         public string LastName { get; set; }
-        public string MatherName { get; set; }
 
-       
-         public int EnsuranceNumber { get; set; }
+        public string EnsuranceNumber { get; set; }
 
+         
+        public  string FullName{ get; set; }
 
-        public DateTime LoginDate { get; set; }
-
-        public DateTime ExitDate { get; set; }
-        
+ 
         [Column(TypeName = "decimal(18,2)")]
 
         public decimal TotalPrice { get; set; }
@@ -65,13 +57,19 @@ namespace api.Entities
            [Column(TypeName = "decimal(18,2)")]
         
         public decimal non_AddForPerson { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         
-        public string EnduranceRatio { get; set; }
-
-        public bool Trust { get; set;}
+        public decimal EnduranceRatio { get; set; }
 
         public int HospitalId{get ; set;}
         public Hospital Hospital{get; set;}
+
+        public bool Trust { get; set;}
+        public DateTime? LoginDate { get; set; }
+
+        public DateTime? ExitDate { get; set; }
+
+        
 
         public int EngId {get ; set ;}
         public  Engineere Engineeree{ get ; set ;}

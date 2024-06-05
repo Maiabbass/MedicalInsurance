@@ -16,10 +16,10 @@ namespace api.Controllers
     {
         
 
-    private readonly IEngineeringeDeparServices  _engineeringeDeparServices;
+    private readonly IEngineeringeDeparService  _engineeringeDeparServices;
           
         
-    public EngineeringeDepars(IEngineeringeDeparServices engineeringeDeparServices)
+    public EngineeringeDepars(IEngineeringeDeparService engineeringeDeparServices)
       {
       _engineeringeDeparServices= engineeringeDeparServices;
          }
@@ -38,56 +38,5 @@ namespace api.Controllers
                }
                return Ok (response);
 
-
+        }}
         }
-        [HttpPut("{Id}")]
-        public  ActionResult<bool> Update(int Id,[FromBody] EngineeringeDeparEditDTO engineeringeDeparEditDTO){
-           bool result= _engineeringeDeparServices.Update(Id,engineeringeDeparEditDTO);
-            if (result)
-            {
-return  Ok(result);
-            }
-            else{
-                return StatusCode(StatusCodes.Status500InternalServerError,result);
-            }
-
-        }
-
-
-[HttpGet("{Id}")]
-public async Task<ActionResult<EngineeringeDepar?>>Get( int Id){
-   return await _engineeringeDeparServices.Get(Id);
-}
-
-
-
-[HttpGet]
-public async Task<ActionResult<IEnumerable<EngineeringeDeparEditDTO>>> GetAll()
-    {
-         var data=await _engineeringeDeparServices.GetAll();
-        
-      return Ok(data);
-    }
-
-    
-    
-   [HttpDelete("{Id}")] 
-      public ActionResult Delete(int Id){
-      try{
-                  _engineeringeDeparServices.Delete(Id);
-                  return Ok("delete Successfully");}
-
-  catch (Exception ex){
-    return StatusCode(StatusCodes.Status500InternalServerError,
-
-                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
-    
-  }
-  
-
-        
-    }
-
-}
-        
- 

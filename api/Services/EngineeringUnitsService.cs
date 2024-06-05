@@ -31,7 +31,10 @@ namespace api.Services
            {
           
             Name = engineeringUnitsEditDTO.Name,
-             
+            Phonepresident=engineeringUnitsEditDTO.Phonepresident,
+            Namepresident=engineeringUnitsEditDTO.Namepresident,
+            Emailpresident=engineeringUnitsEditDTO.Emailpresident, 
+
             
            };
 

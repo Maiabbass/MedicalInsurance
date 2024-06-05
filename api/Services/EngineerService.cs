@@ -41,6 +41,8 @@ namespace api.Services
              EnsuranceNumber = engineerPersonEditDTO.EnsuranceNumber,
              Address = engineerPersonEditDTO.Address,
              Phone = engineerPersonEditDTO.Phone,
+             Mobile=engineerPersonEditDTO.Mobile,
+             Email=engineerPersonEditDTO.Email,
              Subscrib=engineerPersonEditDTO.Subscrib,
              Affiliate=engineerPersonEditDTO.Affiliate,
              Beneficiary=engineerPersonEditDTO.Beneficiary,

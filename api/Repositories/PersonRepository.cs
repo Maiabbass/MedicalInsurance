@@ -32,6 +32,8 @@ namespace api.Repositories
              EnsuranceNumber = person.EnsuranceNumber,
              Address = person.Address,
              Phone = person.Phone,
+             Mobile=person.Mobile,
+             Email=person.Email,
              Subscrib=person.Subscrib,
              Affiliate=person.Affiliate,
              Beneficiary=person.Beneficiary,
@@ -107,6 +109,14 @@ namespace api.Repositories
        return _dataContext.SaveChanges()>0;
       
         }
+       public async Task<AnnualData?> GetEngId(int EngineereId) {
+        return await _dataContext.AnnualDatas.Where(x=>x.Id==EngineereId).FirstOrDefaultAsync();
+
+       }
+      public async Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber)
+{
+    return await _dataContext.Claims.AnyAsync(c => c.EnsuranceNumber == ensuranceNumber);
+}
 
 
 }}

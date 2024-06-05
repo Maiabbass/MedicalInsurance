@@ -7,13 +7,11 @@ namespace api.Entities
 {
     public class EngineeringeDepar
     {
-        #nullable disable
         public int Id { get; set; }
 
         public string Name { get; set; }
 
-        public int SpecializationId {get ; set ;}
-        public Specialization Specialization { get ; set ;}
-        
+       public ICollection<Specialization>Specializations{get; set;}
+
     }
 }

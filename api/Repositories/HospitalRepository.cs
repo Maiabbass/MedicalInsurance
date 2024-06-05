@@ -26,6 +26,9 @@ namespace api.Repositories
                Enabled=hospital.Enabled,
                Inside=hospital.Inside,
                CityId=hospital.CityId,
+               Address=hospital.Address,
+               Email=hospital.Email,
+               Phone=hospital.Phone,
               
              };
 #pragma warning restore IDE0090 // Use 'new(...)'

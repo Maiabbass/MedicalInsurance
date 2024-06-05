@@ -28,6 +28,11 @@ namespace api.DTOS
 
         public string Phone { get; set; }
 
+        public string  Mobile { get; set; }
+
+        public string Email { get; set; }
+
+
         public bool Subscrib { get; set; }
 
         public bool Affiliate  { get; set; }

@@ -92,6 +92,7 @@ namespace api.Services
                      AnnualData annualData =new AnnualData ();
                      annualData.Year = registerAnnualDataDTO.Year;
                      annualData.ExAmount = registerAnnualDataDTO.ExAmount;
+                     annualData.HisDic=registerAnnualDataDTO.HisDic;
                       // get required engineer info ...
                      var engineer= await _unitOfWork.EngineerRepository.Get(registerAnnualDataDTO.EngineerId);
                      if (engineer!=null)
@@ -144,10 +145,6 @@ namespace api.Services
         }
          
 
-        Task<Response> IAnnualDataService.Add(RegisterAnnualDataDTO registerAnnualDataDTO)
-        {
-            throw new NotImplementedException();
-        }
 
 
 

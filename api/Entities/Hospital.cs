@@ -30,21 +30,24 @@ namespace api.Entities
         public int Id { get; set; }
         
         public string Name  { get; set; }
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         public bool Enabled { get; set; }
 
         public bool Inside { get ; set ;}
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         public int CityId {get ; set ;}
         public City City { get ; set ;}
 
         public ICollection<Claims> Claims{get ; set; }
 
-        
+        internal static object FirstOrDefault(Func<object, bool> value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

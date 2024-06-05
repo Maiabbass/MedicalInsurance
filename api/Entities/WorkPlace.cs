@@ -30,7 +30,7 @@ namespace api.Entities
 
         public string? Location { get; set; }
 
-        public string  Phone { get; set; }
+        public string?  Phone { get; set; }
 
 
         public ICollection<Engineere>Engineeres{get; set;}

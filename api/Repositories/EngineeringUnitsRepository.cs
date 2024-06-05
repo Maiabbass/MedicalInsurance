@@ -20,6 +20,11 @@ namespace api.Repositories
             EngineeringUnits newE =new EngineeringUnits()
              {
                Name=engineeringUnits.Name,
+               Emailpresident=engineeringUnits.Emailpresident,
+               Namepresident=engineeringUnits.Namepresident,
+               Phonepresident=engineeringUnits.Phonepresident,
+
+
               
              };
 #pragma warning restore IDE0090 // Use 'new(...)'

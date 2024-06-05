@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using api.Data;
 using api.Entities;
+using api.Helpers;
 using api.Repositories;
 using api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -58,7 +59,7 @@ namespace API
                 }
             )
             .AddEntityFrameworkStores<DataContext>().AddDefaultTokenProviders();
-             
+
 
 
              // Authentication
@@ -85,7 +86,25 @@ namespace API
             
             
               services.AddControllers();
-              services.AddCors();
+
+               services.AddAuthorization(opt=>{
+                opt.AddPolicy("ManagerPolicy",policy=>policy.RequireRole(UserRoles.Admin,UserRoles.User_inquiries
+                ,UserRoles.User_ToEnter,UserRoles.User_FinancialInstallments,UserRoles.User_Managment));
+
+               });
+ 
+
+
+
+              services.AddCors(options =>
+    {
+        options.AddPolicy("AllowReactApp", builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+    });
               services.AddScoped<IUnitOfWork,UnitOfWork>();
               services.AddScoped<IEngineerService,EngineerService>();
               services.AddScoped<IPersonService,PersonService>();
@@ -95,11 +114,16 @@ namespace API
               services.AddScoped<IHospitalService,HospitalService>();
               services.AddScoped<IWorkplaceService,WorkPlaceService>();
               services.AddScoped<IEngineeringUnitsService,EngineeringUnitsService>();
-              services.AddScoped<IEngineeringeDeparServices,EngineeringeDeparServices>();
+              services.AddScoped<IEngineeringeDeparService,EngineeringeDeparService>();
               services.AddScoped<ISurgicalProceduresServices,SurgicalProceduresServices>();
+              services.AddScoped<IClimsRepository,ClimsRepository>();
+              services.AddScoped<IUserRoleService, UserRoleService>();
+            
+              
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
+                 c.CustomSchemaIds(type => type.FullName);
             });
         }
 
@@ -114,32 +138,69 @@ namespace API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
             }
 
-            app.UseHttpsRedirection();
 
-            app.UseCors(x=>x.AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-            .WithOrigins("https://localhost:4200"));
+           // app.UseHttpsRedirection();
+
+            app.UseRouting();
+           app.UseCors("AllowReactApp");
 
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            app.UseRouting();
 
-            app.UseAuthorization();
+        using (var scope = app.ApplicationServices.CreateScope())
+    {
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-            
-             
+        var roles = new[] { "Admin", "User_inquiries", "User_ToEnter", "User_FinancialInstallments", "User_Managment" };
+        foreach (var role in roles)
+        {
+            if (!roleManager.RoleExistsAsync(role).Result)
+            {
+                roleManager.CreateAsync(new IdentityRole(role)).Wait();
+            }
+        }
+
+        var usersWithRoles = new Dictionary<string, string[]>
+        {
+            { "admin", new[] { "Admin" } },
+            { "user1", new[] { "User_inquiries" } },
+            { "user2", new[] { "User_ToEnter" } },
+            { "user3", new[] { "User_FinancialInstallments" } },
+            { "user4", new[] { "User_Managment" } }
+        };
+
+        foreach (var userWithRoles in usersWithRoles)
+        {
+            var username = userWithRoles.Key;
+            var rolesForUser = userWithRoles.Value;
+
+            var user = userManager.FindByNameAsync(username).Result;
+            if (user == null)
+            {
+                user = new User { UserName = username, Email = $"{username}@example.com" };
+                userManager.CreateAsync(user, "Password123!").Wait(); // تغيير كلمة المرور الافتراضية
+            }
+
+            foreach (var role in rolesForUser)
+            {
+                if (!userManager.IsInRoleAsync(user, role).Result)
+                {
+                    userManager.AddToRoleAsync(user, role).Wait();
+                }
+            }
+        }
+    }
+
+         
+
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
               });
-
-
-
-
-
 
             
         }

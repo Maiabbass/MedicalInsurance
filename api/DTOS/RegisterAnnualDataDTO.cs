@@ -20,6 +20,7 @@ namespace api.DTOS
        
 
          public int Year { get; set; }
+         public  DateTime? HisDic { get; set; }
 
           public int PayMethodId { get; set; }
 

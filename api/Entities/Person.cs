@@ -13,7 +13,7 @@ namespace api.Entities
     {
 
 
-        #nullable disable
+       
         public Person()
 
         {
@@ -37,13 +37,13 @@ namespace api.Entities
 
         public string EnsuranceNumber { get; set; }
 
-        public string  Address { get; set; }
+        public string?  Address { get; set; }
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
-        public string Mobile { get; set; }
+        public string? Mobile { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         public bool Subscrib { get; set; }
 

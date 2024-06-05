@@ -18,6 +18,7 @@ namespace api.Services
 
         public bool Delete(int Id);
          public bool Update(int Id, PersonEditDTO personEditDTO);
-       
-    }
-}
+         
+         Task<AnnualData?> GetEngId(int EngineereId);
+          Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
+    }}

@@ -32,7 +32,9 @@ namespace api.Repositories
                 TotalAmount = annualData.TotalAmount,
                 PayMethodId = annualData.PayMethodId,
                 WorkPlaceId = annualData.WorkPlaceId,
-                EngineeringUnitsId = annualData.EngineeringUnitsId
+                EngineeringUnitsId = annualData.EngineeringUnitsId,
+                HisDic=annualData.HisDic,
+
              };
              _dataContext.AnnualDatas.Add(newitem);
             await _dataContext.SaveChangesAsync();

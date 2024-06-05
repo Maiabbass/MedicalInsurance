@@ -34,6 +34,9 @@ namespace api.Services
              Enabled=hospitalEditDTO.Enabled,
              Inside=hospitalEditDTO.Inside,
              CityId=hospitalEditDTO.CityId,
+             Address=hospitalEditDTO.Address,
+             Email=hospitalEditDTO.Email,
+             Phone=hospitalEditDTO.Phone,
              
             
            };
