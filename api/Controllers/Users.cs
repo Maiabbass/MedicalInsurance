@@ -69,7 +69,7 @@ namespace api.Controllers
         }
 
 
-             [HttpPost]
+         [HttpPost]
         [Route("register")]
           
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
@@ -125,7 +125,7 @@ namespace api.Controllers
         
         }
 
-               [HttpPost]
+        [HttpPost]
         [Route("login")]
        
         public async Task<ActionResult<LoggedUserDTO>> Login([FromBody] LoginDTO loginDTO)
@@ -179,6 +179,21 @@ namespace api.Controllers
             return token;
         }
 
+
+
+
+          [HttpGet("getstring/{Id}")]
          
+          public  ActionResult<string> Getstring(string Id)
+          {
+              return Ok(Id);
+          }
+
+
+         [HttpGet("getstring2/{Id}")]
+          public  ActionResult<string> Getstring2(string Id)
+          {
+              return Ok(Id+Id);
+          }
     }
 }
