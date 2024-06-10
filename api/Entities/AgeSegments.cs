@@ -8,14 +8,7 @@ namespace api.Entities
 {
     public class AgeSegments
     {
-        public AgeSegments(int id, int fromYear, int toYear, decimal theAmount) 
-        {
-            this.Id = id;
-    this.FromYear = fromYear;
-    this.ToYear = toYear;
-    this.TheAmount = theAmount;
-   
-        }
+     
          public int Id { get; set; }
 
          public int Year { get; set; }
@@ -28,6 +21,8 @@ namespace api.Entities
         public decimal TheAmount { get; set; }
 
        // public string CardPrice { get; set; }
+
+       public string? EnduranceRatio { get; set; }
         
 
     }

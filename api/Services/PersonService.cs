@@ -48,6 +48,8 @@ namespace api.Services
              EnsuranceNumber = personEditDTO.EnsuranceNumber,
              Address = personEditDTO.Address,
              Phone = personEditDTO.Phone,
+             Mobile=personEditDTO.Mobile,
+             Email=personEditDTO.Email,
              Subscrib=personEditDTO.Subscrib,
              Affiliate=personEditDTO.Affiliate,
              Beneficiary=personEditDTO.Beneficiary,
@@ -116,6 +118,20 @@ namespace api.Services
                  }
     
      }
+      public bool Update(int Id, PersonEditDTO personEditDTO){
+           return _unitOfWork.PersonRepository.Update(Id, personEditDTO);
+        }
+
+        public async Task<AnnualData?> GetEngId(int EngineereId){
+          return await _unitOfWork.PersonRepository.GetEngId(EngineereId);
+
+        }
+
+        public async Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber){
+         return await _unitOfWork.PersonRepository.IsEnsuranceNumberInClaimsAsync(ensuranceNumber);
+
+        }
+
         
     }
 }

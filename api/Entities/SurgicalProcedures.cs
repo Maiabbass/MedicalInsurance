@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace api.Entities
+{
+    public class SurgicalProcedures
+    {
+
+        #nullable disable
+         public  int  Id { get; set; }
+
+         public string Name { get; set; }
+
+         public string Type { get; set;}
+
+         public ICollection<Claims> Claims{get ; set; }
+
+    }
+}

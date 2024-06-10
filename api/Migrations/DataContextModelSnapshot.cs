@@ -30,6 +30,9 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("EnduranceRatio")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("FromYear")
                         .HasColumnType("int");
 
@@ -67,7 +70,10 @@ namespace api.Migrations
                     b.Property<decimal>("ExAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("PayMethodId")
+                    b.Property<DateTime?>("HisDic")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PayMethodId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
@@ -146,54 +152,37 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<decimal>("AdditionalPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("ApprovedPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("EnduranceRatio")
+                    b.Property<decimal>("Company_fees")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("EnduranceRatio")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("EnsuranceNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EngId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EngineereeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ExitDate")
+                    b.Property<DateTime?>("ExitDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FatherName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("HospitalId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LoginDate")
+                    b.Property<DateTime?>("LoginDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MatherName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SurgicalName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SurgicalType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("SurgicalProceduresId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -201,11 +190,19 @@ namespace api.Migrations
                     b.Property<bool>("Trust")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("non_Add")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("non_AddForPerson")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineereeId");
-
                     b.HasIndex("HospitalId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("SurgicalProceduresId");
 
                     b.ToTable("Claims");
                 });
@@ -218,16 +215,16 @@ namespace api.Migrations
                     b.Property<string>("EngNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SpecializationId")
+                    b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
                     b.Property<string>("SubNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("WorkPlaceId")
+                    b.Property<int?>("WorkPlaceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("statusId")
+                    b.Property<int?>("statusId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -241,7 +238,7 @@ namespace api.Migrations
                     b.ToTable("Engineeres");
                 });
 
-            modelBuilder.Entity("api.Entities.EngineeringUnits", b =>
+            modelBuilder.Entity("api.Entities.EngineeringeDepar", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -250,6 +247,35 @@ namespace api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EngineeringeDepars");
+                });
+
+            modelBuilder.Entity("api.Entities.EngineeringUnits", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Emailpresident")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Namepresident")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phonepresident")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -281,11 +307,13 @@ namespace api.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CityId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Enabled")
                         .HasColumnType("bit");
@@ -295,6 +323,9 @@ namespace api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -338,25 +369,37 @@ namespace api.Migrations
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("EnsuranceNumber")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FatherName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GenderId")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Mobile")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotherName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NationalId")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -425,11 +468,16 @@ namespace api.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("EngineeringeDeparId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EngineeringeDeparId");
 
                     b.ToTable("Specializations");
                 });
@@ -446,6 +494,25 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("api.Entities.SurgicalProcedures", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SurgicalProcedures");
                 });
 
             modelBuilder.Entity("api.Entities.User", b =>
@@ -528,11 +595,13 @@ namespace api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Location")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -690,9 +759,7 @@ namespace api.Migrations
 
                     b.HasOne("api.Entities.PayMethod", "PayMethod")
                         .WithMany("AnnualDatas")
-                        .HasForeignKey("PayMethodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PayMethodId");
 
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("AnnualDatas")
@@ -729,21 +796,27 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Entities.Claims", b =>
                 {
-                    b.HasOne("api.Entities.Engineere", "Engineeree")
-                        .WithMany("Claims")
-                        .HasForeignKey("EngineereeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("api.Entities.Hospital", "Hospital")
                         .WithMany("Claims")
                         .HasForeignKey("HospitalId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Engineeree");
+                    b.HasOne("api.Entities.Person", "Person")
+                        .WithMany("Claims")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Entities.SurgicalProcedures", "SurgicalProcedures")
+                        .WithMany("Claims")
+                        .HasForeignKey("SurgicalProceduresId");
 
                     b.Navigation("Hospital");
+
+                    b.Navigation("Person");
+
+                    b.Navigation("SurgicalProcedures");
                 });
 
             modelBuilder.Entity("api.Entities.Engineere", b =>
@@ -756,21 +829,16 @@ namespace api.Migrations
 
                     b.HasOne("api.Entities.Specialization", "Specialization")
                         .WithMany("Engineeres")
-                        .HasForeignKey("SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SpecializationId");
 
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("Engineeres")
                         .HasForeignKey("WorkPlaceId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("api.Entities.Status", "Status")
                         .WithMany("Engineeres")
-                        .HasForeignKey("statusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("statusId");
 
                     b.Navigation("Person");
 
@@ -828,6 +896,17 @@ namespace api.Migrations
                     b.Navigation("Person");
 
                     b.Navigation("RelationType");
+                });
+
+            modelBuilder.Entity("api.Entities.Specialization", b =>
+                {
+                    b.HasOne("api.Entities.EngineeringeDepar", "EngineeringeDepar")
+                        .WithMany("Specializations")
+                        .HasForeignKey("EngineeringeDeparId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EngineeringeDepar");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
@@ -906,9 +985,12 @@ namespace api.Migrations
                 {
                     b.Navigation("AnnualDatas");
 
-                    b.Navigation("Claims");
-
                     b.Navigation("Relations");
+                });
+
+            modelBuilder.Entity("api.Entities.EngineeringeDepar", b =>
+                {
+                    b.Navigation("Specializations");
                 });
 
             modelBuilder.Entity("api.Entities.EngineeringUnits", b =>
@@ -937,7 +1019,10 @@ namespace api.Migrations
                 {
                     b.Navigation("AnnualDataDetails");
 
-                    b.Navigation("Engineere");
+                    b.Navigation("Claims");
+
+                    b.Navigation("Engineere")
+                        .IsRequired();
 
                     b.Navigation("Relations");
                 });
@@ -955,6 +1040,11 @@ namespace api.Migrations
             modelBuilder.Entity("api.Entities.Status", b =>
                 {
                     b.Navigation("Engineeres");
+                });
+
+            modelBuilder.Entity("api.Entities.SurgicalProcedures", b =>
+                {
+                    b.Navigation("Claims");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOS;
 using api.Entities;
 
 namespace api.Repositories
@@ -15,5 +16,8 @@ namespace api.Repositories
         Task <int> Add (Person person);
         Task<int> Add(City city);
         void Delete(int Id);
+        public bool Update(int Id, PersonEditDTO PersonEditDTO);
+        Task<AnnualData?> GetEngId(int EngineereId);
+        Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
     }
 }

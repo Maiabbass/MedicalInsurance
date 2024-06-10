@@ -25,8 +25,8 @@ namespace api.Repositories
 
          void Delete(int Id);
        
-        bool Update(int id, Dictionary<string, object> updateFields);
-        public bool Update(int Id, decimal Amount );
+        bool Update(int id, AnnualDataForView annualDataForView);
+        public bool Update(int Id, AnnualDataDetailForView annualDataDetailForView  );
    
     }
 }

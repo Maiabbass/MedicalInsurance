@@ -10,16 +10,19 @@ namespace api.Entities
     public class AnnualData
     {
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public AnnualData()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-        {
-         
+        public AnnualData(){
+
         }
+
+        
         public int Id { get; set; }
 
         public int Year { get; set; }
+
+        public DateTime? HisDic { get; set; }
+          
+
 
       [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
@@ -34,7 +37,7 @@ namespace api.Entities
         public int EngineereId { get; set;}
         public Engineere Engineere {get; set;}
 
-        public int PayMethodId{ get; set;}
+        public int? PayMethodId{ get; set;}
         public PayMethod PayMethod { get; set;}
 
         public int? WorkPlaceId { get; set;}
@@ -56,4 +59,4 @@ namespace api.Entities
             throw new NotImplementedException();
         }
     }
-}
+} 

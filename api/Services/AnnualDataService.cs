@@ -92,6 +92,7 @@ namespace api.Services
                      AnnualData annualData =new AnnualData ();
                      annualData.Year = registerAnnualDataDTO.Year;
                      annualData.ExAmount = registerAnnualDataDTO.ExAmount;
+                     annualData.HisDic=registerAnnualDataDTO.HisDic;
                       // get required engineer info ...
                      var engineer= await _unitOfWork.EngineerRepository.Get(registerAnnualDataDTO.EngineerId);
                      if (engineer!=null)
@@ -144,10 +145,6 @@ namespace api.Services
         }
          
 
-        Task<Response> IAnnualDataService.Add(RegisterAnnualDataDTO registerAnnualDataDTO)
-        {
-            throw new NotImplementedException();
-        }
 
 
 
@@ -182,16 +179,16 @@ namespace api.Services
                  }
     
      }
-     public bool Update(int Id,Dictionary<string, object> updateFields){
-           return _unitOfWork.AnnualDataRepository.Update(Id, updateFields);
+     public bool Update(int Id,AnnualDataForView annualDataForView){
+           return _unitOfWork.AnnualDataRepository.Update(Id, annualDataForView);
         }
 
         public async Task<IEnumerable<AnnualDataWithDetails>> GetAll(){
             return await _unitOfWork.AnnualDataRepository.GetAll();
      
     }
-     public bool Update(int Id,decimal Amount){
-           return _unitOfWork.AnnualDataRepository.Update(Id, Amount);
+     public bool Update(int Id,AnnualDataDetailForView annualDataDetailForView ){
+           return _unitOfWork.AnnualDataRepository.Update(Id, annualDataDetailForView);
         }
     
 

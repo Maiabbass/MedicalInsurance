@@ -16,7 +16,7 @@ namespace api.Services
           Task<WorkPlace?> Get (int id);
 
           public bool Delete(int Id);
-          public bool Update(int Id, Dictionary<string, object> updateFields);
+          public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO);
          
     
     }

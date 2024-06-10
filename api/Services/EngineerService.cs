@@ -41,6 +41,8 @@ namespace api.Services
              EnsuranceNumber = engineerPersonEditDTO.EnsuranceNumber,
              Address = engineerPersonEditDTO.Address,
              Phone = engineerPersonEditDTO.Phone,
+             Mobile=engineerPersonEditDTO.Mobile,
+             Email=engineerPersonEditDTO.Email,
              Subscrib=engineerPersonEditDTO.Subscrib,
              Affiliate=engineerPersonEditDTO.Affiliate,
              Beneficiary=engineerPersonEditDTO.Beneficiary,
@@ -82,9 +84,34 @@ namespace api.Services
             
         }
 
-        public Task<IEnumerable<Engineere>> GetAll()
+        public async Task<Engineere?>Get(int Id)
+     {
+      return await _unitOfWork.EngineerRepository.Get(Id);
+     }
+
+     public async Task<IEnumerable<Engineere>>GetAll()
         {
-            throw new NotImplementedException();
+            return  await _unitOfWork.EngineerRepository.GetAll() ;
         }
+
+           public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO){
+           return _unitOfWork.EngineerRepository.Update(Id, engineerPersonEditDTO);
+        }
+
+         public bool Delete(int Id){
+      try
+      {
+         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+         {
+        
+      
+        _unitOfWork.EngineerRepository.Delete(Id);
+            scope.Complete();
+            return true;
+         }
+      } 
+          catch (TransactionAbortedException){
+                  return false;
+                 }}
     }
 }

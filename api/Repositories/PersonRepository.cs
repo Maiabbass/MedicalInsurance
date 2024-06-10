@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.DTOS;
 using api.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,8 @@ namespace api.Repositories
              EnsuranceNumber = person.EnsuranceNumber,
              Address = person.Address,
              Phone = person.Phone,
+             Mobile=person.Mobile,
+             Email=person.Email,
              Subscrib=person.Subscrib,
              Affiliate=person.Affiliate,
              Beneficiary=person.Beneficiary,
@@ -78,5 +81,42 @@ namespace api.Repositories
         {
             throw new NotImplementedException();
         }
-    }
+
+
+    
+ public bool Update(int Id, PersonEditDTO PersonEditDTO)
+        {
+       var databaseEntity= _dataContext.Persons.FirstOrDefault(x=>x.Id==Id);
+       if(databaseEntity==null){
+        
+         return false;
+
+       }
+       databaseEntity.FirstName=PersonEditDTO.FirstName;
+       databaseEntity.FatherName=PersonEditDTO.FatherName;
+       databaseEntity.LastName=PersonEditDTO.LastName;
+       databaseEntity.MotherName=PersonEditDTO.MotherName;
+       databaseEntity.BirthDate=PersonEditDTO.BirthDate;
+       databaseEntity.NationalId=PersonEditDTO.NationalId;
+       databaseEntity.EnsuranceNumber=PersonEditDTO.EnsuranceNumber;
+       databaseEntity.Address=PersonEditDTO.Address;
+       databaseEntity.Phone=PersonEditDTO.Phone;
+       databaseEntity.Subscrib=PersonEditDTO.Subscrib;
+       databaseEntity.Affiliate=PersonEditDTO.Affiliate;
+       databaseEntity.Beneficiary=PersonEditDTO.Beneficiary;
+       databaseEntity.GenderId=PersonEditDTO.GenderId;
+
+       return _dataContext.SaveChanges()>0;
+      
+        }
+       public async Task<AnnualData?> GetEngId(int EngineereId) {
+        return await _dataContext.AnnualDatas.Where(x=>x.Id==EngineereId).FirstOrDefaultAsync();
+
+       }
+      public async Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber)
+{
+    return await _dataContext.Claims.AnyAsync(c => c.EnsuranceNumber == ensuranceNumber);
 }
+
+
+}}

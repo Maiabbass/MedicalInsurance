@@ -32,7 +32,9 @@ namespace api.Repositories
                 TotalAmount = annualData.TotalAmount,
                 PayMethodId = annualData.PayMethodId,
                 WorkPlaceId = annualData.WorkPlaceId,
-                EngineeringUnitsId = annualData.EngineeringUnitsId
+                EngineeringUnitsId = annualData.EngineeringUnitsId,
+                HisDic=annualData.HisDic,
+
              };
              _dataContext.AnnualDatas.Add(newitem);
             await _dataContext.SaveChangesAsync();
@@ -186,65 +188,31 @@ namespace api.Repositories
             }
         }
 
-
-         public bool Update(int Id, Dictionary<string, object> updateFields)
+         public bool Update(int Id, AnnualDataForView annualDataForView )
         {
        var databaseEntity= _dataContext.AnnualDatas.FirstOrDefault(x=>x.Id==Id);
        if(databaseEntity==null){
         
          return false;
+
        }
+       databaseEntity.Amount=annualDataForView.Amount;
+       databaseEntity.ExAmount=annualDataForView.ExAmount;
+       databaseEntity.Year=annualDataForView.Year;
+       databaseEntity.EngineereId=annualDataForView.EngineereId;
+       databaseEntity.PayMethodId=annualDataForView.PayMethodId;
+       databaseEntity.WorkPlaceId=annualDataForView.WorkPlaceId;
+       databaseEntity.EngineeringUnitsId=annualDataForView.EngineeringUnitsId;
+       databaseEntity.TotalAmount=annualDataForView.TotalAmount;
+       
+       
+       return _dataContext.SaveChanges()>0;
       
-       foreach (var field in updateFields)
-    {
-        if (field.Value is JsonElement jsonElement)
-        {
-        
-            switch (field.Key)
-            {
-                case "ExAmount":
-                    if (jsonElement.TryGetDecimal(out decimal exAmount))
-                    {
-                        databaseEntity.ExAmount = exAmount;
-                    }
-                    break;
-
-                case "PayMethodId":
-                    if (jsonElement.TryGetInt32(out int payMethodId))
-                    {
-                        databaseEntity.PayMethodId = payMethodId;
-                    }
-                    break;
-
-                case "WorkPlaceId":
-                    if (jsonElement.TryGetInt32(out int workPlaceId))
-                    {
-                        databaseEntity.WorkPlaceId = workPlaceId;
-                    }
-                    break;
-
-                case "EngineeringUnitsId":
-                    if (jsonElement.TryGetInt32(out int engineeringUnitsId))
-                    {
-                        databaseEntity.EngineeringUnitsId = engineeringUnitsId;
-                    }
-                    break;
-
-                case "Amount":
-                    if (jsonElement.TryGetDecimal(out decimal amount))
-                    {
-                        databaseEntity.Amount = amount;
-                    }
-                    break;
-            }
         }
-    }
-
-    return _dataContext.SaveChanges() > 0;
-}
+        
 
 
- public bool Update(int Id, decimal Amount )
+ public bool Update(int Id, AnnualDataDetailForView annualDataDetailForView )
         {
        var databaseEntity= _dataContext.AnnualDataDetails.FirstOrDefault(x=>x.Id==Id);
        if(databaseEntity==null){
@@ -252,17 +220,18 @@ namespace api.Repositories
          return false;
 
        }
-       databaseEntity.Amount=Amount;
+       databaseEntity.Amount=annualDataDetailForView.Amount;
+       databaseEntity.PersonId=annualDataDetailForView.PersonId;
+       databaseEntity.AnnualDataId=annualDataDetailForView.AnnualDataId;
+       databaseEntity.IsEngineer=annualDataDetailForView.IsEngineer;
+
 
        return _dataContext.SaveChanges()>0;
       
         }
 
 
-        public bool Update(int id, object updateFields)
-        {
-            throw new NotImplementedException();
-        }
+        
 
        
     }

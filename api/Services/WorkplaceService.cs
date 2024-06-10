@@ -36,6 +36,7 @@ namespace api.Services
              Name = workplaceEditDTO.Name,
              Location=workplaceEditDTO.Location,
              EngineeringUnitsId=workplaceEditDTO.EngineeringUnitsId ,
+             Phone=workplaceEditDTO.Phone,
              
             
            };
@@ -65,12 +66,8 @@ namespace api.Services
           return await _unitOfWork.WorkplaceRepository.GetAll();
         }
 
-/*
-        Task<IEnumerable<WorkPlace>> IWorkplaceService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-        */
+
+
           public async Task<WorkPlace?> Get(int Id)
         {
               return await _unitOfWork.WorkplaceRepository.Get(Id);
@@ -95,8 +92,8 @@ namespace api.Services
 
 
 
-             public bool Update(int Id, Dictionary<string, object> updateFields) {
-             return _unitOfWork.WorkplaceRepository.Update(Id, updateFields);
+             public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO) {
+             return _unitOfWork.WorkplaceRepository.Update(Id,workplaceEditDTO );
              }   
 
     }

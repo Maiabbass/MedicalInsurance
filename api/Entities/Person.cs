@@ -13,7 +13,7 @@ namespace api.Entities
     {
 
 
-        #nullable disable
+       
         public Person()
 
         {
@@ -37,9 +37,13 @@ namespace api.Entities
 
         public string EnsuranceNumber { get; set; }
 
-        public string  Address { get; set; }
+        public string?  Address { get; set; }
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
+
+        public string? Mobile { get; set; }
+
+        public string? Email { get; set; }
 
         public bool Subscrib { get; set; }
 
@@ -54,11 +58,12 @@ namespace api.Entities
       //  public Relation Relation{get; set; }
 
         public int GenderId {get; set;}
-        public Gender Gender{ get; set;}
+         public Gender Gender{ get; set;}
 
-       public ICollection<Relation>Relations{get ; set ;}
+         public ICollection<Relation>Relations{get ; set ;}
 
          public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }
+         public ICollection<Claims> Claims { get ; set;}
 
     }
 }

@@ -23,6 +23,11 @@ namespace api.Repositories
         IWorkplaceRepository WorkplaceRepository{get;}
 
         IEngineeringUnitsRepository EngineeringUnitsRepository{get;}
+        IEngineeringeDeparRepository EngineeringeDeparRepository {get;}
+        ISurgicalProceduresRepository SurgicalProceduresRepository {get;}
+
+        IClimsRepository ClimsRepository {get ;}
+       
 
         Task<bool> Complete();
     }

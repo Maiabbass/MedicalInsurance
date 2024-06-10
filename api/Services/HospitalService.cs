@@ -34,6 +34,9 @@ namespace api.Services
              Enabled=hospitalEditDTO.Enabled,
              Inside=hospitalEditDTO.Inside,
              CityId=hospitalEditDTO.CityId,
+             Address=hospitalEditDTO.Address,
+             Email=hospitalEditDTO.Email,
+             Phone=hospitalEditDTO.Phone,
              
             
            };
@@ -60,10 +63,7 @@ namespace api.Services
 
         
 
-        Task<IEnumerable<Hospital>> IHospitalService.GetAll()
-        {
-            throw new NotImplementedException();
-        }
+     
 
          public async Task<IEnumerable<Hospital>>GetAll()
         {

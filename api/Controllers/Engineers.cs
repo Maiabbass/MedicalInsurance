@@ -29,9 +29,11 @@ namespace api.Controllers
          [HttpPost]
         public async Task <ActionResult<Response>> AddEngineer([FromBody] EngineerPersonEditDTO   engineerPersonEditDTO)
         {
+
+              engineerPersonEditDTO.PersonId = 0;
            
     
-                var response=  await _engineerService.Add(engineerPersonEditDTO);
+              var response=  await _engineerService.Add(engineerPersonEditDTO);
                if (response.ErrorMessage!=null)
                {
                     return StatusCode(StatusCodes.Status500InternalServerError,
@@ -41,6 +43,53 @@ namespace api.Controllers
 
 
         }
+        [HttpGet("{Id}")]
+        public async Task<ActionResult<Engineere?>>Get( int Id){
+   return await _engineerService.Get(Id);
+}
+
+
+
+    [HttpGet]
+        public async Task<ActionResult<IEnumerable<Engineere>>> GetAll()
+    {
+         var data=await _engineerService.GetAll();
+        
+      return Ok(data);
+    }
+
+
+
+ [HttpPut("{Id}")]
+        public  ActionResult<bool> Update(int Id,[FromBody] EngineerPersonEditDTO engineerPersonEditDTO){
+           bool result= _engineerService.Update(Id,engineerPersonEditDTO);
+            if (result)
+            {
+return  Ok(result);
+            }
+            else{
+                return StatusCode(StatusCodes.Status500InternalServerError,result);
+            }
+
+        }
+
+
+         [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _engineerService.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
+
+     
         
     }
+
+
 }

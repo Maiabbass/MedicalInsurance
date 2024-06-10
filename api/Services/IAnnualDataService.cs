@@ -19,8 +19,8 @@ namespace api.Services
       
         
          public bool Delete(int Id);
-         public bool Update(int Id,  Dictionary<string, object> updateFields);
-         public bool Update(int Id,decimal Amount);
+         public bool Update(int Id,   AnnualDataForView annualDataForViews);
+         public bool Update(int Id,AnnualDataDetailForView annualDataDetailForView);
          
 
          

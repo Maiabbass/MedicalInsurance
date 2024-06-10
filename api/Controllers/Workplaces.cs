@@ -69,8 +69,8 @@ public async Task<ActionResult<Workplaces?>>GetAll(){
 
      [HttpPut("{Id}")]
          
-        public  ActionResult<bool> Update(int Id, Dictionary<string, object> updateFields){
-           bool result= _workplaceService.Update(Id,updateFields);
+        public  ActionResult<bool> Update(int Id, WorkplaceEditDTO workplaceEditDTO){
+           bool result= _workplaceService.Update(Id,workplaceEditDTO);
             if (result)
             {
             return  Ok(result);
