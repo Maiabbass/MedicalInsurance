@@ -100,6 +100,7 @@ namespace api.Repositories
             */
 
                     claims.Add(newClaim);
+                    // test....
                   //  claims.Add(newC);
                 }
             }
