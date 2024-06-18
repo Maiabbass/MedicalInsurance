@@ -30,7 +30,7 @@ namespace api.Controllers
         public async Task <ActionResult<Response>> AddEngineer([FromBody] EngineerPersonEditDTO   engineerPersonEditDTO)
         {
 
-              engineerPersonEditDTO.PersonId = 0;
+             
            
     
               var response=  await _engineerService.Add(engineerPersonEditDTO);

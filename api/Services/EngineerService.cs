@@ -46,7 +46,8 @@ namespace api.Services
              Subscrib=engineerPersonEditDTO.Subscrib,
              Affiliate=engineerPersonEditDTO.Affiliate,
              Beneficiary=engineerPersonEditDTO.Beneficiary,
-             GenderId = engineerPersonEditDTO.GenderId
+             GenderId = engineerPersonEditDTO.GenderId,
+             statusId = engineerPersonEditDTO.statusId,
            };
 
            
@@ -60,7 +61,7 @@ namespace api.Services
                 EngNumber = engineerPersonEditDTO.EngNumber,
                 SubNumber = engineerPersonEditDTO.SubNumber,
                 Id = insertedId,
-                statusId = engineerPersonEditDTO.statusId,
+                
                 SpecializationId = engineerPersonEditDTO.SpecializationId,
                 WorkPlaceId =engineerPersonEditDTO.WorkPlaceId
                

@@ -36,6 +36,8 @@ namespace api.Repositories
  
         public IClimsRepository ClimsRepository => new ClimsRepository(_dataContext);
 
+        public ISearchRepository  SearchRepository => new SearchRepository(_dataContext);
+
         public Task<bool> Complete()
         {
             throw new NotImplementedException();

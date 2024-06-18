@@ -50,17 +50,11 @@ namespace api.Data
 
 
              
-              builder.Entity<Person>()
-            .HasOne(e => e.Engineere)
-            .WithOne(ed => ed.Person)
-            .HasForeignKey<Engineere>(ed => ed.Id);
+            
 
             builder.Entity<EngineeringUnits>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.EngineeringUnits).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<WorkPlace>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Person>()
-            .HasOne(r => r.Engineere)
-            .WithOne(e => e.Person)
-            .OnDelete(DeleteBehavior.NoAction);
+            
 
             
              builder.Entity<WorkPlace>().HasMany(tg=>tg.Engineeres).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
