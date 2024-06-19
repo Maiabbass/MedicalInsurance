@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace api.DTOS
-{
+
     public class EngineerPersonEditDTO
     {
 
@@ -46,7 +46,7 @@ namespace api.DTOS
         public string SubNumber { get; set; }
 
     
-        public int PersonId { get; set; }    
+        //public int? PersonId { get; set; }    
        
 
     
