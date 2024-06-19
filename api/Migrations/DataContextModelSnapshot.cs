@@ -218,9 +218,6 @@ namespace api.Migrations
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StatusId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SubNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -230,8 +227,6 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SpecializationId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("WorkPlaceId");
 
@@ -372,7 +367,7 @@ namespace api.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EngineereId")
+                    b.Property<int?>("EngineereId")
                         .HasColumnType("int");
 
                     b.Property<string>("EnsuranceNumber")
@@ -409,11 +404,11 @@ namespace api.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Subscrib")
                         .HasColumnType("bit");
-
-                    b.Property<int?>("statusId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -421,7 +416,7 @@ namespace api.Migrations
 
                     b.HasIndex("GenderId");
 
-                    b.HasIndex("statusId");
+                    b.HasIndex("StatusId");
 
                     b.ToTable("Persons");
                 });
@@ -835,10 +830,6 @@ namespace api.Migrations
                         .WithMany("Engineeres")
                         .HasForeignKey("SpecializationId");
 
-                    b.HasOne("api.Entities.Status", null)
-                        .WithMany("Engineeres")
-                        .HasForeignKey("StatusId");
-
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("Engineeres")
                         .HasForeignKey("WorkPlaceId")
@@ -864,9 +855,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Entities.Engineere", "Engineere")
                         .WithMany()
-                        .HasForeignKey("EngineereId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EngineereId");
 
                     b.HasOne("api.Entities.Gender", "Gender")
                         .WithMany("Persons")
@@ -876,7 +865,7 @@ namespace api.Migrations
 
                     b.HasOne("api.Entities.Status", "Status")
                         .WithMany()
-                        .HasForeignKey("statusId");
+                        .HasForeignKey("StatusId");
 
                     b.Navigation("Engineere");
 
@@ -1044,11 +1033,6 @@ namespace api.Migrations
                 });
 
             modelBuilder.Entity("api.Entities.Specialization", b =>
-                {
-                    b.Navigation("Engineeres");
-                });
-
-            modelBuilder.Entity("api.Entities.Status", b =>
                 {
                     b.Navigation("Engineeres");
                 });

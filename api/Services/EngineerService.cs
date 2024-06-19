@@ -47,7 +47,7 @@ namespace api.Services
              Affiliate=engineerPersonEditDTO.Affiliate,
              Beneficiary=engineerPersonEditDTO.Beneficiary,
              GenderId = engineerPersonEditDTO.GenderId,
-             statusId = engineerPersonEditDTO.statusId,
+             StatusId = engineerPersonEditDTO.statusId,
            };
 
            
