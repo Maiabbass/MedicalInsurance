@@ -24,7 +24,7 @@ namespace API
                 .ConfigureWebHostDefaults(async webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>() ; 
-                    webBuilder.UseUrls("http://*:5226");
+                   // webBuilder.UseUrls("http://*:5226");
 
                     
                 });

@@ -57,6 +57,9 @@ namespace api.Entities
        // public int RelationId{ get ; set ;}
       //  public Relation Relation{get; set; }
 
+       public int? statusId{ get; set;}
+        public Status? Status { get; set;}
+
         public int GenderId {get; set;}
          public Gender Gender{ get; set;}
 

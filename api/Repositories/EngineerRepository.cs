@@ -23,7 +23,7 @@ namespace api.Repositories
                EngNumber=engineere.EngNumber,
                SubNumber = engineere.SubNumber,
                Id =engineere.Id,
-               statusId= engineere.statusId,
+               
                SpecializationId=engineere.SpecializationId,
                WorkPlaceId= engineere.WorkPlaceId
              }; 
@@ -56,7 +56,7 @@ namespace api.Repositories
        }
        databaseEntity.EngNumber=engineerPersonEditDTO.EngNumber;
        databaseEntity.SubNumber=engineerPersonEditDTO.SubNumber;
-       databaseEntity.statusId=engineerPersonEditDTO.statusId;
+       
        databaseEntity.SpecializationId=engineerPersonEditDTO.SpecializationId;
        databaseEntity.WorkPlaceId=engineerPersonEditDTO.WorkPlaceId;
 

@@ -45,10 +45,6 @@ public class Persons : ControllerBase
             personEditDTO.Beneficiary=true;
           }
    
-   
-    
-     
-           
             var response = await _personService.Add(personEditDTO);
              if (response.ErrorMessage!=null)
            {

@@ -118,6 +118,7 @@ namespace API
               services.AddScoped<ISurgicalProceduresServices,SurgicalProceduresServices>();
               services.AddScoped<IClimsRepository,ClimsRepository>();
               services.AddScoped<IUserRoleService, UserRoleService>();
+              services.AddScoped<ISearchService,SearchService>();
             
               
             services.AddSwaggerGen(c =>

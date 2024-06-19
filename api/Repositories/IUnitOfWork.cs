@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Entities;
 
 namespace api.Repositories
 {
@@ -27,8 +28,11 @@ namespace api.Repositories
         ISurgicalProceduresRepository SurgicalProceduresRepository {get;}
 
         IClimsRepository ClimsRepository {get ;}
+
+        ISearchRepository SearchRepository{get ;}
        
 
         Task<bool> Complete();
+       
     }
 }
