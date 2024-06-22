@@ -9,16 +9,11 @@ using api.Data;
 
 #nullable disable
 
-namespace api.Migrations
+namespace api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-<<<<<<<< HEAD:api/Data/Migrations/20240621160949_InitialCreat.Designer.cs
-    [Migration("20240621160949_InitialCreat")]
+    [Migration("20240622110752_InitialCreat")]
     partial class InitialCreat
-========
-    [Migration("20240619083101_initial")]
-    partial class initial
->>>>>>>> 3bcb0eeeaa8ae1096cb293c809066883ebb7593d:api/Migrations/20240619083101_initial.Designer.cs
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -225,9 +220,6 @@ namespace api.Migrations
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StatusId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SubNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -237,8 +229,6 @@ namespace api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("SpecializationId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("WorkPlaceId");
 
@@ -379,7 +369,7 @@ namespace api.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EngineereId")
+                    b.Property<int?>("EngineereId")
                         .HasColumnType("int");
 
                     b.Property<string>("EnsuranceNumber")
@@ -841,10 +831,6 @@ namespace api.Migrations
                         .WithMany("Engineeres")
                         .HasForeignKey("SpecializationId");
 
-                    b.HasOne("api.Entities.Status", null)
-                        .WithMany("Engineeres")
-                        .HasForeignKey("StatusId");
-
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("Engineeres")
                         .HasForeignKey("WorkPlaceId")
@@ -870,9 +856,7 @@ namespace api.Migrations
                 {
                     b.HasOne("api.Entities.Engineere", "Engineere")
                         .WithMany()
-                        .HasForeignKey("EngineereId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EngineereId");
 
                     b.HasOne("api.Entities.Gender", "Gender")
                         .WithMany("Persons")
@@ -1050,11 +1034,6 @@ namespace api.Migrations
                 });
 
             modelBuilder.Entity("api.Entities.Specialization", b =>
-                {
-                    b.Navigation("Engineeres");
-                });
-
-            modelBuilder.Entity("api.Entities.Status", b =>
                 {
                     b.Navigation("Engineeres");
                 });

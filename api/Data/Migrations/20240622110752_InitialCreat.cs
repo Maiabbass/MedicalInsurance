@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace api.Migrations
+namespace api.Data.Migrations
 {
-    public partial class initial : Migration
+    public partial class InitialCreat : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -351,8 +351,7 @@ namespace api.Migrations
                     EngNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SpecializationId = table.Column<int>(type: "int", nullable: true),
-                    WorkPlaceId = table.Column<int>(type: "int", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: true)
+                    WorkPlaceId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -361,11 +360,6 @@ namespace api.Migrations
                         name: "FK_Engineeres_Specializations_SpecializationId",
                         column: x => x.SpecializationId,
                         principalTable: "Specializations",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Engineeres_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "Statuses",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Engineeres_WorkPlaces_WorkPlaceId",
@@ -425,9 +419,9 @@ namespace api.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MotherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NationalId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    NationalId = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     EnsuranceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -436,7 +430,7 @@ namespace api.Migrations
                     Subscrib = table.Column<bool>(type: "bit", nullable: false),
                     Affiliate = table.Column<bool>(type: "bit", nullable: false),
                     Beneficiary = table.Column<bool>(type: "bit", nullable: false),
-                    EngineereId = table.Column<int>(type: "int", nullable: false),
+                    EngineereId = table.Column<int>(type: "int", nullable: true),
                     StatusId = table.Column<int>(type: "int", nullable: true),
                     GenderId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -447,8 +441,7 @@ namespace api.Migrations
                         name: "FK_Persons_Engineeres_EngineereId",
                         column: x => x.EngineereId,
                         principalTable: "Engineeres",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Persons_Genders_GenderId",
                         column: x => x.GenderId,
@@ -654,11 +647,6 @@ namespace api.Migrations
                 column: "SpecializationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Engineeres_StatusId",
-                table: "Engineeres",
-                column: "StatusId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Engineeres_WorkPlaceId",
                 table: "Engineeres",
                 column: "WorkPlaceId");
@@ -772,10 +760,10 @@ namespace api.Migrations
                 name: "Genders");
 
             migrationBuilder.DropTable(
-                name: "Specializations");
+                name: "Statuses");
 
             migrationBuilder.DropTable(
-                name: "Statuses");
+                name: "Specializations");
 
             migrationBuilder.DropTable(
                 name: "WorkPlaces");
