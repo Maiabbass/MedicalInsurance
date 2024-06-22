@@ -22,7 +22,10 @@ namespace api.Services
          public bool Update(int Id,   AnnualDataForView annualDataForViews);
          public bool Update(int Id,AnnualDataDetailForView annualDataDetailForView);
          
+          public decimal calcualteAmount(DateTime? birthDate,int year);
 
          
+          Task <Response> AddAnnualSettings (AnnualSettingDTO annualSettingDTO); 
+           public bool DeleteAnnuaSetting(int year);
     }
 }

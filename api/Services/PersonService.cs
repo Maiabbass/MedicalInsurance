@@ -75,11 +75,10 @@ namespace api.Services
                  }
                  }
                    catch(TransactionAbortedException ex)
-                {
-
+                 {
                    response.ErrorMessage = ex.Message;
-                 
                  }
+                 catch(Exception exx){  response.ErrorMessage = exx.Message;}
                 response.InsertedId  =insertedId;
              return response;
         }
@@ -116,6 +115,7 @@ namespace api.Services
                   
                   return false;
                  }
+                 
     
      }
       public bool Update(int Id, PersonEditDTO personEditDTO){

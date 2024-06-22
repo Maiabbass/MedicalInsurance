@@ -129,6 +129,9 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
 
 
 
+
+
+
         [HttpPut]
         [Route("UpdateAllFields/{Id}")]
    
@@ -161,5 +164,62 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
             }
 
         }  
+
+
+        // action method to get the amount of register annual data based on birth date and given Year 
+           [HttpGet("CalculateAmount")]
+            public ActionResult<decimal> CalculateAmount(DateTime? birthdate,int year)
+            {
+                 
+                 decimal amount=0m;
+                 try 
+                 {
+                 amount= _AnnualDataService.calcualteAmount(birthdate,year);
+                 return  Ok(amount);
+                 }
+                 catch(Exception ex)
+                 {
+                   return StatusCode(StatusCodes.Status500InternalServerError,new Response {ErrorMessage=ex.Message});
+                 }
+                
+
+            }
+
+
+       [HttpDelete("AnnualSetting/{year}")] 
+      public ActionResult DeleteAnnualSetting(int year)
+      
+      {
+      try     
+                {
+                bool completed=   _AnnualDataService.DeleteAnnuaSetting(year);
+                if (completed)
+                { return Ok("delete Successfully");}
+                
+                   return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = "Delete Failed" }) ;
+                }
+                 catch (Exception ex){
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+                    
+         }
+
+
+
+          [HttpPost]
+          [Route("AnnualSetting")]
+        public async Task<ActionResult< Response>> AddAnnualSetting([FromBody] AnnualSettingDTO annualSettingDTO)
+        {
+                var response =await _AnnualDataService.AddAnnualSettings(annualSettingDTO);
+                  if (response.ErrorMessage!=null)
+               {
+                    return StatusCode(StatusCodes.Status500InternalServerError,
+                       new Response {  ErrorMessage =response.ErrorMessage});
+               }
+                return Ok(response);
+        } 
   
-  } }
+  }
+   }

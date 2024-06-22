@@ -79,6 +79,10 @@ namespace api.Services
                 response.ErrorMessage = ex.Message;
                  
             }
+            catch(Exception exx)
+            {
+                response.ErrorMessage = exx.Message;
+            }
 
             response.InsertedId  =insertedId;
              return response;

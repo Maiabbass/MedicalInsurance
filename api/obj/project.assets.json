@@ -3777,11 +3777,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
       "projectName": "api",
       "projectPath": "C:\\midpro\\MedicalInsurance\\api\\api.csproj",
       "packagesPath": "C:\\Users\\Zaher\\.nuget\\packages\\",
       "outputPath": "C:\\midpro\\MedicalInsurance\\api\\obj\\",
+=======
+      "projectUniqueName": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj",
+      "projectName": "api",
+      "projectPath": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj",
+      "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\obj\\",
+>>>>>>> origin/backend
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Zaher\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3858,7 +3866,11 @@
             "privateAssets": "all"
           }
         },
+<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.419\\RuntimeIdentifierGraph.json"
+=======
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
+>>>>>>> origin/backend
       }
     }
   }

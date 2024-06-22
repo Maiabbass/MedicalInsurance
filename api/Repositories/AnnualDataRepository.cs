@@ -230,10 +230,27 @@ namespace api.Repositories
       
         }
 
+        public async Task<int> Add_Year_Configuration(YearConfiguration yearConfiguration)
+        {
+            int insertedId=0;
+             _dataContext.YearConfigurations.Add(yearConfiguration);
+            await _dataContext.SaveChangesAsync();
+            insertedId = yearConfiguration.Id;
+            return insertedId;
+
+        }
+
+        public  void Delete_Year_Configuration(int year)
+        {
+             var yearConfigurationItem=  _dataContext.YearConfigurations.FirstOrDefault(x=>x.Year==year);
+             if (yearConfigurationItem!=null)
+             {
+                _dataContext.YearConfigurations.Remove(yearConfigurationItem);
+             }
+
+        }
 
         
-
-       
     }
 
     }

@@ -615,6 +615,31 @@ namespace api.Data.Migrations
                     b.ToTable("WorkPlaces");
                 });
 
+            modelBuilder.Entity("api.Entities.YearConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal?>("CardPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("InsideHospitalPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("OutsideHospitalPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("YearConfigurations");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")

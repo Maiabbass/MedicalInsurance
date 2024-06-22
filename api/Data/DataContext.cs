@@ -38,24 +38,14 @@ namespace api.Data
          public DbSet<SurgicalProcedures> SurgicalProcedures { get; set; }
          public DbSet<EngineeringeDepar> EngineeringeDepars { get; set;}
 
+         public DbSet<YearConfiguration> YearConfigurations { get; set;}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-
             base.OnModelCreating(builder);
-
            // builder.Entity<TaskTypeGroup>().HasMany(tg=>tg.TaskTypeCheckLists).WithOne(tg=>tg.TaskTypeGroup).OnDelete(DeleteBehavior.NoAction);
-
-
-
-
-             
-            
-
             builder.Entity<EngineeringUnits>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.EngineeringUnits).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<WorkPlace>().HasMany(tg=>tg.AnnualDatas).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
-            
-
             
              builder.Entity<WorkPlace>().HasMany(tg=>tg.Engineeres).WithOne(tg=>tg.WorkPlace).OnDelete(DeleteBehavior.NoAction);
 

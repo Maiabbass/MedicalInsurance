@@ -20,5 +20,22 @@ namespace api.Repositories
         {
         return  await _dataContext.AgeSegments.Where(x=>x.Year==year).ToListAsync();
         }
+        public async Task<bool> Add_Age_Segments(List<AgeSegments> ageSegments)
+        {
+            
+            await _dataContext.AgeSegments.AddRangeAsync(ageSegments);
+           return  await _dataContext.SaveChangesAsync()>0;
+        }
+
+        public void Delete_Age_Segments(int year)
+        {
+             var segmentsDBItems=_dataContext.AgeSegments.Where(x=>x.Year==year).ToList();
+             if (segmentsDBItems!=null)
+             {
+                _dataContext.AgeSegments.RemoveRange(segmentsDBItems);
+                _dataContext.SaveChanges();
+             }
+             
+        }
     }
 }

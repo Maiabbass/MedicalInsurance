@@ -27,6 +27,12 @@ namespace api.Repositories
        
         bool Update(int id, AnnualDataForView annualDataForView);
         public bool Update(int Id, AnnualDataDetailForView annualDataDetailForView  );
+
+
+        Task<int> Add_Year_Configuration(YearConfiguration yearConfiguration);
+        void Delete_Year_Configuration(int year);
+
+         
    
     }
 }
