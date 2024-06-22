@@ -52,12 +52,12 @@ namespace api.Entities
         public bool Beneficiary { get; set; }
 
         
-        public Engineere Engineere { get; set; }
+        public Engineere? Engineere { get; set; }
 
        // public int RelationId{ get ; set ;}
       //  public Relation Relation{get; set; }
 
-       public int? statusId{ get; set;}
+       public int? StatusId{ get; set;}
         public Status? Status { get; set;}
 
         public int GenderId {get; set;}

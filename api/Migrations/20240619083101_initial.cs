@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace api.Data.Migrations
+namespace api.Migrations
 {
-    public partial class InitialCreat : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -425,15 +425,9 @@ namespace api.Data.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FatherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-<<<<<<<< HEAD:api/Data/Migrations/20240621160949_InitialCreat.cs
-                    MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    NationalId = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-========
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NationalId = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
->>>>>>>> 3bcb0eeeaa8ae1096cb293c809066883ebb7593d:api/Migrations/20240619083101_initial.cs
                     EnsuranceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -443,11 +437,7 @@ namespace api.Data.Migrations
                     Affiliate = table.Column<bool>(type: "bit", nullable: false),
                     Beneficiary = table.Column<bool>(type: "bit", nullable: false),
                     EngineereId = table.Column<int>(type: "int", nullable: false),
-<<<<<<<< HEAD:api/Data/Migrations/20240621160949_InitialCreat.cs
-                    statusId = table.Column<int>(type: "int", nullable: true),
-========
                     StatusId = table.Column<int>(type: "int", nullable: true),
->>>>>>>> 3bcb0eeeaa8ae1096cb293c809066883ebb7593d:api/Migrations/20240619083101_initial.cs
                     GenderId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -466,13 +456,8 @@ namespace api.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-<<<<<<<< HEAD:api/Data/Migrations/20240621160949_InitialCreat.cs
-                        name: "FK_Persons_Statuses_statusId",
-                        column: x => x.statusId,
-========
                         name: "FK_Persons_Statuses_StatusId",
                         column: x => x.StatusId,
->>>>>>>> 3bcb0eeeaa8ae1096cb293c809066883ebb7593d:api/Migrations/20240619083101_initial.cs
                         principalTable: "Statuses",
                         principalColumn: "Id");
                 });
@@ -694,15 +679,9 @@ namespace api.Data.Migrations
                 column: "GenderId");
 
             migrationBuilder.CreateIndex(
-<<<<<<<< HEAD:api/Data/Migrations/20240621160949_InitialCreat.cs
-                name: "IX_Persons_statusId",
-                table: "Persons",
-                column: "statusId");
-========
                 name: "IX_Persons_StatusId",
                 table: "Persons",
                 column: "StatusId");
->>>>>>>> 3bcb0eeeaa8ae1096cb293c809066883ebb7593d:api/Migrations/20240619083101_initial.cs
 
             migrationBuilder.CreateIndex(
                 name: "IX_Relations_EngineereId",
