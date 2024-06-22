@@ -9,11 +9,11 @@ using api.Data;
 
 #nullable disable
 
-namespace api.Migrations
+namespace api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240610184300_claims2")]
-    partial class claims2
+    [Migration("20240621160949_InitialCreat")]
+    partial class InitialCreat
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -220,22 +220,22 @@ namespace api.Migrations
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StatusId")
+                        .HasColumnType("int");
+
                     b.Property<string>("SubNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("WorkPlaceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("statusId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("SpecializationId");
 
-                    b.HasIndex("WorkPlaceId");
+                    b.HasIndex("StatusId");
 
-                    b.HasIndex("statusId");
+                    b.HasIndex("WorkPlaceId");
 
                     b.ToTable("Engineeres");
                 });
@@ -374,6 +374,9 @@ namespace api.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EngineereId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EnsuranceNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -397,13 +400,12 @@ namespace api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotherName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NationalId")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -411,9 +413,16 @@ namespace api.Migrations
                     b.Property<bool>("Subscrib")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("statusId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("EngineereId");
+
                     b.HasIndex("GenderId");
+
+                    b.HasIndex("statusId");
 
                     b.ToTable("Persons");
                 });
@@ -823,30 +832,20 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Entities.Engineere", b =>
                 {
-                    b.HasOne("api.Entities.Person", "Person")
-                        .WithOne("Engineere")
-                        .HasForeignKey("api.Entities.Engineere", "Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("api.Entities.Specialization", "Specialization")
                         .WithMany("Engineeres")
                         .HasForeignKey("SpecializationId");
+
+                    b.HasOne("api.Entities.Status", null)
+                        .WithMany("Engineeres")
+                        .HasForeignKey("StatusId");
 
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("Engineeres")
                         .HasForeignKey("WorkPlaceId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("api.Entities.Status", "Status")
-                        .WithMany("Engineeres")
-                        .HasForeignKey("statusId");
-
-                    b.Navigation("Person");
-
                     b.Navigation("Specialization");
-
-                    b.Navigation("Status");
 
                     b.Navigation("WorkPlace");
                 });
@@ -864,13 +863,27 @@ namespace api.Migrations
 
             modelBuilder.Entity("api.Entities.Person", b =>
                 {
+                    b.HasOne("api.Entities.Engineere", "Engineere")
+                        .WithMany()
+                        .HasForeignKey("EngineereId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("api.Entities.Gender", "Gender")
                         .WithMany("Persons")
                         .HasForeignKey("GenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("api.Entities.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("statusId");
+
+                    b.Navigation("Engineere");
+
                     b.Navigation("Gender");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("api.Entities.Relation", b =>
@@ -1022,9 +1035,6 @@ namespace api.Migrations
                     b.Navigation("AnnualDataDetails");
 
                     b.Navigation("Claims");
-
-                    b.Navigation("Engineere")
-                        .IsRequired();
 
                     b.Navigation("Relations");
                 });

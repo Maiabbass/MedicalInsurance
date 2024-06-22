@@ -28,11 +28,11 @@ namespace api.Entities
 
         public string LastName { get; set; }
 
-        public string  MotherName { get; set; }
+        public string?  MotherName { get; set; }
 
         public DateTime? BirthDate { get; set; }
 
-        [StringLength(10,MinimumLength =10,ErrorMessage ="Invalid National ID Length")]
+      [StringLength(11,MinimumLength =11,ErrorMessage ="Invalid National ID Length")]
         public string NationalId { get; set; }
 
         public string EnsuranceNumber { get; set; }

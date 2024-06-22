@@ -30,6 +30,8 @@ namespace api.Repositories
         IClimsRepository ClimsRepository {get ;}
 
         ISearchRepository SearchRepository{get ;}
+
+        ISubscriberRepository SubscriberRepository{get ;}
        
 
         Task<bool> Complete();

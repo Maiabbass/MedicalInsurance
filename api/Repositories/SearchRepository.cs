@@ -35,5 +35,7 @@ namespace api.Repositories
         {
             return await _dataContext.Persons.Where(x=>x.NationalId==NationalId).FirstOrDefaultAsync();
         }
+
+       
     }
-}
+    }
