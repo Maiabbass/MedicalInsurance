@@ -52,12 +52,17 @@ namespace api.Services
                        Person? engineere= await _unitOfWork.PersonRepository.Get(registerAnnualDataDTO.EngineerId);
                        if (engineere!=null)
                        {
+
+                             engineer_annualDataDetail.Amount=calcualteAmount(engineere.BirthDate,registerAnnualDataDTO.Year);
+                            /*
                             var engineerAge=  engineere.BirthDate.GetAge();
-                            var segment= ageSegments.Where(x=>engineerAge>=x.FromYear&&engineerAge<=x.ToYear).FirstOrDefault();
+                            var segment= ageSegments.Where(x=>engineerAge>=x.FromYear&&engineerAge<=x.ToYear
+                            ).FirstOrDefault();
                             if (segment!=null)
                             {
                                 engineer_annualDataDetail.Amount = segment.TheAmount;
                             }
+                            */
                        }
                     }
 
@@ -77,11 +82,16 @@ namespace api.Services
                        if (person!=null)
                        {
                             var personAge=  person.BirthDate.GetAge();
-                            var segment= ageSegments.Where(x=>personAge>=x.FromYear&&personAge<=x.ToYear).FirstOrDefault();
+                            annualDataDetail_person.Amount  =calcualteAmount(person.BirthDate,registerAnnualDataDTO.Year);
+
+                            /*
+                            var segment= ageSegments.Where(x=>personAge>=x.FromYear&&personAge<=x.ToYear
+                            ).FirstOrDefault();
                             if (segment!=null)
                             {
                                 annualDataDetail_person.Amount = segment.TheAmount;
                             }
+                            */
                        }
                        persons_AnnualDataDetailList.Add(annualDataDetail_person);
                      }
@@ -139,9 +149,30 @@ namespace api.Services
                 response.ErrorMessage = ex.Message;
                  
             }
+            catch(Exception exx){  response.ErrorMessage = exx.Message;}
              return response;
 
            
+        }
+
+
+
+        // helper method to calculate the register annual amount based on birth date and current year...
+        public decimal calcualteAmount(DateTime? birthDate,int year)
+        {
+         
+         
+          decimal amount=0m;
+          var  ageSegments=   _unitOfWork.AgeSegmentsRepository.Get(year).GetAwaiter().GetResult();
+           var age=  birthDate.GetAge();
+                            var segment= ageSegments.Where(x=> age>=x.FromYear&&age<=x.ToYear
+                            ).FirstOrDefault();
+                            if (segment!=null)
+                            {
+                                amount= segment.TheAmount;
+                            }
+
+                            return amount;
         }
          
 
@@ -153,11 +184,7 @@ namespace api.Services
         return await _unitOfWork.AnnualDataRepository.Get(AnnualDataId);
        }
 
-       
-
-       
-
-       
+         
      public bool Delete(int Id){
 
       try
@@ -191,6 +218,75 @@ namespace api.Services
            return _unitOfWork.AnnualDataRepository.Update(Id, annualDataDetailForView);
         }
     
+      
 
 
-    }}
+      public async Task<Response> AddAnnualSettings(AnnualSettingDTO annualSettingDTO)
+      {
+         Response response =new Response ();
+        
+
+         try 
+         {
+              using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+              {
+                  YearConfiguration yearConfiguration =new  YearConfiguration()
+                  {
+                    Id=0,
+                    Year=annualSettingDTO.Year,
+                    InsideHospitalPercentage =annualSettingDTO.InsideHospitalPercentage,
+                    OutsideHospitalPercentage = annualSettingDTO.OutsideHospitalPercentage,
+                    CardPrice = annualSettingDTO.CardPrice,
+
+                  };
+                   await _unitOfWork.AnnualDataRepository.Add_Year_Configuration(yearConfiguration);
+                    
+                    // add age segments 
+                    foreach(var item in annualSettingDTO.AgeSegments)
+                    {
+                      item.Year=annualSettingDTO.Year;
+                    }
+                    await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(annualSettingDTO.AgeSegments);
+                    response.Status="Success";
+                  scope.Complete();
+
+              }//using transaction scope 
+
+         }
+          catch(TransactionAbortedException ex){  response.ErrorMessage = ex.Message;}
+         catch(Exception exx){  response.ErrorMessage = exx.Message;}
+         return response;
+      }
+
+
+
+      public bool DeleteAnnuaSetting(int year)
+      {
+        bool completed=false;
+         try 
+         {
+              using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
+              {
+                   
+                    
+                     _unitOfWork.AnnualDataRepository.Delete_Year_Configuration(year);
+                    
+                    // add age segments 
+                      _unitOfWork.AgeSegmentsRepository.Delete_Age_Segments(year);
+                  
+                  scope.Complete();
+                  completed=true;
+
+              }//using transaction scope 
+
+         }
+          catch(TransactionAbortedException ex){   }
+         catch(Exception exx){   }
+         
+        return completed;
+      }
+
+    }
+    
+    
+    }

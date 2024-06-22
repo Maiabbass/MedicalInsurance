@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\API.csproj": {}
+    "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\API.csproj": {
+    "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\API.csproj",
-        "projectName": "API",
-        "projectPath": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\API.csproj",
+        "projectUniqueName": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj",
+        "projectName": "api",
+        "projectPath": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\api.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\Administrator\\source\\repos\\MedicalInsurance\\api\\obj\\",
         "projectStyle": "PackageReference",
@@ -91,20 +91,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[6.0.16, 6.0.16]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[6.0.16, 6.0.16]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[6.0.16, 6.0.16]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -114,11 +100,6 @@
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }
