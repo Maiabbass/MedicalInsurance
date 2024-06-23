@@ -132,13 +132,12 @@ namespace API
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
            // app.Build();
-            if (env.IsDevelopment())
+            if (env.IsDevelopment()||env.IsProduction())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIv5 v1"));
             }
-
 
            // app.UseHttpsRedirection();
 
@@ -151,7 +150,7 @@ namespace API
 
 
         using (var scope = app.ApplicationServices.CreateScope())
-    {
+       {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
@@ -193,11 +192,7 @@ namespace API
                 }
             }
         }
-    }
-
-         
-
-
+         }
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
