@@ -57,9 +57,29 @@ namespace api.Data
 
 
              builder.Entity<Person>().HasMany(tg=>tg.AnnualDataDetails).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
+             builder.Entity<Person>()
+            .HasIndex(u => u.NationalId)
+            .IsUnique();
+            builder.Entity<Person>()
+            .HasIndex(u => u.EnsuranceNumber)
+            .IsUnique();
+            builder.Entity<Engineere>().HasIndex(u => u.EngNumber).IsUnique();
+            builder.Entity<City>().HasIndex(u => u.Name).IsUnique();
+            builder.Entity<Claims>().HasIndex(u => u.EnsuranceNumber).IsUnique();
+            builder.Entity<EngineeringeDepar>().HasIndex(u => u.Name).IsUnique();
+            builder.Entity<EngineeringUnits>().HasIndex(u => u.Name).IsUnique();
+            builder.Entity<PayMethod>().HasIndex(u => u.NameMethod).IsUnique();
+            builder.Entity<Specialization>().HasIndex(u => u.Name).IsUnique();
+            builder.Entity<WorkPlace>().HasIndex(u => u.Name).IsUnique();
+             builder.Entity<EngineeringeDepar>()
+            .HasMany(e => e.Specializations)
+            .WithOne(s => s.EngineeringeDepar)
+            .HasForeignKey(s => s.EngineeringeDeparId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+
         }
-
-
 
     }
 }

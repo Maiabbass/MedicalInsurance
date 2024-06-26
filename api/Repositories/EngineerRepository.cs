@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -18,6 +19,7 @@ namespace api.Repositories
          }
         public async Task<int> Add(Engineere engineere)
         {
+          try{
             Engineere newEngineer =new Engineere()
              {
                EngNumber=engineere.EngNumber,
@@ -33,7 +35,14 @@ namespace api.Repositories
               await _dataContext.SaveChangesAsync();
 
               return newEngineer.Id;
+          }
+          catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
         }
+        }
+
+        
 
         public async Task<Engineere?> Get(int Id)
         {

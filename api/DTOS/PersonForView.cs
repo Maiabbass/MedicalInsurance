@@ -33,8 +33,9 @@ namespace api.DTOS
 
         public bool Beneficiary { get; set; }
 
-        
-      
+        public string Mobile { get; set; }
+
+        public string Email { get; set; }
 
         public int GenderId {get; set;}
        

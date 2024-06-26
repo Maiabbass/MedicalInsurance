@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -18,6 +19,7 @@ namespace api.Repositories
          }
         public async Task<int> Add(City city)
         {
+          try{
 #pragma warning disable IDE0090 // Use 'new(...)'
             City newCity =new City()
              {
@@ -32,7 +34,11 @@ namespace api.Repositories
 
               return newCity.Id;
         }
-
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+        }
+        }
         public async Task<City?> Get(int Id)
         {
               return await _dataContext.Cities.Where(x=>x.Id==Id).FirstOrDefaultAsync();

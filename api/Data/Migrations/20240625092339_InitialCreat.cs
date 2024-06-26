@@ -72,7 +72,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,7 +85,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -98,7 +98,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Namepresident = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phonepresident = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Emailpresident = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -125,7 +125,7 @@ namespace api.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    NameMethod = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    NameMethod = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,6 +168,22 @@ namespace api.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SurgicalProcedures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "YearConfigurations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    InsideHospitalPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    OutsideHospitalPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    CardPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_YearConfigurations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -307,7 +323,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     EngineeringeDeparId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -327,7 +343,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     EngineeringUnitsId = table.Column<int>(type: "int", nullable: false)
@@ -348,7 +364,7 @@ namespace api.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    EngNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EngNumber = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SubNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SpecializationId = table.Column<int>(type: "int", nullable: true),
                     WorkPlaceId = table.Column<int>(type: "int", nullable: true)
@@ -422,7 +438,7 @@ namespace api.Data.Migrations
                     MotherName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     NationalId = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    EnsuranceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnsuranceNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Mobile = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -488,7 +504,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EnsuranceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnsuranceNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Company_fees = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -627,6 +643,18 @@ namespace api.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Cities_Name",
+                table: "Cities",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Claims_EnsuranceNumber",
+                table: "Claims",
+                column: "EnsuranceNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Claims_HospitalId",
                 table: "Claims",
                 column: "HospitalId");
@@ -642,6 +670,13 @@ namespace api.Data.Migrations
                 column: "SurgicalProceduresId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Engineeres_EngNumber",
+                table: "Engineeres",
+                column: "EngNumber",
+                unique: true,
+                filter: "[EngNumber] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Engineeres_SpecializationId",
                 table: "Engineeres",
                 column: "SpecializationId");
@@ -652,9 +687,27 @@ namespace api.Data.Migrations
                 column: "WorkPlaceId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_EngineeringeDepars_Name",
+                table: "EngineeringeDepars",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EngineeringUnits_Name",
+                table: "EngineeringUnits",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Hospitals_CityId",
                 table: "Hospitals",
                 column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PayMethods_NameMethod",
+                table: "PayMethods",
+                column: "NameMethod",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Persons_EngineereId",
@@ -662,9 +715,21 @@ namespace api.Data.Migrations
                 column: "EngineereId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Persons_EnsuranceNumber",
+                table: "Persons",
+                column: "EnsuranceNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Persons_GenderId",
                 table: "Persons",
                 column: "GenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Persons_NationalId",
+                table: "Persons",
+                column: "NationalId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Persons_StatusId",
@@ -692,9 +757,21 @@ namespace api.Data.Migrations
                 column: "EngineeringeDeparId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Specializations_Name",
+                table: "Specializations",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WorkPlaces_EngineeringUnitsId",
                 table: "WorkPlaces",
                 column: "EngineeringUnitsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkPlaces_Name",
+                table: "WorkPlaces",
+                column: "Name",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -725,6 +802,9 @@ namespace api.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Relations");
+
+            migrationBuilder.DropTable(
+                name: "YearConfigurations");
 
             migrationBuilder.DropTable(
                 name: "AnnualDatas");

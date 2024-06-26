@@ -120,6 +120,7 @@ namespace API
               services.AddScoped<IUserRoleService, UserRoleService>();
               services.AddScoped<ISearchService,SearchService>();
               services.AddScoped<ISubscriberRepository,SubscriberRepository>();
+              services.AddScoped<ISpecializationService,SpecializationService>();
             
               
             services.AddSwaggerGen(c =>

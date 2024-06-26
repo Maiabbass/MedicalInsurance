@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240622110752_InitialCreat")]
-    partial class InitialCreat
+    [Migration("20240626124611_modified1")]
+    partial class modified1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -139,9 +139,12 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Cities");
                 });
@@ -165,7 +168,7 @@ namespace api.Data.Migrations
 
                     b.Property<string>("EnsuranceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ExitDate")
                         .HasColumnType("datetime2");
@@ -200,6 +203,9 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EnsuranceNumber")
+                        .IsUnique();
+
                     b.HasIndex("HospitalId");
 
                     b.HasIndex("PersonId");
@@ -215,7 +221,7 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EngNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
@@ -227,6 +233,10 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EngNumber")
+                        .IsUnique()
+                        .HasFilter("[EngNumber] IS NOT NULL");
 
                     b.HasIndex("SpecializationId");
 
@@ -245,9 +255,12 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("EngineeringeDepars");
                 });
@@ -266,7 +279,7 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Namepresident")
                         .IsRequired()
@@ -277,6 +290,9 @@ namespace api.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("EngineeringUnits");
                 });
@@ -339,9 +355,12 @@ namespace api.Data.Migrations
 
                     b.Property<string>("NameMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NameMethod")
+                        .IsUnique();
 
                     b.ToTable("PayMethods");
                 });
@@ -374,7 +393,7 @@ namespace api.Data.Migrations
 
                     b.Property<string>("EnsuranceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FatherName")
                         .IsRequired()
@@ -415,7 +434,13 @@ namespace api.Data.Migrations
 
                     b.HasIndex("EngineereId");
 
+                    b.HasIndex("EnsuranceNumber")
+                        .IsUnique();
+
                     b.HasIndex("GenderId");
+
+                    b.HasIndex("NationalId")
+                        .IsUnique();
 
                     b.HasIndex("StatusId");
 
@@ -479,11 +504,14 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EngineeringeDeparId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Specializations");
                 });
@@ -605,7 +633,7 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
@@ -614,7 +642,35 @@ namespace api.Data.Migrations
 
                     b.HasIndex("EngineeringUnitsId");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("WorkPlaces");
+                });
+
+            modelBuilder.Entity("api.Entities.YearConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal?>("CardPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("InsideHospitalPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("OutsideHospitalPercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("YearConfigurations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

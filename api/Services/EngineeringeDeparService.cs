@@ -58,6 +58,48 @@ namespace api.Services
              return response;
             
         }
+
+           public async Task<EngineeringeDepar?>Get(int Id)
+     {
+      return await _unitOfWork.EngineeringeDeparRepository.Get(Id);
+     }
+
+     public async Task<IEnumerable<EngineeringeDepar>>GetAll()
+        {
+            return  await _unitOfWork.EngineeringeDeparRepository.GetAll() ;
+        }
+
+      public bool Update(int Id, EngineeringeDeparEditDTO eng){
+           return _unitOfWork.EngineeringeDeparRepository.Update(Id, eng);
+        }
+
+         public bool Delete(int id)
+{
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            _unitOfWork.EngineeringeDeparRepository.DeleteByEngineeringeDeparId(id);
+            _unitOfWork.EngineeringeDeparRepository.Delete(id);
+            scope.Complete();
+            return true;
+        }
+    }
+    catch (TransactionAbortedException ex)
+    {
+        // تسجيل الخطأ
+        Console.WriteLine($"TransactionAbortedException: {ex.Message}");
+        return false;
+    }
+    catch (Exception ex)
+    {
+        // تسجيل الخطأ
+        Console.WriteLine($"Exception: {ex.Message}");
+        return false;
+    }
+}
+
+        
         
     }
 }

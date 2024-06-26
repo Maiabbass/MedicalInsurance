@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using api.DTOS;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -25,8 +27,8 @@ namespace api.Controllers
          [HttpPost]
         public async Task <ActionResult<Response>> AddWorkplace([FromBody] WorkplaceEditDTO   workplaceEditDTO)
         {
-           
-    
+          try{
+
                 var response=  await _workplaceService.Add(workplaceEditDTO);
                if (response.ErrorMessage!=null)
                {
@@ -34,6 +36,17 @@ namespace api.Controllers
                        new Response {  ErrorMessage =response.ErrorMessage});
                }
                return Ok (response);
+          }
+             catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+            {
+                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
+            }
+            catch (Exception ex)
+            {
+                string Details = System.Text.Json.JsonSerializer.Serialize(workplaceEditDTO);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
+            }
 
 
         }

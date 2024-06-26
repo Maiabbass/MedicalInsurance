@@ -39,6 +39,7 @@ namespace api.Repositories
         public ISearchRepository  SearchRepository => new SearchRepository(_dataContext);
 
         public ISubscriberRepository SubscriberRepository => new SubscriberRepository(_dataContext);
+        public ISpecializationRepository SpecializationRepository=> new SpecializationRepository(_dataContext);
 
         public Task<bool> Complete()
         {

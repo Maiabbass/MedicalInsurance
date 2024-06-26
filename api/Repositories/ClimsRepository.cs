@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Entities;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 
 namespace api.Repositories
@@ -22,6 +24,7 @@ namespace api.Repositories
 
         public List<Claims> ReadDataFromExcel(Stream fileStream)
         {
+            try{
             var claims = new List<Claims>();
 
             using (var package = new ExcelPackage(fileStream))
@@ -105,10 +108,17 @@ namespace api.Repositories
                 }
             }
 
-            
 
             return claims;
         }
+         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+        }
+        }
+   
+
 
 
 

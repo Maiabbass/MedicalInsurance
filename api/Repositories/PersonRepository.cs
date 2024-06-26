@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -20,32 +21,38 @@ namespace api.Repositories
             _dataContext = dataContext;
         }
         public async Task<int> Add(Person person)
+    {
+        try
         {
-             Person newperson =new Person()
-             {
-             FirstName = person.FirstName,
-             FatherName =person.FatherName,
-             MotherName =person.MotherName,
-             LastName = person.LastName,
-             BirthDate = person.BirthDate,
-             NationalId = person.NationalId,
-             EnsuranceNumber = person.EnsuranceNumber,
-             Address = person.Address,
-             Phone = person.Phone,
-             Mobile=person.Mobile,
-             Email=person.Email,
-             Subscrib=person.Subscrib,
-             Affiliate=person.Affiliate,
-             Beneficiary=person.Beneficiary,
-             GenderId = person.GenderId
-             }; 
+            Person newPerson = new Person()
+            {
+                FirstName = person.FirstName,
+                FatherName = person.FatherName,
+                MotherName = person.MotherName,
+                LastName = person.LastName,
+                BirthDate = person.BirthDate,
+                NationalId = person.NationalId,
+                EnsuranceNumber = person.EnsuranceNumber,
+                Address = person.Address,
+                Phone = person.Phone,
+                Mobile = person.Mobile,
+                Email = person.Email,
+                Subscrib = person.Subscrib,
+                Affiliate = person.Affiliate,
+                Beneficiary = person.Beneficiary,
+                GenderId = person.GenderId
+            };
 
-             _dataContext.Persons.Add(newperson);
-              await _dataContext.SaveChangesAsync();
+            _dataContext.Persons.Add(newPerson);
+            await _dataContext.SaveChangesAsync();
 
-              return newperson.Id;
-             
+            return newPerson.Id;
         }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+        }
+    }
 
      
         public async Task<Person?> Get(int Id)

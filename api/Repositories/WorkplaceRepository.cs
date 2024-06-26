@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -19,6 +20,7 @@ namespace api.Repositories
          }
         public async Task<int> Add(WorkPlace workPlace)
         {
+         try{
 #pragma warning disable IDE0090 // Use 'new(...)'
             WorkPlace newWorkPlace =new WorkPlace()
              {
@@ -35,6 +37,12 @@ namespace api.Repositories
               await _dataContext.SaveChangesAsync();
 
               return newWorkPlace.Id;
+         }
+              catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+        }
         }
 
         public async Task<WorkPlace?> Get(int Id)

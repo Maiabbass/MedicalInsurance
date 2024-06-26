@@ -88,7 +88,6 @@ namespace api.Controllers
               {
                 try 
                 {
-
                       User user =new ()
            {
             

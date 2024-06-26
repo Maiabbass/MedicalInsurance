@@ -71,22 +71,16 @@ namespace api.Services
                await _unitOfWork.EngineerRepository.Add(engineere);
 
                 scope.Complete();
-                } // using 
-               } // try 
-              catch(TransactionAbortedException ex)
-            {
-
-                response.ErrorMessage = ex.Message;
-                 
-            }
-            catch(Exception exx)
-            {
-                response.ErrorMessage = exx.Message;
-            }
-
-            response.InsertedId  =insertedId;
+             
+               }
+                 }
+                   catch(TransactionAbortedException ex)
+                 {
+                   response.ErrorMessage = ex.Message;
+                 }
+                 catch(Exception exx){  response.ErrorMessage = exx.Message;}
+                response.InsertedId  =insertedId;
              return response;
-            
         }
 
         public async Task<Engineere?>Get(int Id)

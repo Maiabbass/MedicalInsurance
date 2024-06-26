@@ -43,18 +43,16 @@ namespace api.Services
              
 
                 scope.Complete();
-                } // using 
-               } // try 
-              catch(TransactionAbortedException ex)
-            {
-
-                response.ErrorMessage = ex.Message;
-                 
-            }
-
-            response.InsertedId  =insertedId;
+               
+              }
+                 }
+                   catch(TransactionAbortedException ex)
+                 {
+                   response.ErrorMessage = ex.Message;
+                 }
+                 catch(Exception exx){  response.ErrorMessage = exx.Message;}
+                response.InsertedId  =insertedId;
              return response;
-            
         }
 
         
