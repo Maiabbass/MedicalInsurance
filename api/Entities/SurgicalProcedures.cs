@@ -13,7 +13,11 @@ namespace api.Entities
 
          public string Name { get; set; }
 
-         public string Type { get; set;}
+          public bool Technical {get ; set;}
+
+         public bool Financial {get ; set ;}
+
+         public string Pathological_specialization { get; set; }
 
          public ICollection<Claims> Claims{get ; set; }
 

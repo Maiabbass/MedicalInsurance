@@ -31,6 +31,7 @@ namespace api.Services
            {
           
             Name = engineeringUnitsEditDTO.Name,
+            Number=engineeringUnitsEditDTO.Number,
             Phonepresident=engineeringUnitsEditDTO.Phonepresident,
             Namepresident=engineeringUnitsEditDTO.Namepresident,
             Emailpresident=engineeringUnitsEditDTO.Emailpresident, 
@@ -91,8 +92,8 @@ namespace api.Services
                  }
 
 
-        public bool Update(int Id, string Name){
-             return _unitOfWork.EngineeringUnitsRepository.Update(Id, Name);
+        public bool Update(int Id, EngineeringUnitsEditDTO engineeringUnitsEditDTO){
+             return _unitOfWork.EngineeringUnitsRepository.Update(Id,engineeringUnitsEditDTO);
 
 
         }

@@ -194,5 +194,43 @@ namespace api.Controllers
           {
               return Ok(Id+Id);
           }
+
+
+         
+        
+
+
+[HttpPost("editRoles")]
+public async Task<IActionResult> EditRoles([FromBody] EditRolesRequest request) 
+{
+    var user = await _userManager.FindByNameAsync(request.UserName);
+
+    if (user == null) 
+    {
+        return BadRequest($"{request.UserName} not found");
+    }
+
+    var userRoles = await _userManager.GetRolesAsync(user);
+
+    var selectedRoles = request.RoleNames ?? new string[] {};
+
+    var result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
+
+    if (!result.Succeeded) 
+    {
+        return BadRequest("Failed to add to roles");
+    }
+
+    result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
+
+    if (!result.Succeeded) 
+    {
+        return BadRequest("Failed to remove the roles");
+    }   
+
+    return Ok(await _userManager.GetRolesAsync(user));         
+}
+
+
     }
 }

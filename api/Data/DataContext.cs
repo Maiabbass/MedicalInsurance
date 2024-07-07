@@ -64,8 +64,8 @@ namespace api.Data
             .HasIndex(u => u.EnsuranceNumber)
             .IsUnique();
             builder.Entity<Engineere>().HasIndex(u => u.EngNumber).IsUnique();
-            builder.Entity<City>().HasIndex(u => u.Name).IsUnique();
-            builder.Entity<Claims>().HasIndex(u => u.EnsuranceNumber).IsUnique();
+           // builder.Entity<City>().HasIndex(u => u.Name).IsUnique();
+           // builder.Entity<Claims>().HasIndex(u => u.EnsuranceNumber).IsUnique();
             builder.Entity<EngineeringeDepar>().HasIndex(u => u.Name).IsUnique();
             builder.Entity<EngineeringUnits>().HasIndex(u => u.Name).IsUnique();
             builder.Entity<PayMethod>().HasIndex(u => u.NameMethod).IsUnique();
@@ -75,6 +75,11 @@ namespace api.Data
             .HasMany(e => e.Specializations)
             .WithOne(s => s.EngineeringeDepar)
             .HasForeignKey(s => s.EngineeringeDeparId)
+            .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<Person>()
+            .HasOne(p => p.Engineere)
+            .WithOne(e => e.Person)
+            .HasForeignKey<Engineere>(e => e.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
 

@@ -137,12 +137,9 @@ namespace api.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
 
                     b.ToTable("Cities");
                 });
@@ -166,7 +163,7 @@ namespace api.Data.Migrations
 
                     b.Property<string>("EnsuranceNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ExitDate")
                         .HasColumnType("datetime2");
@@ -200,9 +197,6 @@ namespace api.Data.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EnsuranceNumber")
-                        .IsUnique();
 
                     b.HasIndex("HospitalId");
 
@@ -282,6 +276,9 @@ namespace api.Data.Migrations
                     b.Property<string>("Namepresident")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
 
                     b.Property<string>("Phonepresident")
                         .IsRequired()
@@ -537,6 +534,9 @@ namespace api.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Pathological_specialization")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")

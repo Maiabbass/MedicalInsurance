@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Services;
 using api.Entities;
 using Microsoft.AspNetCore.Mvc;
+using api.DTOS;
 
 namespace api.Controllers
 {
@@ -22,26 +23,124 @@ namespace api.Controllers
     }
 
     [HttpGet]
-    [Route("find/ByEnsuranceNumber/{EnsuranceNumber}")]
-    public async Task<ActionResult<Person?>>GetWithEN( string EnsuranceNumber){
-    return Ok(await _searchService.GetWithEN(EnsuranceNumber));
-    }
+    [Route("find/ByEnsuranceNumber/{ensuranceNumber}")]
+    public async Task<ActionResult<PersonWithEngineereDTO>> GetByEnsuranceNumberAsync(string ensuranceNumber)
+        {
+            var personWithEngineere = await _searchService.GetByEnsuranceNumberAsync(ensuranceNumber);
+
+            if (personWithEngineere == null)
+            {
+                return NotFound();
+            }
+
+            return personWithEngineere;
+        }
 
 
 
     [HttpGet]
-    [Route("find/ByName/{Name}")]
+    [Route("find/ByName/{userSearch}")]
 
-    public async Task<ActionResult<Person?>>GetWithName( string Name){
-    return Ok( await _searchService.GetWithName(Name));
+    public async Task<ActionResult<PersonWithEngineereDTO?>>GetWithName( string userSearch){
+    return Ok( await _searchService.GetWithNameAsync(userSearch));
     }
 
     [HttpGet]
-    [Route("find/ByNationalId/{NationalId}")]
-    public async Task<ActionResult<Person?>>GetWithNationalId( string NationalId){
-    return Ok(await _searchService.GetWithNationalId(NationalId));
+    [Route("find/ByNationalId/{NationalId}")]   
+    public async Task<ActionResult<PersonWithEngineereDTO>> GetByNationalIdAsync(string nationalId){
+    return Ok(await _searchService.GetByNationalIdAsync(nationalId));
+    }
+
+    [HttpGet]
+    [Route("find/ByEngNumber/{engNumber}")]   
+    public async Task<ActionResult<PersonWithEngineereDTO>> GetByEngNumberAsync(string engNumber){
+    return Ok(await _searchService.GetEngNumberAsync(engNumber));
     }
 
 
+
+    [HttpGet("find/EngUnits/{name}")]
+        public async Task<ActionResult<IEnumerable<EngineeringUnits>>> GetEngUnits(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Name parameter is required.");
+            }
+
+            var results = await _searchService.GetEngUnits(name);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("No engineering units found with the given name.");
+            }
+
+            return Ok(results);
+        }
+
+
+
+
+        [HttpGet("find/WorkPlace/{name}")]
+        public async Task<ActionResult<IEnumerable<WorkPlace>>> GetWorkPlace(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Name parameter is required.");
+            }
+
+            var results = await _searchService.GetWorkPlace(name);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("No engineering units found with the given name.");
+            }
+
+            return Ok(results);
+        }
+
+
+         [HttpGet("find/Hospital/{name}")]
+        public async Task<ActionResult<IEnumerable<Hospital>>> GetHospital(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return BadRequest("Name parameter is required.");
+            }
+
+            var results = await _searchService.GetHospital(name);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("No engineering units found with the given name.");
+            }
+
+            return Ok(results);
+        }
+
+
+
+        [HttpGet("find/Claim/{ensuranceNumber}")]
+        public async Task<ActionResult<IEnumerable<Claims>>> GetClaim(string ensuranceNumber)
+        {
+            if (string.IsNullOrEmpty(ensuranceNumber))
+            {
+                return BadRequest("Name parameter is required.");
+            }
+
+            var results = await _searchService.GetClaim(ensuranceNumber);
+
+            if (results == null || !results.Any())
+            {
+                return NotFound("No engineering units found with the given name.");
+            }
+
+            return Ok(results);
+        }
+
+
+        
     }
+
+
+    
 }

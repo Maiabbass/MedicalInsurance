@@ -96,6 +96,20 @@ return  Ok(result);
         }
 
 
+         [HttpGet("specializations in Depar with DeparID/{id}")]
+        public async Task<ActionResult<IEnumerable<Specializations>>> GetSpecializationsByEngineeringeDeparId(int id)
+        {
+            var specializations = await _spcializationService.GetSpecializationsByEngineeringeDeparIdAsync(id);
+
+            if (specializations == null || !specializations.Any())
+            {
+                return NotFound("No specializations found for the given department.");
+            }
+
+            return Ok(specializations);
+        }
+
+
         
         
     }

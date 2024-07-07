@@ -83,7 +83,7 @@ namespace api.Controllers
    [HttpPut("{Id}")]
          
         public  ActionResult<bool> Update(int Id,[FromBody] EngineeringUnitsEditDTO engineeringUnitsEditDTO){
-           bool result= _engineeringUnitsService.Update(Id,engineeringUnitsEditDTO.Name);
+           bool result= _engineeringUnitsService.Update(Id,engineeringUnitsEditDTO);
             if (result)
             {
             return  Ok(result);

@@ -31,7 +31,9 @@ namespace api.Services
            {
           
              Name = SurgicalProceduresEditDTO.Name,
-             Type=SurgicalProceduresEditDTO.Type,
+             Technical=SurgicalProceduresEditDTO.Technical,
+             Financial=SurgicalProceduresEditDTO.Financial,
+             Pathological_specialization=SurgicalProceduresEditDTO.Pathological_specialization,
              
             
            };

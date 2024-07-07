@@ -22,7 +22,9 @@ namespace api.Repositories
             SurgicalProcedures newS =new SurgicalProcedures()
              {
                Name=surgicalProcedures.Name,
-               Type=surgicalProcedures.Type,
+               Technical=surgicalProcedures.Technical,
+               Financial=surgicalProcedures.Financial,
+               Pathological_specialization=surgicalProcedures.Pathological_specialization,
 
               
              };
@@ -54,7 +56,9 @@ namespace api.Repositories
 
        }
        databaseEntity.Name=surgicalProceduresEditDTO.Name;
-       databaseEntity.Type=surgicalProceduresEditDTO.Type;
+       databaseEntity.Financial=surgicalProceduresEditDTO.Financial;
+       databaseEntity.Technical=surgicalProceduresEditDTO.Technical;
+       databaseEntity.Pathological_specialization=surgicalProceduresEditDTO.Pathological_specialization;
 
        return _dataContext.SaveChanges()>0;
       

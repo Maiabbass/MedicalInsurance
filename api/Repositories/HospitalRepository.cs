@@ -84,6 +84,14 @@ namespace api.Repositories
             }
         }
 
+
+         public async Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId)
+        {
+            return await _dataContext.Hospitals
+                .Where(h => h.CityId == cityId)
+                .ToListAsync();
+        }
+
  
     }
 }

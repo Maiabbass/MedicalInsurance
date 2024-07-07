@@ -96,5 +96,11 @@ namespace api.Services
 
 
 
+    public async Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId){
+      return await _unitOfWork.HospitalRepository.GetHospitalsByCityIdAsync(cityId);
+    }
+
+
+
     }
 }

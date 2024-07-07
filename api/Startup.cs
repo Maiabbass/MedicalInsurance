@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using api.Data;
 using api.Entities;
@@ -86,6 +87,15 @@ namespace API
             
             
               services.AddControllers();
+              /*
+
+               .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
+
+                */
 
                services.AddAuthorization(opt=>{
                 opt.AddPolicy("ManagerPolicy",policy=>policy.RequireRole(UserRoles.Admin,UserRoles.User_inquiries
@@ -121,6 +131,8 @@ namespace API
               services.AddScoped<ISearchService,SearchService>();
               services.AddScoped<ISubscriberRepository,SubscriberRepository>();
               services.AddScoped<ISpecializationService,SpecializationService>();
+              services.AddScoped<IQuiriesServices,QuiriesServices>();
+              services.AddScoped<IPdfService,PdfService>();
             
               
             services.AddSwaggerGen(c =>

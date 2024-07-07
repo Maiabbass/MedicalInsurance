@@ -81,6 +81,19 @@ return  Ok(result);
     
   }
 
+   [HttpGet("hospitals in City With CityId/{id}")]
+        public async Task<ActionResult<IEnumerable<Hospitals>>> GetHospitalsByCityId(int id)
+        {
+            var hospitals = await _hospitalService.GetHospitalsByCityIdAsync(id);
+
+            if (hospitals == null || !hospitals.Any())
+            {
+                return NotFound("No hospitals found for the given city.");
+            }
+
+            return Ok(hospitals);
+        }
+
         
     }
 

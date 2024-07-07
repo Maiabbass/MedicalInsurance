@@ -33,6 +33,8 @@ namespace api.Repositories
 
         ISubscriberRepository SubscriberRepository{get ;}
         ISpecializationRepository  SpecializationRepository{get ;}
+
+        IQuiriesRepositories QuiriesRepositories{get ;}
        
 
         Task<bool> Complete();

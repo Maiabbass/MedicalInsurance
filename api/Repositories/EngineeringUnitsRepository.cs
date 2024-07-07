@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.DTOS;
 using api.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace api.Repositories
             EngineeringUnits newE =new EngineeringUnits()
              {
                Name=engineeringUnits.Name,
+               Number=engineeringUnits.Number,
                Emailpresident=engineeringUnits.Emailpresident,
                Namepresident=engineeringUnits.Namepresident,
                Phonepresident=engineeringUnits.Phonepresident,
@@ -98,7 +100,7 @@ namespace api.Repositories
 
 
 
-        public bool Update(int Id, string Name)
+        public bool Update(int Id, EngineeringUnitsEditDTO engineeringUnitsEditDTO )
         {
        var databaseEntity= _dataContext.EngineeringUnits.FirstOrDefault(x=>x.Id==Id);
        if(databaseEntity==null){
@@ -106,7 +108,12 @@ namespace api.Repositories
          return false;
 
        }
-       databaseEntity.Name=Name;
+       databaseEntity.Name=engineeringUnitsEditDTO.Name;
+       databaseEntity.Namepresident=engineeringUnitsEditDTO.Namepresident;
+       databaseEntity.Emailpresident=engineeringUnitsEditDTO.Emailpresident;
+       databaseEntity.Phonepresident=engineeringUnitsEditDTO.Phonepresident;
+       databaseEntity.Number=engineeringUnitsEditDTO.Number;
+  
 
        return _dataContext.SaveChanges()>0;
       

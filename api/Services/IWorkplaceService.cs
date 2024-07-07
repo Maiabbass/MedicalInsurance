@@ -17,6 +17,10 @@ namespace api.Services
 
           public bool Delete(int Id);
           public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO);
+
+           Task<IEnumerable<WorkPlace>> GetWorkPlacesByEngineeringUnitIdAsync(int engineeringUnitId);
+
+    
          
     
     }

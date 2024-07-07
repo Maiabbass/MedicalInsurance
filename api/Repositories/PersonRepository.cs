@@ -40,7 +40,8 @@ namespace api.Repositories
                 Subscrib = person.Subscrib,
                 Affiliate = person.Affiliate,
                 Beneficiary = person.Beneficiary,
-                GenderId = person.GenderId
+                GenderId = person.GenderId,
+                StatusId=person.StatusId,
             };
 
             _dataContext.Persons.Add(newPerson);
@@ -112,6 +113,7 @@ namespace api.Repositories
        databaseEntity.Affiliate=PersonEditDTO.Affiliate;
        databaseEntity.Beneficiary=PersonEditDTO.Beneficiary;
        databaseEntity.GenderId=PersonEditDTO.GenderId;
+       databaseEntity.StatusId=PersonEditDTO.StatusId;
 
        return _dataContext.SaveChanges()>0;
       

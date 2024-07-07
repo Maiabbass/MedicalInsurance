@@ -41,6 +41,8 @@ namespace api.Repositories
         public ISubscriberRepository SubscriberRepository => new SubscriberRepository(_dataContext);
         public ISpecializationRepository SpecializationRepository=> new SpecializationRepository(_dataContext);
 
+        public IQuiriesRepositories QuiriesRepositories => new QuiriesRepositories(_dataContext);
+
         public Task<bool> Complete()
         {
             throw new NotImplementedException();

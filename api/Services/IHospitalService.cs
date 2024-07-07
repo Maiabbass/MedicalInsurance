@@ -16,6 +16,8 @@ namespace api.Services
            Task<Hospital?>Get(int Id);
         public bool Update(int Id, HospitalEditDTO hospital);
         public bool Delete(int Id);
+
+         Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId);
           
          
     }

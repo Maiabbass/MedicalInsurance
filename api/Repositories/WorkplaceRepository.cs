@@ -93,6 +93,14 @@ public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO)
       
         }
 
+
+         public async Task<IEnumerable<WorkPlace>> GetWorkPlacesByEngineeringUnitIdAsync(int engineeringUnitId)
+        {
+            return await _dataContext.WorkPlaces
+                .Where(w => w.EngineeringUnitsId == engineeringUnitId)
+                .ToListAsync();
+        }
+
   
  
 

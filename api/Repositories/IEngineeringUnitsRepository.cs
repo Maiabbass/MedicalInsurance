@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOS;
 using api.Entities;
 
 namespace api.Repositories
@@ -18,7 +19,7 @@ namespace api.Repositories
          public void DeleteByEngineeringUnitsId2(int EngineeringUnitsId);
          public void DeleteByWorkPlaceId(int WorkPlaceId);
          public void Delete(int id);
-          public bool Update(int Id, string Name);
+         public bool Update(int Id, EngineeringUnitsEditDTO engineeringUnitsEditDTO );
 
     } 
     }

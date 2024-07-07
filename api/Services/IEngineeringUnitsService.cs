@@ -17,7 +17,7 @@ namespace api.Services
 
        Task<EngineeringUnits?> Get(int Id);
        public bool Delete(int Id);
-        public bool Update(int Id, string Name);
+        public bool Update(int Id, EngineeringUnitsEditDTO engineeringUnitsEditDTO);
          
     
     }

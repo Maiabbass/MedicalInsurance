@@ -53,7 +53,8 @@ namespace api.Services
              Subscrib=personEditDTO.Subscrib,
              Affiliate=personEditDTO.Affiliate,
              Beneficiary=personEditDTO.Beneficiary,
-             GenderId = personEditDTO.GenderId
+             GenderId = personEditDTO.GenderId,
+             StatusId=personEditDTO.StatusId,
                  };
 
                   insertedId=  await _unitOfWork.PersonRepository.Add(person);

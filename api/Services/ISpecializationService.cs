@@ -17,6 +17,10 @@ namespace api.Services
      public bool Delete(int Id);
 
     public bool Update(int id, SpecializationEditDto specializationEditDto);
+
+
+     Task<IEnumerable<Specialization>> GetSpecializationsByEngineeringeDeparIdAsync(int engineeringeDeparId);
+
         
     }
 }

@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using api.DTOS;
+using api.Entities;
+
+namespace api.Services
+{
+    public interface IQuiriesServices
+    {
+
+        Task<SimpleEngineer> GetEngineerWithRelationsAsync(string EngNumber);
+       Task<IEnumerable<SimpleEngineer>> GetEngineers(int? workPlaceId ,int? specializationId  , int? engineeringUnitsId , int? PayMethodId  );
+        
+        
+    }
+}

@@ -94,5 +94,19 @@ public async Task<ActionResult<Workplaces?>>GetAll(){
 
         }  
 
+
+        [HttpGet("workplaces in EgUnit with EngUniId/{id}")]
+        public async Task<ActionResult<IEnumerable<Workplaces>>> GetWorkPlacesByEngineeringUnitId(int id)
+        {
+            var workPlaces = await _workplaceService.GetWorkPlacesByEngineeringUnitIdAsync(id);
+
+            if (workPlaces == null || !workPlaces.Any())
+            {
+                return NotFound("No workplaces found for the given engineering unit.");
+            }
+
+            return Ok(workPlaces);
+        }
+
     }
 }

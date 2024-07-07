@@ -16,6 +16,8 @@ namespace api.Repositories
          public void   Delete(int Id);
 
          public bool Update(int Id, SpecializationEditDto specializationEditDto);
+
+         Task<IEnumerable<Specialization>> GetSpecializationsByEngineeringeDeparIdAsync(int engineeringeDeparId);
         
     }
 }

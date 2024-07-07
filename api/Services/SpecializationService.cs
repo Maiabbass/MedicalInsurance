@@ -93,6 +93,11 @@ namespace api.Services
              return _unitOfWork.SpecializationRepository.Update(id, specializationEditDto);
         }
 
+
+         public async Task<IEnumerable<Specialization>> GetSpecializationsByEngineeringeDeparIdAsync(int engineeringeDeparId){
+          return await _unitOfWork.SpecializationRepository.GetSpecializationsByEngineeringeDeparIdAsync(engineeringeDeparId);
+         }
+
         
     }
 }

@@ -21,6 +21,8 @@ namespace api.Repositories
 
          public void Delete(int Id);
 
+          Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId);
+
          
     }
     

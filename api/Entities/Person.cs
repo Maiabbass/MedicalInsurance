@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
+using System.Text.Json.Serialization;
+
 namespace api.Entities
 {
 
@@ -30,7 +32,16 @@ namespace api.Entities
 
         public string?  MotherName { get; set; }
 
-        public DateTime? BirthDate { get; set; }
+         
+    [JsonIgnore]
+    public DateTime? BirthDate { get; set; }
+
+    // إضافة خاصية جديدة مع التنسيق المناسب
+    public string BirthDateFormatted => BirthDate?.ToString("yyyy-MM-dd");
+
+
+
+        
 
       [StringLength(11,MinimumLength =11,ErrorMessage ="Invalid National ID Length")]
         public string NationalId { get; set; }

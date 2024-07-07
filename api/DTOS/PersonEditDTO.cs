@@ -41,6 +41,8 @@ namespace api.DTOS
 
             public int GenderId {get; set;}
 
+            public int StatusId {get; set;}
+
 
         
            

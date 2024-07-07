@@ -17,6 +17,10 @@ namespace api.Repositories
          Task <int> Add (WorkPlace person);
           public void DeleteByWorkPlaceId(int WorkPlaceId);
           public void Delete (int Id);
-          public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO); }}
+          public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO); 
+          
+          
+           Task<IEnumerable<WorkPlace>> GetWorkPlacesByEngineeringUnitIdAsync(int engineeringUnitId);
+          }}
     
     

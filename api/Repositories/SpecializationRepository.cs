@@ -80,6 +80,13 @@ namespace api.Repositories
        return _dataContext.SaveChanges()>0;
       
         }
+
+         public async Task<IEnumerable<Specialization>> GetSpecializationsByEngineeringeDeparIdAsync(int engineeringeDeparId)
+        {
+            return await _dataContext.Specializations
+                .Where(s => s.EngineeringeDeparId == engineeringeDeparId)
+                .ToListAsync();
+        }
         
     }
 }

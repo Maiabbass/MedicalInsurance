@@ -94,7 +94,12 @@ namespace api.Services
 
              public bool Update(int Id, WorkplaceEditDTO workplaceEditDTO) {
              return _unitOfWork.WorkplaceRepository.Update(Id,workplaceEditDTO );
-             }   
+             }  
+
+
+             public async Task<IEnumerable<WorkPlace>> GetWorkPlacesByEngineeringUnitIdAsync(int engineeringUnitId) {
+              return await _unitOfWork.WorkplaceRepository.GetWorkPlacesByEngineeringUnitIdAsync(engineeringUnitId);
+             }
 
     }
 } 
