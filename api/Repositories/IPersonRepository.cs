@@ -19,5 +19,7 @@ namespace api.Repositories
         public bool Update(int Id, PersonEditDTO PersonEditDTO);
         Task<AnnualData?> GetEngId(int EngineereId);
         Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
+
+        public void SavePerson(Person person);
     }
 }

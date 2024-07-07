@@ -74,6 +74,8 @@ namespace api.Entities
         public int GenderId {get; set;}
          public Gender Gender{ get; set;}
 
+         public decimal? Amount { get; set;}
+
          public ICollection<Relation>Relations{get ; set ;}
 
          public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }

@@ -128,4 +128,18 @@ namespace api.Repositories
 }
 
 
-}}
+public void SavePerson(Person person)
+{
+    try
+    {
+        _dataContext.Persons.Add(person);
+        _dataContext.SaveChanges();
+    }
+    catch (Exception ex)
+    {
+        
+        throw new Exception("ERROR", ex);
+    }
+
+
+}}}

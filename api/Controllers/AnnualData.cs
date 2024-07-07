@@ -18,12 +18,14 @@ namespace api.Controllers
     public class AnnualData : ControllerBase
     {
         private readonly IAnnualDataService _AnnualDataService;
+        private readonly IPersonService _PersonService;
 
         
 
-        public AnnualData(IAnnualDataService AnnualDataService)
+        public AnnualData(IAnnualDataService AnnualDataService , IPersonService PersonService)
         {
             _AnnualDataService =AnnualDataService;
+            _PersonService = PersonService;
         }
 
         [HttpPost]
@@ -168,22 +170,28 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
 
         // action method to get the amount of register annual data based on birth date and given Year 
            [HttpGet("CalculateAmount")]
-            public ActionResult<decimal> CalculateAmount(DateTime? birthdate,int year)
-            {
-                 
-                 decimal amount=0m;
-                 try 
-                 {
-                 amount= _AnnualDataService.calcualteAmount(birthdate,year);
-                 return  Ok(amount);
-                 }
-                 catch(Exception ex)
-                 {
-                   return StatusCode(StatusCodes.Status500InternalServerError,new Response {ErrorMessage=ex.Message});
-                 }
-                
+            public ActionResult<decimal> CalculateAmount(DateTime? birthdate, int year)
+{
+    decimal amount = 0m;
+    try
+    {
+        amount = _AnnualDataService.calcualteAmount(birthdate, year);
 
-            }
+        var person = new Person
+        {
+            Amount = amount
+        };
+
+        _PersonService.SavePerson(person);
+       
+
+        return Ok(amount);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, new Response { ErrorMessage = ex.Message });
+    }
+}
 
 
        [HttpDelete("AnnualSetting/{year}")] 
