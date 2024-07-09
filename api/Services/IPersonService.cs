@@ -22,5 +22,5 @@ namespace api.Services
          Task<AnnualData?> GetEngId(int EngineereId);
           Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
 
-          public void SavePerson(Person person);
+          
     }}

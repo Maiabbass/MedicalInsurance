@@ -128,18 +128,84 @@ namespace api.Repositories
 }
 
 
-public void SavePerson(Person person)
+
+
+
+
+
+
+
+
+public class PersonConverter
+{
+    public static Person ConvertToPerson(PersonWithEngineereDTO dto)
+    {
+        if (dto == null)
+            return null;
+
+        return new Person
+        {
+            EnsuranceNumber = dto.EnsuranceNumber,
+            Amount = dto.Amount,
+            // تحويل الخصائص الأخرى إذا كانت موجودة
+        };
+    }
+
+    public static PersonWithEngineereDTO ConvertToDTO(Person person)
+    {
+        if (person == null)
+            return null;
+
+        return new PersonWithEngineereDTO
+        {
+            EnsuranceNumber = person.EnsuranceNumber,
+            Amount = person.Amount,
+            // تحويل الخصائص الأخرى إذا كانت موجودة
+        };
+    }
+}
+
+
+
+ 
+public async Task SavePerson(PersonWithEngineereDTO dto)
 {
     try
     {
-        _dataContext.Persons.Add(person);
-        _dataContext.SaveChanges();
+        var person = PersonConverter.ConvertToPerson(dto);
+
+        var existingPerson = await _dataContext.Persons
+            .FirstOrDefaultAsync(p => p.EnsuranceNumber == person.EnsuranceNumber);
+
+        if (existingPerson != null)
+        {
+            // تحديث السجل الحالي
+            existingPerson.Amount = person.Amount;
+            _dataContext.Persons.Update(existingPerson);
+        }
+        else
+        {
+        
+            _dataContext.Persons.Add(person);
+        }
+
+        await _dataContext.SaveChangesAsync();
     }
     catch (Exception ex)
     {
-        
-        throw new Exception("ERROR", ex);
+        // تسجيل الاستثناء أو تنفيذ أي تنظيف ضروري
+        string errorMessage = "An error occurred while saving the entity changes.";
+        if (ex.InnerException != null)
+        {
+            errorMessage += " Inner Exception: " + ex.InnerException.Message;
+        }
+
+        throw new Exception(errorMessage, ex);
     }
+}
 
+        
 
-}}}
+       
+    }
+}

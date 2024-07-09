@@ -20,6 +20,7 @@ namespace api.Repositories
         Task<AnnualData?> GetEngId(int EngineereId);
         Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
 
-        public void SavePerson(Person person);
+       // public void SavePerson(Person person);
+        Task SavePerson(PersonWithEngineereDTO person);
     }
 }

@@ -133,9 +133,7 @@ namespace api.Services
 
         }
 
-        public void SavePerson(Person person){
-           _unitOfWork.PersonRepository.SavePerson(person);
-        }
+       
 
      
 

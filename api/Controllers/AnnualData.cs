@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using static api.DTOS.RegisterAnnualDataDTO;
 using static api.Repositories.AnnualDataRepository;
 using static api.DTOS.AnnualDataForView;
+using api.Repositories;
 
 namespace api.Controllers
 {
@@ -18,14 +19,17 @@ namespace api.Controllers
     public class AnnualData : ControllerBase
     {
         private readonly IAnnualDataService _AnnualDataService;
-        private readonly IPersonService _PersonService;
+        private readonly IPersonRepository _personRepository;
+
+        private readonly ISearchService _searchService;
 
         
 
-        public AnnualData(IAnnualDataService AnnualDataService , IPersonService PersonService)
+        public AnnualData(IAnnualDataService AnnualDataService,IPersonRepository personRepository , ISearchService searchService)
         {
             _AnnualDataService =AnnualDataService;
-            _PersonService = PersonService;
+            _personRepository=personRepository;
+            _searchService = searchService;
         }
 
         [HttpPost]
@@ -168,30 +172,48 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
         }  
 
 
-        // action method to get the amount of register annual data based on birth date and given Year 
-           [HttpGet("CalculateAmount")]
-            public ActionResult<decimal> CalculateAmount(DateTime? birthdate, int year)
+ // action method to get the amount of register annual data based on birth date and given Year 
+          
+  [HttpGet("CalculateAmount")]
+public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdate, int year, string ensuranceNumber)
 {
+    if (string.IsNullOrEmpty(ensuranceNumber))
+    {
+        return BadRequest(new Response { ErrorMessage = "EnsuranceNumber must be provided." });
+    }
+
     decimal amount = 0m;
     try
     {
+        // البحث عن الشخص باستخدام EnsuranceNumber
+        var person = await _searchService.GetByEnsuranceNumberAsync(ensuranceNumber);
+
+        if (person == null)
+        {
+            return NotFound(new Response { ErrorMessage = "Person not found." });
+        }
+
+        // حساب القسط
         amount = _AnnualDataService.calcualteAmount(birthdate, year);
 
-        var person = new Person
-        {
-            Amount = amount
-        };
+        // تحديث الحقل Amount للشخص
+        person.Amount = amount;
 
-        _PersonService.SavePerson(person);
-       
+        // حفظ التغييرات في قاعدة البيانات
+        await _personRepository.SavePerson(person);
 
         return Ok(amount);
     }
     catch (Exception ex)
     {
-        return StatusCode(StatusCodes.Status500InternalServerError, new Response { ErrorMessage = ex.Message });
+        var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
+        return StatusCode(StatusCodes.Status500InternalServerError, new Response { ErrorMessage = $"{ex.Message} - Inner Exception: {innerExceptionMessage}" });
     }
 }
+
+
+
+
 
 
        [HttpDelete("AnnualSetting/{year}")] 

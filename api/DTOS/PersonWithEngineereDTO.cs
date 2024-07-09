@@ -33,6 +33,8 @@ namespace api.DTOS
    
     public int? WorkPlaceId { get; set; }
 
+    public decimal? Amount { get; set; }
+
     // يمكنك إضافة المزيد من الخصائص حسب الحاجة
 }
 

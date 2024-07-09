@@ -81,6 +81,8 @@ namespace api.Data
             .WithOne(e => e.Person)
             .HasForeignKey<Engineere>(e => e.Id)
             .OnDelete(DeleteBehavior.Cascade);
+            builder.Entity<AnnualData>().HasIndex(u => u.Year).IsUnique();
+            builder.Entity<AnnualData>().HasIndex(u => u.EngineereId).IsUnique();
 
 
 

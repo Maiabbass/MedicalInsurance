@@ -133,6 +133,7 @@ namespace API
               services.AddScoped<ISpecializationService,SpecializationService>();
               services.AddScoped<IQuiriesServices,QuiriesServices>();
               services.AddScoped<IPdfService,PdfService>();
+              services.AddScoped<IPersonRepository,PersonRepository>();
             
               
             services.AddSwaggerGen(c =>
