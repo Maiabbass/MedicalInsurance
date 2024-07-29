@@ -73,6 +73,9 @@ namespace api.Data.Migrations
                     b.Property<DateTime?>("HisDic")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("Limit")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("PayMethodId")
                         .HasColumnType("int");
 
@@ -176,7 +179,7 @@ namespace api.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("HospitalId")
+                    b.Property<int?>("HospitalId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("LoginDate")
@@ -217,7 +220,7 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("EngNumber")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SpecializationId")
                         .HasColumnType("int");
@@ -229,10 +232,6 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EngNumber")
-                        .IsUnique()
-                        .HasFilter("[EngNumber] IS NOT NULL");
 
                     b.HasIndex("SpecializationId");
 
@@ -391,8 +390,7 @@ namespace api.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EnsuranceNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FatherName")
                         .IsRequired()
@@ -416,7 +414,6 @@ namespace api.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NationalId")
-                        .IsRequired()
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
@@ -431,17 +428,74 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EnsuranceNumber")
-                        .IsUnique();
-
                     b.HasIndex("GenderId");
-
-                    b.HasIndex("NationalId")
-                        .IsUnique();
 
                     b.HasIndex("StatusId");
 
                     b.ToTable("Persons");
+                });
+
+            modelBuilder.Entity("api.Entities.Recovered", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal?>("ApprovedPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Company_fees")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("EnduranceRatio")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("EnsuranceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ExitDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("HospitalId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LoginDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Send")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SurgicalProceduresId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("non_Add")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("non_AddForPerson")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HospitalId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("SurgicalProceduresId");
+
+                    b.ToTable("Recovereds");
                 });
 
             modelBuilder.Entity("api.Entities.Relation", b =>
@@ -535,8 +589,14 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<decimal>("EnduranceRatio")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("Financial")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("Limit")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -863,9 +923,7 @@ namespace api.Data.Migrations
                 {
                     b.HasOne("api.Entities.Hospital", "Hospital")
                         .WithMany("Claims")
-                        .HasForeignKey("HospitalId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("HospitalId");
 
                     b.HasOne("api.Entities.Person", "Person")
                         .WithMany("Claims")
@@ -934,6 +992,29 @@ namespace api.Data.Migrations
                     b.Navigation("Gender");
 
                     b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("api.Entities.Recovered", b =>
+                {
+                    b.HasOne("api.Entities.Hospital", "Hospital")
+                        .WithMany()
+                        .HasForeignKey("HospitalId");
+
+                    b.HasOne("api.Entities.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("api.Entities.SurgicalProcedures", "SurgicalProcedures")
+                        .WithMany()
+                        .HasForeignKey("SurgicalProceduresId");
+
+                    b.Navigation("Hospital");
+
+                    b.Navigation("Person");
+
+                    b.Navigation("SurgicalProcedures");
                 });
 
             modelBuilder.Entity("api.Entities.Relation", b =>

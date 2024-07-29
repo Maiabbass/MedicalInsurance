@@ -25,6 +25,9 @@ namespace api.Services
 
         Task<IEnumerable<Hospital>> GetHospital(string name);
         Task<IEnumerable<Claims>> GetClaim(string ensuranceNumber);
+        Task<IEnumerable<Claims>> GetClaimsByDateRange(DateTime startDate, DateTime endDate);
+
+        Task<IEnumerable<Claims>> GetAllClaims();
     
   
 

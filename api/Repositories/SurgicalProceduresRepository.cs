@@ -25,6 +25,8 @@ namespace api.Repositories
                Technical=surgicalProcedures.Technical,
                Financial=surgicalProcedures.Financial,
                Pathological_specialization=surgicalProcedures.Pathological_specialization,
+               EnduranceRatio=surgicalProcedures.EnduranceRatio,
+               Limit=surgicalProcedures.Limit,
 
               
              };
@@ -59,6 +61,9 @@ namespace api.Repositories
        databaseEntity.Financial=surgicalProceduresEditDTO.Financial;
        databaseEntity.Technical=surgicalProceduresEditDTO.Technical;
        databaseEntity.Pathological_specialization=surgicalProceduresEditDTO.Pathological_specialization;
+       databaseEntity.Limit=surgicalProceduresEditDTO.Limit;
+       databaseEntity.EnduranceRatio=surgicalProceduresEditDTO.EnduranceRatio;
+  
 
        return _dataContext.SaveChanges()>0;
       
@@ -66,17 +71,41 @@ namespace api.Repositories
 
          
 
-         public void Delete(int Id){
-            var result = _dataContext.SurgicalProcedures.Where(x=>x.Id==Id).ToList();
-            if (result!=null){
-                 _dataContext.SurgicalProcedures.RemoveRange(result);
-                 _dataContext.SaveChanges();
-            }
+
+
+        public void Delete(int Id)
+{
+    var surgicalProcedure = _dataContext.SurgicalProcedures.FirstOrDefault(x => x.Id == Id);
+    if (surgicalProcedure != null)
+    {
+       
+        var claims = _dataContext.Claims.Where(c => c.SurgicalProceduresId == Id).ToList();
+        foreach (var claim in claims)
+        {
+            claim.SurgicalProceduresId = null;
         }
+
+        var Reco = _dataContext.Recovereds.Where(c => c.SurgicalProceduresId == Id).ToList();
+        foreach ( var Recoe in Reco){
+          Recoe.SurgicalProceduresId = null;
+        }
+
+
+     
+        _dataContext.SurgicalProcedures.Remove(surgicalProcedure);
+        _dataContext.SaveChanges();
+    }
+}
+
 
         public bool Update(int id, SurgicalProcedures surgicalProcedures)
         {
             throw new NotImplementedException();
         }
+
+         public async Task<SurgicalProcedures> GetByNameAsync(string name)
+    {
+        return await _dataContext.SurgicalProcedures.FirstOrDefaultAsync(sp => sp.Name == name);
+    }
     }
 }

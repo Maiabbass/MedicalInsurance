@@ -17,11 +17,13 @@ namespace api.Repositories
            Task <Hospital?> Get(int Id);
            public bool Update(int Id, HospitalEditDTO hospital);
 
-            public void DeleteByHospitalId(int HospitalId);
+           
 
          public void Delete(int Id);
 
           Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId);
+
+           Task<Hospital> GetByNameAsync(string name);
 
          
     }

@@ -18,5 +18,6 @@ namespace api.Repositories
           bool Update ( int Id, SurgicalProceduresEditDTO Surpro );
         bool Update(int id, SurgicalProcedures surgicalProcedures);
         public void Delete(int Id);
+         Task<SurgicalProcedures> GetByNameAsync(string name);
     }
 }

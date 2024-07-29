@@ -5,9 +5,11 @@ using api.Entities;
 
 namespace api.Repositories
 {
-    public interface ISubscriberRepository
+    public interface ICashRepository
     {
         Task<List<Person>> ReadExcelFileAsync(Stream fileStream);
         Task LoadSubToDatabase(List<Person> list);
+
+        
     }
 }

@@ -61,7 +61,7 @@ namespace api.Entities
         
         public decimal EnduranceRatio { get; set; }
 
-        public int HospitalId{get ; set;}
+        public int? HospitalId{get ; set;}
         public Hospital Hospital{get; set;}
 
         public bool Trust { get; set;}

@@ -40,6 +40,8 @@ namespace api.Data
 
          public DbSet<YearConfiguration> YearConfigurations { get; set;}
 
+         public DbSet<Recovered> Recovereds { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -57,13 +59,13 @@ namespace api.Data
 
 
              builder.Entity<Person>().HasMany(tg=>tg.AnnualDataDetails).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
-             builder.Entity<Person>()
-            .HasIndex(u => u.NationalId)
-            .IsUnique();
-            builder.Entity<Person>()
-            .HasIndex(u => u.EnsuranceNumber)
-            .IsUnique();
-            builder.Entity<Engineere>().HasIndex(u => u.EngNumber).IsUnique();
+            // builder.Entity<Person>()
+           // .HasIndex(u => u.NationalId)
+            //.IsUnique();
+           // builder.Entity<Person>()
+           // .HasIndex(u => u.EnsuranceNumber)
+           // .IsUnique();
+           // builder.Entity<Engineere>().HasIndex(u => u.EngNumber).IsUnique();
            // builder.Entity<City>().HasIndex(u => u.Name).IsUnique();
            // builder.Entity<Claims>().HasIndex(u => u.EnsuranceNumber).IsUnique();
             builder.Entity<EngineeringeDepar>().HasIndex(u => u.Name).IsUnique();

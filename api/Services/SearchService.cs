@@ -56,6 +56,15 @@ namespace api.Services
             return await _unitOfWork.SearchRepository.GetClaim(ensuranceNumber);
          }
 
+         public async Task<IEnumerable<Claims>> GetClaimsByDateRange(DateTime startDate, DateTime endDate) {
+
+            return await _unitOfWork.SearchRepository.GetClaimsByDateRange(startDate, endDate);
+         }
+
+         public async Task<IEnumerable<Claims>> GetAllClaims(){
+            return await _unitOfWork.SearchRepository.GetAllClaims();
+         }
+
     
     }
 }

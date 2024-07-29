@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -23,6 +24,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OfficeOpenXml;
+using QuestPDF.Infrastructure;
+
 
 namespace API
 {
@@ -39,10 +43,15 @@ namespace API
         
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services )
         {
+
+
+       
+            QuestPDF.Settings.License=LicenseType.Community;
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
             
-           
             services.AddDbContext<DataContext>( Options => {
                 Options.UseSqlServer(_config.GetConnectionString("DefaultConnection")) ;
             });
@@ -129,11 +138,14 @@ namespace API
               services.AddScoped<IClimsRepository,ClimsRepository>();
               services.AddScoped<IUserRoleService, UserRoleService>();
               services.AddScoped<ISearchService,SearchService>();
-              services.AddScoped<ISubscriberRepository,SubscriberRepository>();
+              services.AddScoped<ICashRepository,CashRepository>();
               services.AddScoped<ISpecializationService,SpecializationService>();
               services.AddScoped<IQuiriesServices,QuiriesServices>();
-              services.AddScoped<IPdfService,PdfService>();
+              //services.AddScoped<IPdfService,PdfService>();
               services.AddScoped<IPersonRepository,PersonRepository>();
+              services.AddScoped<IRecoveredServices,RecoveredServices>();
+              services.AddScoped<IExcelService,ExcelService>();
+              
             
               
             services.AddSwaggerGen(c =>
@@ -146,6 +158,9 @@ namespace API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+
+            
            // app.Build();
             if (env.IsDevelopment())
             {

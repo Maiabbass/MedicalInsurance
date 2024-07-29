@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using static api.DTOS.RegisterAnnualDataDTO;
 
@@ -23,6 +24,9 @@ namespace api.Repositories
         }
         public async Task<int> Add_AnnualData(AnnualData annualData)
         {
+            try {
+
+            
              AnnualData newitem=new AnnualData ()
              {
                 EngineereId = annualData.EngineereId,
@@ -34,12 +38,21 @@ namespace api.Repositories
                 WorkPlaceId = annualData.WorkPlaceId,
                 EngineeringUnitsId = annualData.EngineeringUnitsId,
                 HisDic=annualData.HisDic,
+                Limit=annualData.Limit,
 
              };
              _dataContext.AnnualDatas.Add(newitem);
             await _dataContext.SaveChangesAsync();
             return newitem.Id;
         }
+         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        {
+            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+        }
+        }
+        
+
+
 
         public async Task<int> Add_AnnualDataDetail(AnnualDataDetail annualDataDetail)
         {
@@ -75,6 +88,8 @@ namespace api.Repositories
              Id =data.Id,
              Year= data.Year,
              Amount=data.Amount,
+             Limit=data.Limit,
+             HisDic=data.HisDic,
              ExAmount=data.ExAmount,
              EngineereId=data.EngineereId,
              PayMethodId=data.PayMethodId,
@@ -132,6 +147,8 @@ namespace api.Repositories
              WorkPlaceId=item.WorkPlaceId,
              EngineeringUnitsId=item.EngineeringUnitsId,
              TotalAmount=item.TotalAmount,
+            Limit=item.Limit,
+             HisDic=item.HisDic,
              };
                List<AnnualDataDetail> annualDataDetails =new  List<AnnualDataDetail>();
 
@@ -204,6 +221,8 @@ namespace api.Repositories
        databaseEntity.WorkPlaceId=annualDataForView.WorkPlaceId;
        databaseEntity.EngineeringUnitsId=annualDataForView.EngineeringUnitsId;
        databaseEntity.TotalAmount=annualDataForView.TotalAmount;
+       databaseEntity.HisDic=annualDataForView.HisDic;
+       databaseEntity.Limit=annualDataForView.Limit;
        
        
        return _dataContext.SaveChanges()>0;

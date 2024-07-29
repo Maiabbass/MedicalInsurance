@@ -34,6 +34,8 @@ namespace api.Services
              Technical=SurgicalProceduresEditDTO.Technical,
              Financial=SurgicalProceduresEditDTO.Financial,
              Pathological_specialization=SurgicalProceduresEditDTO.Pathological_specialization,
+             Limit=SurgicalProceduresEditDTO.Limit,
+             EnduranceRatio=SurgicalProceduresEditDTO.EnduranceRatio,
              
             
            };
@@ -81,20 +83,21 @@ namespace api.Services
              return _unitOfWork.SurgicalProceduresRepository.Update(id, surgicalProceduresEditDTO);
         }
 
-         public bool Delete(int Id){
-      try
-      {
-         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-         {
-       
-      
-        _unitOfWork.SurgicalProceduresRepository.Delete(Id);
+        public bool Delete(int Id)
+{
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            _unitOfWork.SurgicalProceduresRepository.Delete(Id);
             scope.Complete();
             return true;
-         }
-      } 
-          catch (TransactionAbortedException){
-                  return false;
-                 }}
+        }
+    }
+    catch (TransactionAbortedException)
+    {
+        return false;
+    }
+}
     }
 }

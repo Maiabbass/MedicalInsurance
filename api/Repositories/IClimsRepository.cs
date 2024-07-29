@@ -10,6 +10,5 @@ namespace api.Repositories
     {
          List<Claims> ReadDataFromExcel(Stream fileStream);
         Task LoadClaimsToDatabase(List<Claims> claimsList);
-       
     }
 }

@@ -103,7 +103,8 @@ namespace api.Services
          using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
          {
         
-      
+         _unitOfWork.EngineerRepository.DeleteByEngId(Id);
+         
         _unitOfWork.EngineerRepository.Delete(Id);
             scope.Complete();
             return true;

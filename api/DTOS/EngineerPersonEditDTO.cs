@@ -46,7 +46,9 @@ namespace api.DTOS{
         public string SubNumber { get; set; }
 
     
-        //public int? PersonId { get; set; }    
+        //public int? PersonId { get; set; } 
+
+       // public decimal Amount { get; set; }
        
 
     

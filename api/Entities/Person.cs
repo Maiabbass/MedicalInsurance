@@ -22,7 +22,8 @@ namespace api.Entities
             
         }
 
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
        
        public int Id {get;set;}
         public string FirstName { get; set; }
@@ -44,9 +45,9 @@ namespace api.Entities
         
 
       [StringLength(11,MinimumLength =11,ErrorMessage ="Invalid National ID Length")]
-        public string NationalId { get; set; }
+        public string? NationalId { get; set; }
 
-        public string EnsuranceNumber { get; set; }
+        public string? EnsuranceNumber { get; set; }
 
         public string?  Address { get; set; }
 

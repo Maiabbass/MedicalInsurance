@@ -55,16 +55,24 @@ namespace api.Repositories
             return await _dataContext.Specializations.ToListAsync();
         }
 
-        public void   Delete(int Id)
+        public void Delete(int Id)
+{
+    var specialization = _dataContext.Specializations.FirstOrDefault(x => x.Id == Id);
+    if (specialization != null)
+    {
+        // العثور على الكيانات المرتبطة وتحديث FK إلى null
+        var engineers = _dataContext.Engineeres.Where(e => e.SpecializationId == Id).ToList();
+        foreach (var engineer in engineers)
         {
-            
-            var rest = _dataContext.Specializations.FirstOrDefault(x=>x.Id==Id);
-            if(rest!=null)
-            {
-                _dataContext.Specializations.Remove(rest);
-                _dataContext.SaveChanges();
-            }
+            engineer.SpecializationId = null;
         }
+
+        // حذف التخصيص
+        _dataContext.Specializations.Remove(specialization);
+        _dataContext.SaveChanges();
+    }
+}
+
 
          public bool Update(int Id, SpecializationEditDto specializationEditDto)
         {

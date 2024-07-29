@@ -12,14 +12,14 @@ namespace api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class Claims : ControllerBase
+    public class ClaimsExcel : ControllerBase
 
     {
 
     private readonly IClimsRepository _climsRepository;
           
         
-    public Claims(IClimsRepository climsRepository)
+    public ClaimsExcel(IClimsRepository climsRepository)
       {
       _climsRepository= climsRepository;
          }

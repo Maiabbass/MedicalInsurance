@@ -38,10 +38,6 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "BouncyCastle": {
-              "target": "Package",
-              "version": "[1.8.3, )"
-            },
             "EPPlus": {
               "target": "Package",
               "version": "[7.1.3, )"
@@ -68,13 +64,13 @@
               "target": "Package",
               "version": "[6.0.27, )"
             },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2024.7.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
-            },
-            "itext7": {
-              "target": "Package",
-              "version": "[7.1.3, )"
             }
           },
           "imports": [

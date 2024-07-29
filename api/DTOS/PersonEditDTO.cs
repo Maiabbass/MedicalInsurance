@@ -43,6 +43,8 @@ namespace api.DTOS
 
             public int StatusId {get; set;}
 
+            //public decimal Amount { get; set; }
+
 
         
            

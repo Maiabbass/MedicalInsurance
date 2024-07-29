@@ -103,6 +103,7 @@ namespace api.Services
                      annualData.Year = registerAnnualDataDTO.Year;
                      annualData.ExAmount = registerAnnualDataDTO.ExAmount;
                      annualData.HisDic=registerAnnualDataDTO.HisDic;
+                     annualData.Limit=registerAnnualDataDTO.Limit;
                       // get required engineer info ...
                      var engineer= await _unitOfWork.EngineerRepository.Get(registerAnnualDataDTO.EngineerId);
                      if (engineer!=null)

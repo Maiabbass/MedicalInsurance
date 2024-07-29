@@ -22,6 +22,8 @@ namespace api.DTOS
          public int Year { get; set; }
          public  DateTime? HisDic { get; set; }
 
+         public decimal Limit { get; set; }
+
           public int PayMethodId { get; set; }
 
           //for edit 

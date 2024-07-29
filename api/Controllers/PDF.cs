@@ -1,72 +1,103 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using api.Services;
-using api.DTOS;
+using api.Entities;
 
 namespace api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PDFController : ControllerBase
+    public class PDF : ControllerBase
     {
-        private readonly IPdfService _pdfService;
-        private readonly IEngineeringUnitsService _engineeringUnitService;
+        private readonly IEngineeringUnitsService _engineeringUnitsService;
 
-        private readonly IWorkplaceService _workplaceService;
-
-        private readonly IQuiriesServices _quiriesServices;
-
-        public PDFController(IPdfService pdfService, IEngineeringUnitsService engineeringUnitService, IWorkplaceService workplaceService ,IQuiriesServices quiriesServices)
+        public PDF(IEngineeringUnitsService engineeringUnitsService)
         {
-            _pdfService = pdfService;
-            _engineeringUnitService = engineeringUnitService;
-            _workplaceService = workplaceService;
-            _quiriesServices=quiriesServices;
+            _engineeringUnitsService = engineeringUnitsService;
         }
 
-        [HttpGet("reportEngUints")]
-        public async Task<IActionResult> GetPdfReport1()
+        private async Task<QuestPDF.Infrastructure.IDocument> CreateDocument()
         {
-    
-            var units = await _engineeringUnitService.GetAll();
+            var engineeringUnits = await _engineeringUnitsService.GetAll();
 
-            byte[] pdfBytes = _pdfService.GeneratePdfEngUnits(units);
-  
-            return File(pdfBytes, "application/pdf", "report.pdf");
+            return Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(2, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(20));
+
+                    page.Header()
+                        .AlignCenter()
+                        .Text("تقرير الوحدات الهندسية")
+                        .SemiBold().FontSize(36).FontColor(Colors.Black)
+                        .DirectionFromRightToLeft();
+
+                    page.Content()
+                        .PaddingVertical(1, Unit.Centimetre)
+                        .Column(x =>
+                        {
+                            x.Spacing(20);
+
+                            foreach (var unit in engineeringUnits)
+                            {
+                                x.Item().Text($"الاسم: {unit.Name}").DirectionFromRightToLeft();
+                                x.Item().Text($"الرقم: {unit.Number}").DirectionFromRightToLeft();
+                                x.Item().Text($"اسم رئيس الوحدة: {unit.Namepresident}").DirectionFromRightToLeft();
+                                x.Item().Text($"رقم رئيس الوحدة: {unit.Phonepresident}").DirectionFromRightToLeft();
+                                x.Item().Text($"ايميل رئيس الوحدة: {unit.Emailpresident}").DirectionFromRightToLeft();
+                                x.Item().PaddingBottom(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
+                            }
+                        });
+
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(x =>
+                        {
+                            x.Span("الصفحة ").DirectionFromRightToLeft();
+                            x.CurrentPageNumber();
+                        });
+                });
+            });
         }
 
+        [HttpGet("GeneratePdf")]
+        public async Task<FileContentResult> GeneratePdf()
+        {
+            var document = await CreateDocument();
 
-        [HttpGet("reportWorkPlace")]
-public async Task<IActionResult> GetPdfReport2()
-{
-    
-    var workPlaces = await _workplaceService.GetAll();
-    
-    
-    var engineeringUnits = await _engineeringUnitService.GetAll();
-    
-    
-    byte[] pdfBytes = _pdfService.GeneratePdfWorkPlace(workPlaces, engineeringUnits);
-    
-    
-    return File(pdfBytes, "application/pdf", "report.pdf");
-}
+            var pdf = document.GeneratePdf();
+            
+            var stream = new MemoryStream(pdf);
 
+            HttpResponseMessage httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StreamContent(stream)
+            };
 
-[HttpGet("reportEngWithFamily/{engNumber}")]
-public async Task<IActionResult> GetPdfReport3(string engNumber)
-{
-    var engineer = await _quiriesServices.GetEngineerWithRelationsAsync(engNumber);
+            httpResponseMessage.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = "EN1.pdf"
+            };
 
-    if (engineer == null)
-    {
-        return NotFound("Engineer not found.");
-    }
+            httpResponseMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
 
-    byte[] pdfBytes = _pdfService.GeneratePdfEngineerReport(new List<SimpleEngineer> { engineer });
+            FileContentResult file = new FileContentResult(stream.ToArray(), "application/pdf")
+            {
+                FileDownloadName = "EN1.pdf"
+            };
 
-    return File(pdfBytes, "application/pdf", "report.pdf");
-}
+            return file;
+        }
     }
 }

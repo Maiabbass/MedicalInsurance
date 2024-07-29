@@ -64,20 +64,30 @@ namespace api.Repositories
        }
        databaseEntity.Enabled=hospital.Enabled;
         databaseEntity.Inside=hospital.Inside;
+        databaseEntity.Name=hospital.Name;
+        databaseEntity.Address=hospital.Address;
+        databaseEntity.Phone=hospital.Phone;
+        databaseEntity.Email=hospital.Email;
+        databaseEntity.CityId=hospital.CityId;
 
        return _dataContext.SaveChanges()>0;
       
         }
 
-           public void DeleteByHospitalId(int HospitalId){
-         var rest=   _dataContext.Claims.Where(x=>x.HospitalId==HospitalId).ToList();
-         if(rest!=null){
-            _dataContext.Claims.RemoveRange(rest);
-            _dataContext.SaveChanges();
-         }}
+           
 
          public void Delete(int Id){
             var result = _dataContext.Hospitals.Where(x=>x.Id==Id).ToList();
+
+            var claims = _dataContext.Claims.Where(c => c.HospitalId == Id).ToList();
+        foreach (var claim in claims)
+        {
+            claim.HospitalId = null;
+        }
+        var Reco = _dataContext.Recovereds.Where(c => c.HospitalId == Id).ToList();
+        foreach ( var Recoe in Reco){
+          Recoe.HospitalId = null;
+        }  
             if (result!=null){
                  _dataContext.Hospitals.RemoveRange(result);
                  _dataContext.SaveChanges();
@@ -91,6 +101,13 @@ namespace api.Repositories
                 .Where(h => h.CityId == cityId)
                 .ToListAsync();
         }
+
+
+        public async Task<Hospital> GetByNameAsync(string name)
+    {
+        return await _dataContext.Hospitals.FirstOrDefaultAsync(h => h.Name == name);
+    }
+
 
  
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using api.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,16 +15,21 @@ namespace api.Repositories
     {
 
         private readonly DataContext _dataContext;
+        private readonly IAnnualDataService _nnualDataService;
 
 
-        public PersonRepository(DataContext dataContext)
+        public PersonRepository(DataContext dataContext , IAnnualDataService nnualDataService)
         {
             _dataContext = dataContext;
+            _nnualDataService = nnualDataService;
         }
+
+       
         public async Task<int> Add(Person person)
     {
         try
         {
+            var Amount = _nnualDataService.calcualteAmount(person.BirthDate,2024);
             Person newPerson = new Person()
             {
                 FirstName = person.FirstName,
@@ -42,6 +48,7 @@ namespace api.Repositories
                 Beneficiary = person.Beneficiary,
                 GenderId = person.GenderId,
                 StatusId=person.StatusId,
+                Amount=Amount,
             };
 
             _dataContext.Persons.Add(newPerson);
@@ -79,45 +86,55 @@ namespace api.Repositories
 
 
 
-
-
-
-
-
-
         public Task<int> Add(City city)
         {
             throw new NotImplementedException();
         }
 
 
+
+
+
     
  public bool Update(int Id, PersonEditDTO PersonEditDTO)
-        {
-       var databaseEntity= _dataContext.Persons.FirstOrDefault(x=>x.Id==Id);
-       if(databaseEntity==null){
-        
-         return false;
+{
+    // البحث عن الشخص في قاعدة البيانات
+    var databaseEntity = _dataContext.Persons.FirstOrDefault(x => x.Id == Id);
+    if (databaseEntity == null)
+    {
+        return false; // في حال عدم وجود الشخص، قم بإرجاع false
+    }
 
-       }
-       databaseEntity.FirstName=PersonEditDTO.FirstName;
-       databaseEntity.FatherName=PersonEditDTO.FatherName;
-       databaseEntity.LastName=PersonEditDTO.LastName;
-       databaseEntity.MotherName=PersonEditDTO.MotherName;
-       databaseEntity.BirthDate=PersonEditDTO.BirthDate;
-       databaseEntity.NationalId=PersonEditDTO.NationalId;
-       databaseEntity.EnsuranceNumber=PersonEditDTO.EnsuranceNumber;
-       databaseEntity.Address=PersonEditDTO.Address;
-       databaseEntity.Phone=PersonEditDTO.Phone;
-       databaseEntity.Subscrib=PersonEditDTO.Subscrib;
-       databaseEntity.Affiliate=PersonEditDTO.Affiliate;
-       databaseEntity.Beneficiary=PersonEditDTO.Beneficiary;
-       databaseEntity.GenderId=PersonEditDTO.GenderId;
-       databaseEntity.StatusId=PersonEditDTO.StatusId;
+    // حساب المبلغ بناءً على تاريخ الميلاد الجديد
+    var Amount = _nnualDataService.calcualteAmount(PersonEditDTO.BirthDate, 2024);
+    
+    // تحديث الحقول الخاصة بالشخص
+    databaseEntity.FirstName = PersonEditDTO.FirstName;
+    databaseEntity.FatherName = PersonEditDTO.FatherName;
+    databaseEntity.LastName = PersonEditDTO.LastName;
+    databaseEntity.MotherName = PersonEditDTO.MotherName;
+    databaseEntity.BirthDate = PersonEditDTO.BirthDate;
+    databaseEntity.NationalId = PersonEditDTO.NationalId;
+    databaseEntity.EnsuranceNumber = PersonEditDTO.EnsuranceNumber;
+    databaseEntity.Address = PersonEditDTO.Address;
+    databaseEntity.Phone = PersonEditDTO.Phone;
+    databaseEntity.Subscrib = PersonEditDTO.Subscrib;
+    databaseEntity.Affiliate = PersonEditDTO.Affiliate;
+    databaseEntity.Beneficiary = PersonEditDTO.Beneficiary;
+    databaseEntity.GenderId = PersonEditDTO.GenderId;
+    databaseEntity.StatusId = PersonEditDTO.StatusId;
+    
+    // تحديث المبلغ الجديد
+    databaseEntity.Amount = Amount;
 
-       return _dataContext.SaveChanges()>0;
-      
-        }
+    // حفظ التغييرات في قاعدة البيانات
+    return _dataContext.SaveChanges() > 0;
+}
+
+
+
+
+
        public async Task<AnnualData?> GetEngId(int EngineereId) {
         return await _dataContext.AnnualDatas.Where(x=>x.Id==EngineereId).FirstOrDefaultAsync();
 
@@ -126,12 +143,6 @@ namespace api.Repositories
 {
     return await _dataContext.Claims.AnyAsync(c => c.EnsuranceNumber == ensuranceNumber);
 }
-
-
-
-
-
-
 
 
 

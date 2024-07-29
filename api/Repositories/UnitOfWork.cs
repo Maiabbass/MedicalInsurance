@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Entities;
+using api.Services;
 
 namespace api.Repositories
 {
@@ -11,14 +12,23 @@ namespace api.Repositories
     {
 
         private readonly DataContext _dataContext;
+        private readonly IServiceProvider _serviceProvider;
 
-        public UnitOfWork(DataContext dataContext)
+        public UnitOfWork(DataContext dataContext , IServiceProvider serviceProvider)
         {
             _dataContext = dataContext;
+            _serviceProvider = serviceProvider;
             
         }
-        public IPersonRepository PersonRepository => new PersonRepository(_dataContext);
-        public IEngineerRepository EngineerRepository=> new EngineerRepository(_dataContext);
+
+        private IAnnualDataService annualDataService => _serviceProvider.GetRequiredService<IAnnualDataService>();
+
+        
+
+
+
+        public IPersonRepository PersonRepository => new PersonRepository(_dataContext,annualDataService);
+        public IEngineerRepository EngineerRepository=> new EngineerRepository(_dataContext, annualDataService);
 
         public IRelationRepository RelationRepository=>new RelationRepository(_dataContext);
 
@@ -38,10 +48,14 @@ namespace api.Repositories
 
         public ISearchRepository  SearchRepository => new SearchRepository(_dataContext);
 
-        public ISubscriberRepository SubscriberRepository => new SubscriberRepository(_dataContext);
+        public ICashRepository CashRepository => new CashRepository(_dataContext);
         public ISpecializationRepository SpecializationRepository=> new SpecializationRepository(_dataContext);
 
         public IQuiriesRepositories QuiriesRepositories => new QuiriesRepositories(_dataContext);
+
+        public IRecoveredRepository RecoveredRepository => new RecoveredRepository(_dataContext);
+
+        
 
         public Task<bool> Complete()
         {

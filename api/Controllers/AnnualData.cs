@@ -11,6 +11,8 @@ using static api.DTOS.RegisterAnnualDataDTO;
 using static api.Repositories.AnnualDataRepository;
 using static api.DTOS.AnnualDataForView;
 using api.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace api.Controllers
 {
@@ -35,6 +37,9 @@ namespace api.Controllers
         [HttpPost]
         public async Task<ActionResult< Response>> RegisterAnnualData([FromBody] RegisterAnnualDataDTO registerAnnualDataDTO)
         {
+            try {
+
+            
                 var response =await _AnnualDataService.Add(registerAnnualDataDTO);
                   if (response.ErrorMessage!=null)
                {
@@ -42,6 +47,17 @@ namespace api.Controllers
                        new Response {  ErrorMessage =response.ErrorMessage});
                }
                 return Ok(response);
+        }
+                catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+            {
+                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
+            }
+            catch (Exception ex)
+            {
+                string Details = System.Text.Json.JsonSerializer.Serialize(registerAnnualDataDTO);
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
+            }
         }
         
 
@@ -175,32 +191,29 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
  // action method to get the amount of register annual data based on birth date and given Year 
           
   [HttpGet("CalculateAmount")]
-public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdate, int year, string ensuranceNumber)
+public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdate, int year)
 {
-    if (string.IsNullOrEmpty(ensuranceNumber))
-    {
-        return BadRequest(new Response { ErrorMessage = "EnsuranceNumber must be provided." });
-    }
+    
 
     decimal amount = 0m;
     try
     {
         // البحث عن الشخص باستخدام EnsuranceNumber
-        var person = await _searchService.GetByEnsuranceNumberAsync(ensuranceNumber);
+      //  var person = await _searchService.GetByEnsuranceNumberAsync(ensuranceNumber);
 
-        if (person == null)
-        {
-            return NotFound(new Response { ErrorMessage = "Person not found." });
-        }
+      //  if (person == null)
+      //  {
+     //       return NotFound(new Response { ErrorMessage = "Person not found." });
+     //   }
 
         // حساب القسط
         amount = _AnnualDataService.calcualteAmount(birthdate, year);
 
         // تحديث الحقل Amount للشخص
-        person.Amount = amount;
+       // person.Amount = amount;
 
         // حفظ التغييرات في قاعدة البيانات
-        await _personRepository.SavePerson(person);
+        //await _personRepository.SavePerson(person);
 
         return Ok(amount);
     }

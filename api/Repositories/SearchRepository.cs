@@ -200,6 +200,27 @@ namespace api.Repositories
         }
 
 
+        public async Task<IEnumerable<Claims>> GetClaimsByDateRange(DateTime startDate, DateTime endDate)
+    {
+        return await _dataContext.Claims
+            .Where(c => c.LoginDate.HasValue && c.LoginDate.Value.Date >= startDate.Date &&
+                        c.LoginDate.Value.Date <= endDate.Date)
+            .ToListAsync();
+    }
+
+
+     public async Task<IEnumerable<Claims>> GetAllClaims()
+    {
+        return await _dataContext.Claims
+            
+            .ToListAsync();
+    }
+
+    
+
+     
+
+
 
 
         

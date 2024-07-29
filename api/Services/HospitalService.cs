@@ -83,7 +83,7 @@ namespace api.Services
       {
          using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
          {
-        _unitOfWork.HospitalRepository.DeleteByHospitalId(Id);
+       
       
         _unitOfWork.HospitalRepository.Delete(Id);
             scope.Complete();

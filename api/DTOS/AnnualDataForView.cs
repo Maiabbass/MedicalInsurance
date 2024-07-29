@@ -33,6 +33,12 @@ namespace api.DTOS
        
 
         public int? EngineeringUnitsId { get; set;} 
+
+        public decimal Limit {get ; set ;}
+
+        public DateTime? HisDic { get; set; }
+
+
         public List<AnnualDataDetailForView> AnnualDataDetails { get;  set; }
    
 

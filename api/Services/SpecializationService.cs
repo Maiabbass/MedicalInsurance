@@ -66,27 +66,23 @@ namespace api.Services
       return await _unitOfWork.SpecializationRepository.Get(Id);
      }
 
-     public bool Delete(int Id){
-
-      try
-      {
-         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-         {
-      
-        _unitOfWork.SpecializationRepository.Delete(Id);
+    public bool Delete(int Id)
+{
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            _unitOfWork.SpecializationRepository.Delete(Id);
             scope.Complete();
             return true;
-         }
-      } 
-          catch (TransactionAbortedException)
-            {
+        }
+    }
+    catch (TransactionAbortedException)
+    {
+        return false;
+    }
+}
 
-                  
-                  return false;
-                 }
-                 
-    
-     }
 
      public bool Update(int id, SpecializationEditDto specializationEditDto)
         {

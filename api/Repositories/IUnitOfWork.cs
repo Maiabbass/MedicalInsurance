@@ -31,10 +31,12 @@ namespace api.Repositories
 
         ISearchRepository SearchRepository{get ;}
 
-        ISubscriberRepository SubscriberRepository{get ;}
+        ICashRepository CashRepository{get ;}
         ISpecializationRepository  SpecializationRepository{get ;}
 
         IQuiriesRepositories QuiriesRepositories{get ;}
+
+        IRecoveredRepository RecoveredRepository{get ;}
        
 
         Task<bool> Complete();

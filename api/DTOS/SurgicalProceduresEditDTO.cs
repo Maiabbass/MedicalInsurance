@@ -15,5 +15,11 @@ namespace api.DTOS
         public bool Financial {get ; set ; }
 
         public string Pathological_specialization { get; set; }
+
+        
+         public decimal Limit { get; set; }
+         
+
+         public decimal EnduranceRatio { get; set; }
     }
 }

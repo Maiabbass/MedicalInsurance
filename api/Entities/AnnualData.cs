@@ -43,6 +43,8 @@ namespace api.Entities
         public int? WorkPlaceId { get; set;}
         public WorkPlace? WorkPlace { get; set;}
 
+        public decimal Limit  { get; set; }
+
         public int? EngineeringUnitsId { get; set;} 
         public  EngineeringUnits? EngineeringUnits{ get; set;}
 
