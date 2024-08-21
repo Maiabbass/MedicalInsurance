@@ -22,5 +22,8 @@ namespace api.DTOS
     public bool Affiliate { get; set; }
     public bool Beneficiary { get; set; }
     public int GenderId { get; set; }
+    public int StatusId { get; set; }
+
+    public decimal Amount { get ; set;}
     }
 }

@@ -22,34 +22,39 @@ namespace api.Repositories
         {
             _dataContext=dataContext;
         }
-        public async Task<int> Add_AnnualData(AnnualData annualData)
-        {
-            try {
 
-            
-             AnnualData newitem=new AnnualData ()
-             {
-                EngineereId = annualData.EngineereId,
-                Year = annualData.Year,
-                Amount = annualData.Amount,
-                ExAmount = annualData.ExAmount,
-                TotalAmount = annualData.TotalAmount,
-                PayMethodId = annualData.PayMethodId,
-                WorkPlaceId = annualData.WorkPlaceId,
-                EngineeringUnitsId = annualData.EngineeringUnitsId,
-                HisDic=annualData.HisDic,
-                Limit=annualData.Limit,
 
-             };
-             _dataContext.AnnualDatas.Add(newitem);
-            await _dataContext.SaveChangesAsync();
-            return newitem.Id;
-        }
-         catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+       public async Task<int> Add_AnnualData(AnnualData annualData)
+{
+    try
+    {
+        AnnualData newitem = new AnnualData()
         {
-            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
-        }
-        }
+            EngineereId = annualData.EngineereId,
+            Year = annualData.Year,
+            Amount = annualData.Amount,
+            ExAmount = annualData.ExAmount,
+            TotalAmount = annualData.TotalAmount,
+            PayMethodId = annualData.PayMethodId,
+            WorkPlaceId = annualData.WorkPlaceId,
+            EngineeringUnitsId = annualData.EngineeringUnitsId,
+            HisDic = annualData.HisDic,
+            CardStatuse=annualData.CardStatuse,
+            Subscrib = annualData.Subscrib,
+            Affiliate = annualData.Affiliate,
+            Beneficiary = annualData.Beneficiary
+        };
+        _dataContext.AnnualDatas.Add(newitem);
+        await _dataContext.SaveChangesAsync();
+        return newitem.Id;
+    }
+    catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+    {
+        throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+    }
+}
+
+      
         
 
 
@@ -88,7 +93,7 @@ namespace api.Repositories
              Id =data.Id,
              Year= data.Year,
              Amount=data.Amount,
-             Limit=data.Limit,
+             CardStatuse=data.CardStatuse,
              HisDic=data.HisDic,
              ExAmount=data.ExAmount,
              EngineereId=data.EngineereId,
@@ -126,55 +131,78 @@ namespace api.Repositories
  
 // get all data from tow tabel
 
-    public async Task<IEnumerable<AnnualDataWithDetails>> GetAll() {
-            
-            List<AnnualDataWithDetails> result =new  List<AnnualDataWithDetails>();
-           var data = await _dataContext.AnnualDatas
-            .Include(a => a.AnnualDataDetails)
-           .ToListAsync() ; 
-            
+   public async Task<IEnumerable<AnnualDataWithDetails>> GetAll(int pageNumber, int pageSize)
+{
+    int skip = (pageNumber - 1) * pageSize;
+    int take = pageSize;
 
-            foreach (var item in data)
+    // استعلام SQL لاستخدام ROW_NUMBER لتطبيق Paging على AnnualData فقط
+    var query = @"
+        WITH PagedData AS (
+             SELECT a.Id, a.Year, a.Amount, a.ExAmount, a.EngineereId, a.PayMethodId, 
+                   a.WorkPlaceId, a.EngineeringUnitsId, a.TotalAmount, a.CardStatuse, a.HisDic,
+                   a.Affiliate, a.Subscrib, a.Beneficiary,
+                   ROW_NUMBER() OVER (ORDER BY a.Id) AS RowNumber
+            FROM AnnualDatas a
+        )
+        SELECT * FROM PagedData
+        WHERE RowNumber BETWEEN @startRow AND @endRow;
+    ";
+
+    var startRow = skip + 1;
+    var endRow = skip + take;
+
+    var rawData = await _dataContext.AnnualDatas
+        .FromSqlRaw(query, 
+            new SqlParameter("@startRow", startRow), 
+            new SqlParameter("@endRow", endRow))
+        .ToListAsync();
+
+    // تحويل البيانات إلى النموذج المطلوب (AnnualDataWithDetails) مع تحميل التفاصيل لاحقًا
+    var result = new List<AnnualDataWithDetails>();
+
+    foreach (var item in rawData)
+    {
+        var annualDataDetails = await _dataContext.AnnualDataDetails
+            .Where(d => d.AnnualDataId == item.Id)
+            .ToListAsync();
+
+        result.Add(new AnnualDataWithDetails
+        {
+            AnnualData = new AnnualData
             {
-            AnnualData _annualData=new AnnualData ()
-             {
-             Id =item.Id,
-             Year= item.Year,
-             Amount=item.Amount,
-             ExAmount=item.ExAmount,
-             EngineereId=item.EngineereId,
-             PayMethodId=item.PayMethodId,
-             WorkPlaceId=item.WorkPlaceId,
-             EngineeringUnitsId=item.EngineeringUnitsId,
-             TotalAmount=item.TotalAmount,
-            Limit=item.Limit,
-             HisDic=item.HisDic,
-             };
-               List<AnnualDataDetail> annualDataDetails =new  List<AnnualDataDetail>();
+                Id = item.Id,
+                Year = item.Year,
+                Amount = item.Amount,
+                ExAmount = item.ExAmount,
+                EngineereId = item.EngineereId,
+                PayMethodId = item.PayMethodId,
+                WorkPlaceId = item.WorkPlaceId,
+                EngineeringUnitsId = item.EngineeringUnitsId,
+                TotalAmount = item.TotalAmount,
+                CardStatuse=item.CardStatuse,
+                HisDic = item.HisDic,
+                Affiliate = item.Affiliate,
+                Subscrib = item.Subscrib,
+                Beneficiary = item.Beneficiary
+            },
+            AnnualDataDetails = annualDataDetails.Select(d => new AnnualDataDetail
+            {
+                Id = d.Id,
+                PersonId = d.PersonId,
+                AnnualDataId = d.AnnualDataId,
+                IsEngineer = d.IsEngineer,
+                Amount = d.Amount
+            }).ToList()
+        });
+    }
 
-               foreach(var detailitem in item.AnnualDataDetails)
-               {
-                AnnualDataDetail annualDataDetailnew=new  AnnualDataDetail()
-                {
-                    Id =detailitem.Id,
-                    PersonId=detailitem.PersonId,
-                    AnnualDataId=detailitem.AnnualDataId,
-                    IsEngineer=detailitem.IsEngineer,
-                    Amount=detailitem.Amount,
-                };
-                annualDataDetails.Add(annualDataDetailnew);
-               }  
+    return result;
+}
+ 
 
-               AnnualDataWithDetails AnnualDataWithDetailsNew=new AnnualDataWithDetails ()
-               {
-                AnnualData=_annualData,
-                AnnualDataDetails=annualDataDetails
-               };
-               result.Add(AnnualDataWithDetailsNew);
-            }
-             
-           return  result;} 
 
+       
 
        
 
@@ -222,7 +250,8 @@ namespace api.Repositories
        databaseEntity.EngineeringUnitsId=annualDataForView.EngineeringUnitsId;
        databaseEntity.TotalAmount=annualDataForView.TotalAmount;
        databaseEntity.HisDic=annualDataForView.HisDic;
-       databaseEntity.Limit=annualDataForView.Limit;
+       databaseEntity.CardStatuse=annualDataForView.CardStatuse;
+       
        
        
        return _dataContext.SaveChanges()>0;
@@ -269,7 +298,189 @@ namespace api.Repositories
 
         }
 
-        
+        public async Task Update_Year_Configuration(YearConfiguration yearConfiguration)
+{
+    var existingConfig = await _dataContext.YearConfigurations
+        .FirstOrDefaultAsync(y => y.Id == yearConfiguration.Id);
+
+    if (existingConfig != null)
+    {
+        existingConfig.Year = yearConfiguration.Year;
+        existingConfig.InsideHospitalPercentage = yearConfiguration.InsideHospitalPercentage;
+        existingConfig.OutsideHospitalPercentage = yearConfiguration.OutsideHospitalPercentage;
+        existingConfig.CardPrice = yearConfiguration.CardPrice;
+        existingConfig.Limit=yearConfiguration.Limit;
+
+        _dataContext.YearConfigurations.Update(existingConfig);
+        await _dataContext.SaveChangesAsync();
+    }
+}
+
+
+
+
+
+ public async Task<IEnumerable<AnnualDataWithDetails>> GetByYear(int year, int pageNumber, int pageSize)
+{
+    int skip = (pageNumber - 1) * pageSize;
+    int take = pageSize;
+    int endRow = skip + take;
+
+    var query = @"
+        WITH PagedData AS (
+            SELECT 
+                a.Id, 
+                a.Year, 
+                a.Amount, 
+                a.ExAmount, 
+                a.EngineereId, 
+                a.PayMethodId, 
+                a.WorkPlaceId, 
+                a.EngineeringUnitsId, 
+                a.TotalAmount, 
+                a.CardStatuse,
+                a.HisDic,
+                a.Affiliate, 
+                a.Subscrib, 
+                a.Beneficiary,
+                ROW_NUMBER() OVER (ORDER BY a.Id) AS RowNumber
+            FROM AnnualDatas a
+            WHERE a.Year = @year
+        )
+        SELECT 
+            Id, 
+            Year, 
+            Amount, 
+            ExAmount, 
+            EngineereId, 
+            PayMethodId, 
+            WorkPlaceId, 
+            EngineeringUnitsId, 
+            TotalAmount, 
+            CardStatuse,
+            HisDic,
+            Affiliate, 
+            Subscrib, 
+            Beneficiary
+        FROM PagedData
+        WHERE RowNumber > @skip AND RowNumber <= @endRow;
+    ";
+
+    var parameters = new[]
+    {
+        new SqlParameter("@year", year),
+        new SqlParameter("@skip", skip),
+        new SqlParameter("@endRow", endRow)
+    };
+
+    var data = await _dataContext.AnnualDatas
+        .FromSqlRaw(query, parameters)
+        .ToListAsync();
+
+    // تحويل البيانات إلى النموذج المطلوب (AnnualDataWithDetails)
+    var result = data.Select(item => new AnnualDataWithDetails
+    {
+        AnnualData = new AnnualData
+        {
+            Id = item.Id,
+            Year = item.Year,
+            Amount = item.Amount,
+            ExAmount = item.ExAmount,
+            EngineereId = item.EngineereId,
+            PayMethodId = item.PayMethodId,
+            WorkPlaceId = item.WorkPlaceId,
+            EngineeringUnitsId = item.EngineeringUnitsId,
+            TotalAmount = item.TotalAmount,
+            CardStatuse=item.CardStatuse,
+            HisDic = item.HisDic,
+            Affiliate = item.Affiliate,
+            Subscrib = item.Subscrib,
+            Beneficiary = item.Beneficiary
+        },
+        AnnualDataDetails = new List<AnnualDataDetail>() // قائمة فارغة لأن التفاصيل تُعبأ لاحقًا
+    }).ToList();
+
+    return result;
+}
+
+
+  public async Task<(SimpleEngineer engineer, bool? cardStatus, int? payMethod)> GetEngineerDetailsAndCardStatus(string insuranceNumber, int year)
+{
+    // Step 1: Retrieve the engineer based on the insurance number
+    var engineer = await _dataContext.Engineeres
+        .Include(e => e.Person)
+        .Include(e => e.Relations)
+            .ThenInclude(r => r.Person)
+        .FirstOrDefaultAsync(e => e.Person.EnsuranceNumber == insuranceNumber);
+
+    if (engineer == null)
+    {
+        // Handle the case where the engineer is not found
+        return (null, null, null);
     }
 
-    }
+    // Step 2: Retrieve the card status and pay method from the AnnualData table
+    var annualData = await _dataContext.AnnualDatas
+        .Where(x => x.EngineereId == engineer.Id && x.Year == year)
+        .Select(x => new { x.CardStatuse, x.PayMethodId })
+        .FirstOrDefaultAsync();
+
+    // تحويل الكائن إلى كائن بسيط
+    var simpleEngineer = new SimpleEngineer
+    {
+        Id = engineer.Id,
+        EngNumber = engineer.EngNumber,
+        SubNumber = engineer.SubNumber,
+        Person = new SimplePerson
+        {
+            Id = engineer.Person.Id,
+            FirstName = engineer.Person.FirstName,
+            FatherName = engineer.Person.FatherName,
+            LastName = engineer.Person.LastName,
+            MotherName = engineer.Person.MotherName,
+            NationalId = engineer.Person.NationalId,
+            EnsuranceNumber = engineer.Person.EnsuranceNumber,
+            Address = engineer.Person.Address,
+            Phone = engineer.Person.Phone,
+            Mobile = engineer.Person.Mobile,
+            Email = engineer.Person.Email,
+            StatusId = engineer.Person.StatusId ?? 0,
+            GenderId = engineer.Person.GenderId,
+            Amount = (decimal)engineer.Person.Amount
+        },
+        Relations = engineer.Relations.Select(r => new SimpleRelation
+        {
+            Id = r.Id,
+            Name = r.Name,
+            RelationTypeId = r.RelationTypeId, // توضيح نوع العلاقة
+            Person = new SimplePerson
+            {
+                Id = r.Person.Id,
+                FirstName = r.Person.FirstName,
+                FatherName = r.Person.FatherName,
+                LastName = r.Person.LastName,
+                MotherName = r.Person.MotherName,
+                NationalId = r.Person.NationalId,
+                EnsuranceNumber = r.Person.EnsuranceNumber,
+                Address = r.Person.Address,
+                Phone = r.Person.Phone,
+                Mobile = r.Person.Mobile,
+                Email = r.Person.Email,
+                StatusId = r.Person.StatusId ?? 0,
+                GenderId = r.Person.GenderId,
+                Amount = (decimal)r.Person.Amount
+            }
+        }).ToList()
+    };
+
+    // Return the engineer details, card status, and pay method
+    return (simpleEngineer, annualData?.CardStatuse, annualData?.PayMethodId);
+}
+
+
+
+   
+        
+    }}
+
+    

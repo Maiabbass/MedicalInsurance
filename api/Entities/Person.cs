@@ -57,11 +57,7 @@ namespace api.Entities
 
         public string? Email { get; set; }
 
-        public bool Subscrib { get; set; }
-
-        public bool Affiliate  { get; set; }
-
-        public bool Beneficiary { get; set; }
+        
 
         
         public Engineere? Engineere { get; set; }
@@ -72,7 +68,7 @@ namespace api.Entities
        public int? StatusId{ get; set;}
         public Status? Status { get; set;}
 
-        public int GenderId {get; set;}
+   public int GenderId {get; set;}
          public Gender Gender{ get; set;}
 
          public decimal? Amount { get; set;}
@@ -81,6 +77,8 @@ namespace api.Entities
 
          public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }
          public ICollection<Claims> Claims { get ; set;}
+
+        public virtual User User { get; set; }
 
     }
 }

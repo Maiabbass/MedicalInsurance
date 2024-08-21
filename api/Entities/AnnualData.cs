@@ -43,13 +43,24 @@ namespace api.Entities
         public int? WorkPlaceId { get; set;}
         public WorkPlace? WorkPlace { get; set;}
 
-        public decimal Limit  { get; set; }
+        
+
+
+        public bool Subscrib { get; set; }
+
+        public bool Affiliate  { get; set; }
+
+        public bool Beneficiary { get; set; }
+        public bool CardStatuse { get; set; }
+
+
 
         public int? EngineeringUnitsId { get; set;} 
         public  EngineeringUnits? EngineeringUnits{ get; set;}
 
 
         public ICollection<AnnualDataDetail>  AnnualDataDetails { get; set; }
+        
 
         internal object Select(Func<object, AnnualDataForView> value)
         {

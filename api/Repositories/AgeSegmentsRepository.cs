@@ -37,5 +37,41 @@ namespace api.Repositories
              }
              
         }
+
+
+  public async Task Update_Age_Segments(List<AgeSegments> ageSegments)
+{
+    if (ageSegments == null || ageSegments.Count == 0)
+        throw new ArgumentException("The list of age segments cannot be null or empty.");
+
+    // افتراض أن جميع الشرائح العمرية الجديدة لها نفس السنة
+    int year = ageSegments.First().Year;
+
+    // حذف الشرائح العمرية الموجودة للسنة المحددة
+    var existingSegments = await _dataContext.AgeSegments
+        .Where(a => a.Year == year)
+        .ToListAsync();
+    _dataContext.AgeSegments.RemoveRange(existingSegments);
+
+    // إضافة الشرائح العمرية الجديدة
+    foreach (var segment in ageSegments)
+    {
+        var newSegment = new AgeSegments
+        {
+            FromYear = segment.FromYear,
+            ToYear = segment.ToYear,
+            TheAmount = segment.TheAmount,
+            EnduranceRatio = segment.EnduranceRatio,
+            Year = segment.Year // استخدام السنة من الشريحة الجديدة
+        };
+
+        await _dataContext.AgeSegments.AddAsync(newSegment);
+    }
+
+    await _dataContext.SaveChangesAsync();
+}
+
+
+
     }
 }

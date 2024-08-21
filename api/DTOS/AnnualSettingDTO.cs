@@ -13,10 +13,12 @@ namespace api.DTOS
     /// </summary>
     public class AnnualSettingDTO
     {
+        public int Id { get; set; }
          public int Year { get; set; }
          public decimal? InsideHospitalPercentage { get; set; }
          public decimal? OutsideHospitalPercentage { get; set; }
          public decimal? CardPrice { get; set; }
          public List<AgeSegments>? AgeSegments{get;set;}
+          public decimal Limit  { get; set; }
     }
 }

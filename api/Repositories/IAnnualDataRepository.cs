@@ -14,7 +14,7 @@ namespace api.Repositories
         Task<AnnualDataWithDetails> Get(int AnnualDataId);
 
      
-       Task<IEnumerable<AnnualDataWithDetails>> GetAll() ;
+       Task<IEnumerable<AnnualDataWithDetails>> GetAll(int pageNumber, int pageSize) ;
       
 
         Task<int>Add_AnnualData (AnnualData annualData);
@@ -31,6 +31,14 @@ namespace api.Repositories
 
         Task<int> Add_Year_Configuration(YearConfiguration yearConfiguration);
         void Delete_Year_Configuration(int year);
+
+        Task Update_Year_Configuration(YearConfiguration yearConfiguration);
+        Task<IEnumerable<AnnualDataWithDetails>> GetByYear(int year, int pageNumber, int pageSize);
+
+       Task<(SimpleEngineer engineer, bool? cardStatus, int? payMethod)> GetEngineerDetailsAndCardStatus(string insuranceNumber, int year);
+
+
+    
 
          
    

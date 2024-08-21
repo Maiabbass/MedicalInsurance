@@ -17,11 +17,23 @@ namespace api.DTOS
     public decimal? non_AddForPerson { get; set; }
     public decimal? EnduranceRatio { get; set; }
     public int HospitalId { get; set; } 
-    public bool Send { get; set; }
+    public bool Status { get; set; }
     public DateTime? LoginDate { get; set; }
     public DateTime? ExitDate { get; set; }
     public int PersonId { get; set; }
     public int  SurgicalProceduresId { get; set; } 
-}
+
+      public DateTime? RecoDate { get; set; }
+
+      public int Number { get;set;}
+        public string? HospitalName { get; internal set; }
+        public SurgicalProceduresEditDTO? SurgicalProcedures { get; internal set; }
+        public DateTime? DateSurgicalProcedures {
+          get ; set;
+        }
+
+
+
+    }
 
     }

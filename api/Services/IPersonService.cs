@@ -12,7 +12,7 @@ namespace api.Services
         object Person { get; }
 
         Task <Response> Add (PersonEditDTO  personEditDTO);
-        Task<IEnumerable<Person>> GetAll();
+        Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize);
 
         Task<Person?>GetWithId(int Id);
 

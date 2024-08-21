@@ -14,7 +14,7 @@ namespace api.Entities
         public string EnsuranceNumber { get; set; }
 
          
-        public  string FullName{ get; set; }
+        public  string? FullName{ get; set; }
 
  
         [Column(TypeName = "decimal(18,2)")]
@@ -43,7 +43,7 @@ namespace api.Entities
         public int? HospitalId{get ; set;}
         public Hospital Hospital{get; set;}
 
-        public bool Send { get; set;}
+        public bool Status { get; set;}
         public DateTime? LoginDate { get; set; }
 
         public DateTime? ExitDate { get; set; }
@@ -64,7 +64,15 @@ namespace api.Entities
 
         public SurgicalProcedures? SurgicalProcedures { get; set; }
 
+        public int Number { get; set ;}
+        
 
+       public DateTime? RecoDate { get; set; }
+
+
+       public DateTime? DateSurgicalProcedures { get ; set;}
+ 
+  
         
     }
     }

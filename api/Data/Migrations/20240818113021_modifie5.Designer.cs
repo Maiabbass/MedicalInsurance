@@ -12,8 +12,8 @@ using api.Data;
 namespace api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240727075754_InitialCreat")]
-    partial class InitialCreat
+    [Migration("20240818113021_modifie5")]
+    partial class modifie5
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,8 +32,8 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("EnduranceRatio")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<decimal?>("EnduranceRatio")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("FromYear")
                         .HasColumnType("int");
@@ -60,8 +60,17 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<bool>("Affiliate")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Beneficiary")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CardStatuse")
+                        .HasColumnType("bit");
 
                     b.Property<int>("EngineereId")
                         .HasColumnType("int");
@@ -75,11 +84,11 @@ namespace api.Data.Migrations
                     b.Property<DateTime?>("HisDic")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Limit")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<int?>("PayMethodId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Subscrib")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -101,7 +110,7 @@ namespace api.Data.Migrations
 
                     b.HasIndex("WorkPlaceId");
 
-                    b.HasIndex("Year")
+                    b.HasIndex("Year", "EngineereId")
                         .IsUnique();
 
                     b.ToTable("AnnualDatas");
@@ -167,6 +176,9 @@ namespace api.Data.Migrations
                     b.Property<decimal>("Company_fees")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("DateSurgicalProcedures")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("EnduranceRatio")
                         .HasColumnType("decimal(18,2)");
 
@@ -230,12 +242,17 @@ namespace api.Data.Migrations
                     b.Property<string>("SubNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("WorkPlaceId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SpecializationId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("WorkPlaceId");
 
@@ -334,6 +351,9 @@ namespace api.Data.Migrations
                     b.Property<bool>("Inside")
                         .HasColumnType("bit");
 
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(18,6)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -341,11 +361,41 @@ namespace api.Data.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("latitude")
+                        .HasColumnType("decimal(18,6)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CityId");
 
                     b.ToTable("Hospitals");
+                });
+
+            modelBuilder.Entity("api.Entities.PasswordEng", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EngineerNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EngineerNumber")
+                        .IsUnique();
+
+                    b.ToTable("passwordEngs");
                 });
 
             modelBuilder.Entity("api.Entities.PayMethod", b =>
@@ -376,14 +426,8 @@ namespace api.Data.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Affiliate")
-                        .HasColumnType("bit");
-
                     b.Property<decimal?>("Amount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("Beneficiary")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("BirthDate")
                         .HasColumnType("datetime2");
@@ -425,9 +469,6 @@ namespace api.Data.Migrations
                     b.Property<int?>("StatusId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Subscrib")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GenderId");
@@ -451,6 +492,9 @@ namespace api.Data.Migrations
                     b.Property<decimal?>("Company_fees")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("DateSurgicalProcedures")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal?>("EnduranceRatio")
                         .HasColumnType("decimal(18,2)");
 
@@ -462,7 +506,6 @@ namespace api.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("HospitalId")
@@ -471,10 +514,16 @@ namespace api.Data.Migrations
                     b.Property<DateTime?>("LoginDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Send")
+                    b.Property<DateTime?>("RecoDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Status")
                         .HasColumnType("bit");
 
                     b.Property<int?>("SurgicalProceduresId")
@@ -633,6 +682,9 @@ namespace api.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("EngineerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
@@ -653,6 +705,9 @@ namespace api.Data.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("PersonId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -671,6 +726,10 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EngineerId")
+                        .IsUnique()
+                        .HasFilter("[EngineerId] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -678,6 +737,10 @@ namespace api.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("PersonId")
+                        .IsUnique()
+                        .HasFilter("[PersonId] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -727,6 +790,9 @@ namespace api.Data.Migrations
                     b.Property<decimal?>("InsideHospitalPercentage")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("Limit")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal?>("OutsideHospitalPercentage")
                         .HasColumnType("decimal(18,2)");
 
@@ -734,6 +800,9 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Year")
+                        .IsUnique();
 
                     b.ToTable("YearConfigurations");
                 });
@@ -956,6 +1025,10 @@ namespace api.Data.Migrations
                         .WithMany("Engineeres")
                         .HasForeignKey("SpecializationId");
 
+                    b.HasOne("api.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
                     b.HasOne("api.Entities.WorkPlace", "WorkPlace")
                         .WithMany("Engineeres")
                         .HasForeignKey("WorkPlaceId")
@@ -964,6 +1037,8 @@ namespace api.Data.Migrations
                     b.Navigation("Person");
 
                     b.Navigation("Specialization");
+
+                    b.Navigation("User");
 
                     b.Navigation("WorkPlace");
                 });
@@ -1055,6 +1130,23 @@ namespace api.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("EngineeringeDepar");
+                });
+
+            modelBuilder.Entity("api.Entities.User", b =>
+                {
+                    b.HasOne("api.Entities.Engineere", "Engineer")
+                        .WithOne()
+                        .HasForeignKey("api.Entities.User", "EngineerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("api.Entities.Person", "Person")
+                        .WithOne("User")
+                        .HasForeignKey("api.Entities.User", "PersonId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Engineer");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
@@ -1172,6 +1264,9 @@ namespace api.Data.Migrations
                     b.Navigation("Engineere");
 
                     b.Navigation("Relations");
+
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("api.Entities.RelationType", b =>

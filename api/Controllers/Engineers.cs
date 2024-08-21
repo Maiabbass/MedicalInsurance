@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
 using api.DTOS;
@@ -57,20 +58,87 @@ namespace api.Controllers
 
 
         }
+
+        
         [HttpGet("{Id}")]
-        public async Task<ActionResult<Engineere?>>Get( int Id){
-   return await _engineerService.Get(Id);
+public async Task<ActionResult<Engineere?>> Get(int Id)
+{
+    var engineer = await _engineerService.Get(Id);
+
+    if (engineer == null)
+    {
+        return NotFound();
+    }
+
+    var options = new JsonSerializerOptions
+    {
+        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+        WriteIndented = true // This is optional, for better readability of JSON output
+    };
+
+    var jsonResult = new JsonResult(engineer, options);
+
+    return jsonResult;
 }
 
 
 
-    [HttpGet]
-        public async Task<ActionResult<IEnumerable<Engineere>>> GetAll()
+
+
+
+
+ [HttpGet]
+public async Task<ActionResult<PagedResult<PersonWithEngineereDTO>>> GetEngineersWithPersons([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+{
+    var engineers = await _engineerService.GetAll(pageNumber, pageSize);
+    
+    // تحويل البيانات إلى PersonWithEngineereDTO
+    var items = engineers.Select(e => new PersonWithEngineereDTO
     {
-         var data=await _engineerService.GetAll();
-        
-      return Ok(data);
+        PersonId = e.Persons.FirstOrDefault()?.Id ?? 0,
+        FirstName = e.Persons.FirstOrDefault()?.FirstName,
+        FatherName = e.Persons.FirstOrDefault()?.FatherName,
+        LastName = e.Persons.FirstOrDefault()?.LastName,
+        MotherName = e.Persons.FirstOrDefault()?.MotherName,
+        NationalId = e.Persons.FirstOrDefault()?.NationalId,
+        EnsuranceNumber = e.Persons.FirstOrDefault()?.EnsuranceNumber,
+        BirthDate = e.Persons.FirstOrDefault()?.BirthDate,
+        Address = e.Persons.FirstOrDefault()?.Address,
+        Phone = e.Persons.FirstOrDefault()?.Phone,
+        Mobile = e.Persons.FirstOrDefault()?.Mobile,
+        Email = e.Persons.FirstOrDefault()?.Email,
+        StatusId = e.Persons.FirstOrDefault()?.StatusId,
+        GenderId = e.Persons.FirstOrDefault()?.GenderId,
+        EngNumber = e.EngNumber,
+        SubNumber = e.SubNumber,
+        SpecializationId = e.SpecializationId,
+        WorkPlaceId = e.WorkPlaceId,
+        Amount = e.Persons.FirstOrDefault()?.Amount
+    }).ToList();
+
+    // إعداد بيانات النتيجة
+    var pagedResult = new PagedResult<PersonWithEngineereDTO>
+    {
+        CurrentPage = pageNumber,
+        TotalPages = (int)Math.Ceiling(engineers.Count() / (double)pageSize),
+        PageSize = pageSize,
+        TotalCount = engineers.Count(),
+        Items = items
+    };
+
+    if (!pagedResult.Items.Any())
+    {
+        return NotFound();
     }
+
+    return Ok(pagedResult);
+}
+
+
+
+
+
+
 
 
 

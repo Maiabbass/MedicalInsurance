@@ -6,6 +6,7 @@ using System.Transactions;
 using api.DTOS;
 using api.Entities;
 using api.Repositories;
+using static api.DTOS.PersonWithEngineereDTO;
 
 namespace api.Services
 {
@@ -43,9 +44,7 @@ namespace api.Services
              Phone = engineerPersonEditDTO.Phone,
              Mobile=engineerPersonEditDTO.Mobile,
              Email=engineerPersonEditDTO.Email,
-             Subscrib=engineerPersonEditDTO.Subscrib,
-             Affiliate=engineerPersonEditDTO.Affiliate,
-             Beneficiary=engineerPersonEditDTO.Beneficiary,
+            
              GenderId = engineerPersonEditDTO.GenderId,
              StatusId = engineerPersonEditDTO.statusId,
            };
@@ -64,6 +63,7 @@ namespace api.Services
                 
                 SpecializationId = engineerPersonEditDTO.SpecializationId,
                 WorkPlaceId =engineerPersonEditDTO.WorkPlaceId
+                
                
                 
                };
@@ -88,9 +88,9 @@ namespace api.Services
       return await _unitOfWork.EngineerRepository.Get(Id);
      }
 
-     public async Task<IEnumerable<Engineere>>GetAll()
+     public async  Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize)
         {
-            return  await _unitOfWork.EngineerRepository.GetAll() ;
+            return  await _unitOfWork.EngineerRepository.GetAll(pageNumber,pageSize) ;
         }
 
            public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO){
@@ -104,6 +104,7 @@ namespace api.Services
          {
         
          _unitOfWork.EngineerRepository.DeleteByEngId(Id);
+         _unitOfWork.EngineerRepository.DeleteByEngId2(Id);
          
         _unitOfWork.EngineerRepository.Delete(Id);
             scope.Complete();

@@ -15,7 +15,7 @@ namespace api.Repositories
          Task<RecoveredSummary> GetAll();
           public void   Delete(int Id);
           public bool Update(int Id, RecoveredDto recoveredDto);
-            Task<RecoveredSummary> GetByEnsuranceNumber(string ensuranceNumber);
+            Task<List<RecoveredDto>> GetByEnsuranceNumber(string ensuranceNumber);
         
     }
 }

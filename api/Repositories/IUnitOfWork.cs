@@ -31,7 +31,7 @@ namespace api.Repositories
 
         ISearchRepository SearchRepository{get ;}
 
-        ICashRepository CashRepository{get ;}
+        IUploadRepository UploadRepository{get ;}
         ISpecializationRepository  SpecializationRepository{get ;}
 
         IQuiriesRepositories QuiriesRepositories{get ;}

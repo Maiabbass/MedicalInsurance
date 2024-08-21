@@ -13,6 +13,7 @@ using static api.DTOS.AnnualDataForView;
 using api.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using api.Data;
 
 namespace api.Controllers
 {
@@ -25,40 +26,46 @@ namespace api.Controllers
 
         private readonly ISearchService _searchService;
 
+        private readonly DataContext _dataContext ;
         
 
-        public AnnualData(IAnnualDataService AnnualDataService,IPersonRepository personRepository , ISearchService searchService)
+        public AnnualData(IAnnualDataService AnnualDataService,IPersonRepository personRepository , ISearchService searchService , DataContext dataContext )
         {
             _AnnualDataService =AnnualDataService;
             _personRepository=personRepository;
             _searchService = searchService;
+            _dataContext = dataContext;
+            
         }
+
+
+
 
         [HttpPost]
-        public async Task<ActionResult< Response>> RegisterAnnualData([FromBody] RegisterAnnualDataDTO registerAnnualDataDTO)
+       public async Task<ActionResult<Response>> RegisterAnnualData([FromBody] RegisterAnnualDataDTO registerAnnualDataDTO)
+{
+    try
+    {
+       
+        var response = await _AnnualDataService.Add(registerAnnualDataDTO);
+        if (response.ErrorMessage != null)
         {
-            try {
-
-            
-                var response =await _AnnualDataService.Add(registerAnnualDataDTO);
-                  if (response.ErrorMessage!=null)
-               {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                       new Response {  ErrorMessage =response.ErrorMessage});
-               }
-                return Ok(response);
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new Response { ErrorMessage = response.ErrorMessage });
         }
-                catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
-            {
-                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
-            }
-            catch (Exception ex)
-            {
-                string Details = System.Text.Json.JsonSerializer.Serialize(registerAnnualDataDTO);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
-            }
-        }
+        return Ok(response);
+    }
+    catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+    {
+        return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
+    }
+    catch (Exception ex)
+    {
+        string details = System.Text.Json.JsonSerializer.Serialize(registerAnnualDataDTO);
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {details}" });
+    }
+}
         
 
 
@@ -77,57 +84,41 @@ namespace api.Controllers
 
 
 
-[HttpGet]
-public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll()
+ [HttpGet]
+public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll(
+    [FromQuery] int pageNumber = 1, 
+    [FromQuery] int pageSize = 10)
 {
-    var data = await _AnnualDataService.GetAll();
-    List<AnnualDataWithDetails> dataList = data.ToList();
-    List<AnnualDataForView> annualDataForViews = new List<AnnualDataForView>();
-    
+    var data = await _AnnualDataService.GetAll(pageNumber, pageSize);
+    var dataList = data.ToList();
+    var annualDataForViews = new List<AnnualDataForView>();
+
     foreach (var item in dataList)
     {
-        int id = item.AnnualData.Id;
-        int year = item.AnnualData.Year;
-        int engineereId = item.AnnualData.EngineereId;
-        decimal exAmount = item.AnnualData.ExAmount;
-        decimal amount = item.AnnualData.Amount;
-        decimal totalAmount = item.AnnualData.TotalAmount;
-        List<AnnualDataDetailForView> annualDataDetailsForView = new List<AnnualDataDetailForView>();
-        
-        foreach (var detail in item.AnnualDataDetails)
+        var annualDataForView = new AnnualDataForView
         {
-            int detailId = detail.Id;
-            int personId = detail.PersonId;
-            int annualDataId=detail.AnnualDataId;
-            bool isEngineer=detail.IsEngineer;
-            decimal amount1=detail.Amount;
-            AnnualDataDetailForView annualDataDetailForView = new AnnualDataDetailForView
+            Id = item.AnnualData.Id,
+            Year = item.AnnualData.Year,
+            EngineereId = item.AnnualData.EngineereId,
+            ExAmount = item.AnnualData.ExAmount,
+            Amount = item.AnnualData.Amount,
+            TotalAmount = item.AnnualData.TotalAmount,
+            AnnualDataDetails = item.AnnualDataDetails.Select(detail => new AnnualDataDetailForView
             {
-                Id = detailId,
-                PersonId = personId,
-                AnnualDataId=annualDataId,
-                IsEngineer=isEngineer,
-                Amount=amount1,
-            };
-            annualDataDetailsForView.Add(annualDataDetailForView);
-        }
-        
-        AnnualDataForView annualDataForView = new AnnualDataForView
-        {
-            Id = id,
-            Year=year,
-            EngineereId=engineereId,
-            ExAmount = exAmount,
-            Amount = amount,
-            TotalAmount = totalAmount,
-            AnnualDataDetails = annualDataDetailsForView
+                Id = detail.Id,
+                PersonId = detail.PersonId,
+                AnnualDataId = detail.AnnualDataId,
+                IsEngineer = detail.IsEngineer,
+                Amount = detail.Amount
+            }).ToList()
         };
-        
+
         annualDataForViews.Add(annualDataForView);
     }
-    
+
     return Ok(annualDataForViews);
 }
+
 
       
     
@@ -263,6 +254,157 @@ public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdat
                }
                 return Ok(response);
         } 
-  
-  }
+
+    [HttpPut]
+    [Route("UpdateAnnualSettings")]
+    public async Task<IActionResult> UpdateAnnualSettings( [FromBody] AnnualSettingDTO annualSettingDTO)
+    {
+        if (annualSettingDTO == null)
+        {
+            return BadRequest("Invalid data.");
+        }
+
+        
+
+        var response = await _AnnualDataService.UpdateAnnualSettings( annualSettingDTO);
+
+        if (response.Status == "Success")
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response.ErrorMessage);
+        }
+   }
+   
+   
+      [HttpGet("GetByYear")]
+public async Task<ActionResult<IEnumerable<AnnualDataWithDetails>>> GetByYear(
+    [FromQuery] int year,
+    [FromQuery] int pageNumber = 1,
+    [FromQuery] int pageSize = 10) 
+{
+    // التحقق من صحة القيم المدخلة
+    if (pageNumber < 1) pageNumber = 1;
+    if (pageSize < 1) pageSize = 10;
+    if (pageSize > 100) pageSize = 100; // فرض حد أقصى للصفحات لتجنب الحمل الزائد
+
+    try 
+    {
+        var pagedData = await _AnnualDataService.GetByYear(year, pageNumber, pageSize);
+        
+        // التحقق من وجود بيانات
+        if (pagedData == null || !pagedData.Any()) 
+        {
+            return NotFound(new { message = "No data found for the specified year." });
+        }
+
+        return Ok(pagedData);
+    } 
+    catch (Exception ex) 
+    {
+        // سجل الخطأ إذا لزم الأمر
+        return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An error occurred while processing your request.", details = ex.Message });
+    }
+}
+
+
+
+
+
+ [HttpGet("GetEngineerDetailsAndCardStatusByInsuranceNumber/{insuranceNumber}")]
+public async Task<IActionResult> GetEngineerDetailsAndCardStatusByInsuranceNumber(string insuranceNumber, int year)
+{
+    var result = await _AnnualDataService.GetEngineerDetailsAndCardStatus(insuranceNumber, year);
+
+    if (result.engineer == null)
+    {
+        return NotFound(new { Message = "لم يتم العثور على بيانات للرقم التأميني والسنة المقدمة." });
+    }
+
+    return Ok(new
+    {
+        Engineer = new
+        {
+            result.engineer.Id,
+            result.engineer.EngNumber,
+            result.engineer.SubNumber,
+            Person = new
+            {
+                result.engineer.Person.Id,
+                result.engineer.Person.FirstName,
+                result.engineer.Person.FatherName,
+                result.engineer.Person.LastName,
+                result.engineer.Person.MotherName,
+                result.engineer.Person.NationalId,
+                result.engineer.Person.EnsuranceNumber,
+                result.engineer.Person.Address,
+                result.engineer.Person.Phone,
+                result.engineer.Person.Mobile,
+                result.engineer.Person.Email,
+                result.engineer.Person.StatusId,
+                result.engineer.Person.GenderId,
+                result.engineer.Person.Amount,
+
+            },
+            Relations = result.engineer.Relations.Select(r => new
+            {
+                r.Id,
+                r.Name,
+                r.RelationTypeId,
+                Person = new
+                {
+                    r.Person.Id,
+                    r.Person.FirstName,
+                    r.Person.FatherName,
+                    r.Person.LastName,
+                    r.Person.MotherName,
+                    r.Person.NationalId,
+                    r.Person.EnsuranceNumber,
+                    r.Person.Address,
+                    r.Person.Phone,
+                    r.Person.Mobile,
+                    r.Person.Email,
+                    r.Person.StatusId,
+                    r.Person.GenderId,
+                    r.Person.Amount
+                }
+            }).ToList()
+        },
+        CardStatus = result.cardStatus,
+        PayMethod = result.payMethod
+    });
+}
+
+
+
+ [HttpGet("GetYearConfigurations")]
+    public async Task<ActionResult<List<YearConfiguration>>> GetYearConfigurations()
+    {
+        var yearConfigurations = await _dataContext.YearConfigurations.ToListAsync();
+
+        if (yearConfigurations == null || yearConfigurations.Count == 0)
+        {
+            return NotFound("No year configurations found.");
+        }
+
+        return Ok(yearConfigurations);
+    }
+
+
+ [HttpGet("GetAgeSegments")]
+        public async Task<ActionResult<List<AgeSegments>>> GetAgeSegments()
+        {
+            var ageSegments = await _dataContext.AgeSegments.ToListAsync();
+
+            if (ageSegments == null || ageSegments.Count == 0)
+            {
+                return NotFound("No age segments found.");
+            }
+
+            return Ok(ageSegments);
+        }
+    }
+   
    }

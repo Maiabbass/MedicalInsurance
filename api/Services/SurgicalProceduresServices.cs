@@ -36,6 +36,7 @@ namespace api.Services
              Pathological_specialization=SurgicalProceduresEditDTO.Pathological_specialization,
              Limit=SurgicalProceduresEditDTO.Limit,
              EnduranceRatio=SurgicalProceduresEditDTO.EnduranceRatio,
+             //Date=SurgicalProceduresEditDTO.Date,
              
             
            };

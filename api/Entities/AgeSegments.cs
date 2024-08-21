@@ -21,8 +21,8 @@ namespace api.Entities
         public decimal TheAmount { get; set; }
 
        // public string CardPrice { get; set; }
-
-       public string? EnduranceRatio { get; set; }
+       [Column(TypeName = "decimal(18,2)")]
+       public decimal? EnduranceRatio { get; set; }
         
 
     }

@@ -50,9 +50,7 @@ namespace api.Services
              Phone = personEditDTO.Phone,
              Mobile=personEditDTO.Mobile,
              Email=personEditDTO.Email,
-             Subscrib=personEditDTO.Subscrib,
-             Affiliate=personEditDTO.Affiliate,
-             Beneficiary=personEditDTO.Beneficiary,
+             
              GenderId = personEditDTO.GenderId,
              StatusId=personEditDTO.StatusId,
                  };
@@ -84,9 +82,9 @@ namespace api.Services
              return response;
         }
 
-        public async Task<IEnumerable<Person>>  GetAll()
+        public async Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize)
         {
-            return  await _unitOfWork.PersonRepository.GetAll() ;
+            return  await _unitOfWork.PersonRepository.GetAll(pageNumber,pageSize) ;
         }
 
      public async Task<Person?>GetWithId(int Id)

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
+using api.DTOS;
 using api.Entities;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -87,10 +88,12 @@ namespace api.Repositories
                         non_Add = nonAdd,
                         Company_fees = companyFees,
                         non_AddForPerson = nonAddForPerson,
-                        Trust=false,
+                        Trust=true,
                         LoginDate=null,
                         ExitDate=null,
-                        SurgicalProceduresId=null
+                        SurgicalProceduresId=null,
+                        DateSurgicalProcedures=null
+
                     };
 
         /*
@@ -155,7 +158,135 @@ namespace api.Repositories
             
         }
 
-
-       
-    }
+        public async Task<bool> ExistsAsync(int engineerId)
+{
+    return await _dataContext.Claims.AnyAsync(c => c.PersonId == engineerId);
 }
+
+ 
+
+   public async Task<bool> UpdateSurgicalProcedureAsync(int claimId, string surgicalProcedureName, DateTime? newClaimDate = null)
+{
+    // البحث عن الإجراء الجراحي بناءً على الاسم
+    var surgicalProcedure = await _dataContext.SurgicalProcedures
+        .FirstOrDefaultAsync(sp => sp.Name == surgicalProcedureName);
+
+    if (surgicalProcedure == null)
+    {
+        return false; // لم يتم العثور على الإجراء الجراحي
+    }
+
+    // البحث عن المطالبة بناءً على الـ Id
+    var claim = await _dataContext.Claims.FindAsync(claimId);
+
+    if (claim == null)
+    {
+        return false; // لم يتم العثور على المطالبة
+    }
+
+    // تحديث الـ SurgicalProceduresId في الكائن Claim
+    claim.SurgicalProceduresId = surgicalProcedure.Id;
+
+    // إذا تم تقديم تاريخ جديد، يتم تحديثه
+    if (newClaimDate.HasValue)
+    {
+        claim.LoginDate = newClaimDate.Value;
+    }
+
+    // حفظ التغييرات في قاعدة البيانات
+    await _dataContext.SaveChangesAsync();
+
+    return true; // تم التحديث بنجاح
+}
+
+
+
+
+
+
+
+    public async Task<List<ClaimDetailsDTO>> GetClaimsAsync()
+{
+    var claims = await _dataContext.Claims
+        .Include(c => c.Hospital)
+        .Include(c => c.SurgicalProcedures)
+        .Select(c => new ClaimDetailsDTO
+        {
+            Id = c.Id,
+            EnsuranceNumber = c.EnsuranceNumber,
+            FullName = c.FullName,
+            TotalPrice = c.TotalPrice,
+            Company_fees = c.Company_fees,
+            ApprovedPrice = c.ApprovedPrice,
+            non_Add = c.non_Add,
+            non_AddForPerson = c.non_AddForPerson,
+            EnduranceRatio = c.EnduranceRatio,
+            HospitalName = c.Hospital.Name,
+            Trust = c.Trust,
+            LoginDate = c.LoginDate,
+            ExitDate = c.ExitDate,
+            PersonId = c.PersonId,
+            DateSurgicalProcedures=c.DateSurgicalProcedures,
+            SurgicalProcedures = c.SurgicalProcedures != null ? new SurgicalProceduresEditDTO
+            {
+                Id = c.SurgicalProcedures.Id,
+                Name = c.SurgicalProcedures.Name,
+                Technical = c.SurgicalProcedures.Technical,
+                Financial = c.SurgicalProcedures.Financial,
+                Limit = c.SurgicalProcedures.Limit,
+                EnduranceRatio = c.SurgicalProcedures.EnduranceRatio,
+                Pathological_specialization = c.SurgicalProcedures.Pathological_specialization
+            } : null // إذا كانت `SurgicalProcedures` null، يتم تعيين `SurgicalProcedures` في الـ DTO كـ null
+        })
+        .ToListAsync();
+
+    return claims;
+}
+
+
+
+
+  public async Task<List<ClaimDetailsDTO>> GetClaimsByEnsuranceNumberAsync(string ensuranceNumber)
+{
+    var claims = await _dataContext.Claims
+        .Include(c => c.Hospital)
+        .Include(c => c.SurgicalProcedures)
+        .Where(c => c.EnsuranceNumber == ensuranceNumber)
+        .Select(c => new ClaimDetailsDTO
+        {
+            Id = c.Id,
+            EnsuranceNumber = c.EnsuranceNumber,
+            FullName = c.FullName,
+            TotalPrice = c.TotalPrice,
+            Company_fees = c.Company_fees,
+            ApprovedPrice = c.ApprovedPrice,
+            non_Add = c.non_Add,
+            non_AddForPerson = c.non_AddForPerson,
+            EnduranceRatio = c.EnduranceRatio,
+            HospitalName = c.Hospital.Name,
+            Trust = c.Trust,
+            LoginDate = c.LoginDate,
+            ExitDate = c.ExitDate,
+            PersonId = c.PersonId,
+            DateSurgicalProcedures = c.DateSurgicalProcedures,
+            SurgicalProcedures = c.SurgicalProcedures != null ? new SurgicalProceduresEditDTO
+            {
+                Id = c.SurgicalProcedures.Id,
+                Name = c.SurgicalProcedures.Name,
+                Technical = c.SurgicalProcedures.Technical,
+                Financial = c.SurgicalProcedures.Financial,
+                Limit = c.SurgicalProcedures.Limit,
+                EnduranceRatio = c.SurgicalProcedures.EnduranceRatio,
+                Pathological_specialization = c.SurgicalProcedures.Pathological_specialization
+            } : null
+        })
+        .ToListAsync();
+
+    return claims;
+}
+
+
+    }
+       
+    } 
+

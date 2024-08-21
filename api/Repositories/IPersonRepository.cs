@@ -9,7 +9,7 @@ namespace api.Repositories
 {
     public interface IPersonRepository
     {
-        Task <IEnumerable<Person>> GetAll();
+        Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize);
 
         Task <Person?> Get(int Id);
 

@@ -32,11 +32,7 @@ namespace api.DTOS{
         
         public string  Email { get; set; }
 
-        public bool Subscrib { get; set; }
-
-        public bool Affiliate  { get; set; }
-
-        public bool Beneficiary { get; set; }
+        
 
         public int GenderId {get; set;}
        
@@ -59,6 +55,8 @@ namespace api.DTOS{
     
 
         public int WorkPlaceId{ get; set;}
+
+        
     
 
     

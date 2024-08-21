@@ -38,12 +38,15 @@ namespace api.Services
             non_Add=recoveredDto.non_Add,
             non_AddForPerson=recoveredDto.non_AddForPerson,
             EnduranceRatio=recoveredDto.EnduranceRatio,
-            Send=recoveredDto.Send,
+            Status=recoveredDto.Status,
             SurgicalProceduresId=recoveredDto.SurgicalProceduresId,
             PersonId=recoveredDto.PersonId,
             HospitalId=recoveredDto.HospitalId,
             LoginDate=recoveredDto.LoginDate,
             ExitDate=recoveredDto.ExitDate,
+            RecoDate=recoveredDto.RecoDate,
+            Number=recoveredDto.Number,
+            DateSurgicalProcedures=recoveredDto.DateSurgicalProcedures,
 
             
           
@@ -105,7 +108,7 @@ namespace api.Services
 
 
 
-                  public async Task<RecoveredSummary> GetByEnsuranceNumber(string ensuranceNumber){
+                  public async Task<List<RecoveredDto>> GetByEnsuranceNumber(string ensuranceNumber){
                     return await _unitOfWork.RecoveredRepository.GetByEnsuranceNumber(ensuranceNumber);
                   }
     }

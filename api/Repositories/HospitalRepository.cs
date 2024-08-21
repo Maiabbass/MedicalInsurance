@@ -29,6 +29,9 @@ namespace api.Repositories
                Address=hospital.Address,
                Email=hospital.Email,
                Phone=hospital.Phone,
+               Longitude=hospital.Longitude,
+               latitude=hospital.latitude,
+
               
              };
 #pragma warning restore IDE0090 // Use 'new(...)'
@@ -69,6 +72,8 @@ namespace api.Repositories
         databaseEntity.Phone=hospital.Phone;
         databaseEntity.Email=hospital.Email;
         databaseEntity.CityId=hospital.CityId;
+        databaseEntity.Longitude=hospital.Longitude;
+        databaseEntity.latitude=hospital.Latitude;
 
        return _dataContext.SaveChanges()>0;
       

@@ -8,6 +8,7 @@ using api.Entities;
 using api.Services;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static api.DTOS.PersonWithEngineereDTO;
 
 namespace api.Repositories
 {
@@ -21,42 +22,140 @@ namespace api.Repositories
             _dataContext =dataContext;
             _annualDataService =annualDataService;
          }
+
+
+
         public async Task<int> Add(Engineere engineere)
+{
+    try
+    {
+        Engineere newEngineer = new Engineere()
         {
-          try{
-            Engineere newEngineer =new Engineere()
-             {
-               EngNumber=engineere.EngNumber,
-               SubNumber = engineere.SubNumber,
-               Id =engineere.Id,
-               
-               SpecializationId=engineere.SpecializationId,
-               WorkPlaceId= engineere.WorkPlaceId
-             }; 
+            EngNumber = engineere.EngNumber,
+            SubNumber = engineere.SubNumber,
+            Id = engineere.Id,
+            SpecializationId = engineere.SpecializationId,
+            WorkPlaceId = engineere.WorkPlaceId
+        };
 
+        _dataContext.Engineeres.Add(newEngineer);
+        await _dataContext.SaveChangesAsync();
 
-              _dataContext.Engineeres.Add(newEngineer);
-              await _dataContext.SaveChangesAsync();
-
-              return newEngineer.Id;
-          }
-          catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+        return newEngineer.Id;
+    }
+    catch (DbUpdateException ex)
+    {
+        var sqlException = ex.InnerException as SqlException;
+        if (sqlException != null)
         {
-            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+            // سجل معلومات إضافية حول استثناء SQL
+            var errorMessage = $"SQL Error Number: {sqlException.Number}, Message: {sqlException.Message}, StackTrace: {sqlException.StackTrace}";
+            throw new Exception($"Database update error: {errorMessage}", ex);
         }
-        }
+
+        // سجل معلومات حول استثناء قاعدة البيانات
+        throw new Exception("Database update error. See inner exception for details.", ex);
+    }
+    catch (Exception ex)
+    {
+        // سجل أي استثناء آخر
+        throw new Exception("An unexpected error occurred. See inner exception for details.", ex);
+    }
+}
+
 
         
 
-        public async Task<Engineere?> Get(int Id)
-        {
-              return await _dataContext.Engineeres.Where(x=>x.Id==Id).FirstOrDefaultAsync();
-        }
 
-        public async Task<IEnumerable<Engineere>> GetAll()
+
+        public async Task<Engineere?> Get(int Id)
+{
+    return await _dataContext.Engineeres
+        .Include(e => e.Person)  // تضمين بيانات الـ Person المرتبطة
+        .FirstOrDefaultAsync(x => x.Id == Id);
+}
+
+
+
+
+
+
+        
+    public async Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize)
+{
+    int skip = (pageNumber - 1) * pageSize;
+    int take = pageSize;
+
+    // استعلام SQL لاستخدام ROW_NUMBER لتطبيق Paging على Engineers فقط
+    var query = @"
+        WITH PagedData AS (
+            SELECT e.Id, e.EngNumber, e.SubNumber, e.SpecializationId, e.WorkPlaceId, e.UserId,
+                   ROW_NUMBER() OVER (ORDER BY e.Id) AS RowNumber
+            FROM dbo.Engineeres e  -- تأكد من استخدام الاسم الكامل للجدول
+        )
+        SELECT * FROM PagedData
+        WHERE RowNumber BETWEEN @startRow AND @endRow;
+    ";
+
+    var startRow = skip + 1;
+    var endRow = skip + take;
+
+    var rawData = await _dataContext.Engineeres
+        .FromSqlRaw(query, 
+            new SqlParameter("@startRow", startRow), 
+            new SqlParameter("@endRow", endRow))
+        .ToListAsync();
+
+    // تحويل البيانات إلى النموذج المطلوب (PersonWithEngineerDTO) مع تحميل التفاصيل لاحقًا
+    var result = new List<EngineerFull>();
+
+    foreach (var item in rawData)
+    {
+        var persons = await _dataContext.Persons
+            .Where(p => p.Id == item.Id)
+            .ToListAsync();
+
+        result.Add(new EngineerFull
         {
-             return await _dataContext.Engineeres.ToListAsync();
-        }
+            Id = item.Id,
+            EngNumber = item.EngNumber,
+            SubNumber = item.SubNumber,
+            SpecializationId = item.SpecializationId.HasValue ? item.SpecializationId.Value : 0, // تحقق من القيمة nullable
+            WorkPlaceId = item.WorkPlaceId.HasValue ? item.WorkPlaceId.Value : 0,               // تحقق من القيمة nullable
+            
+            Persons = persons.Select(p => new Person
+            {
+                Id = p.Id,
+                FirstName = p.FirstName,
+                FatherName = p.FatherName,
+                LastName = p.LastName,
+                MotherName = p.MotherName,
+                BirthDate = p.BirthDate,
+                NationalId = p.NationalId,
+                EnsuranceNumber = p.EnsuranceNumber,
+                Address = p.Address,
+                Phone = p.Phone,
+                Mobile = p.Mobile,
+                Email = p.Email,
+                GenderId = p.GenderId,
+                Gender = p.Gender,
+                Amount = p.Amount
+                // يجب إدراج الخصائص الأخرى إذا كانت موجودة
+            }).ToList()
+        });
+    }
+
+    return result;
+}
+
+
+
+
+
+
+
+
+
 
 
           public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO)
@@ -76,6 +175,7 @@ namespace api.Repositories
     engineerEntity.SubNumber = engineerPersonEditDTO.SubNumber;
     engineerEntity.SpecializationId = engineerPersonEditDTO.SpecializationId;
     engineerEntity.WorkPlaceId = engineerPersonEditDTO.WorkPlaceId;
+    
 
     // البحث عن الشخص في قاعدة البيانات باستخدام نفس المعرف
     var personEntity = _dataContext.Persons.FirstOrDefault(x => x.Id == Id);
@@ -94,9 +194,7 @@ namespace api.Repositories
     personEntity.EnsuranceNumber = engineerPersonEditDTO.EnsuranceNumber;
     personEntity.Address = engineerPersonEditDTO.Address;
     personEntity.Phone = engineerPersonEditDTO.Phone;
-    personEntity.Subscrib = engineerPersonEditDTO.Subscrib;
-    personEntity.Affiliate = engineerPersonEditDTO.Affiliate;
-    personEntity.Beneficiary = engineerPersonEditDTO.Beneficiary;
+   
     personEntity.GenderId = engineerPersonEditDTO.GenderId;
     personEntity.StatusId = engineerPersonEditDTO.statusId;
     personEntity.Amount = amount; // تحديث المبلغ الجديد
@@ -110,6 +208,15 @@ namespace api.Repositories
          var rest=   _dataContext.Relations.Where(x=>x.EngineereId==EngineereId).ToList();
          if(rest!=null){
             _dataContext.Relations.RemoveRange(rest);
+            _dataContext.SaveChanges();
+         }}
+
+
+
+            public void DeleteByEngId2(int Id){
+         var rest=   _dataContext.Persons.Where(x=>x.Id==Id).ToList();
+         if(rest!=null){
+            _dataContext.Persons.RemoveRange(rest);
             _dataContext.SaveChanges();
          }}
            

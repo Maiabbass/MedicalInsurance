@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,6 +43,13 @@ namespace api.Entities
 
         public int CityId {get ; set ;}
         public City City { get ; set ;}
+
+         [Column(TypeName = "decimal(18,6)")]
+         public decimal? latitude { get; set; }
+
+        [Column(TypeName = "decimal(18,6)")]
+
+         public decimal? Longitude { get; set; }
 
         public ICollection<Claims> Claims{get ; set; }
 

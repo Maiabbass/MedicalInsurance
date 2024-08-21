@@ -25,7 +25,7 @@ namespace api.Controllers
          }
 
       [HttpPost("upload")]
-        public async Task<IActionResult> UploadClaims(IFormFile file ,[FromForm] int EngineereeId, [FromForm] int SurgicalProceduresId)
+        public async Task<IActionResult> UploadClaims(IFormFile file)
         {
             try{
 
@@ -55,4 +55,51 @@ namespace api.Controllers
                     new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
             }
     }
+
+
+
+     [HttpPut("{claimId}/surgical-procedure")]
+public async Task<IActionResult> EditClaimSurgicalProcedure(int claimId, [FromBody] string surgicalProcedureName, [FromQuery] DateTime? newClaimDate = null)
+{
+    var result = await _climsRepository.UpdateSurgicalProcedureAsync(claimId, surgicalProcedureName, newClaimDate);
+
+    if (!result)
+    {
+        return NotFound($"Either the claim with Id '{claimId}' or the surgical procedure '{surgicalProcedureName}' was not found.");
+    }
+
+    return Ok($"Claim with Id '{claimId}' has been updated with Surgical Procedure '{surgicalProcedureName}' and new claim date '{newClaimDate?.ToString("yyyy-MM-dd") ?? "unchanged"}'.");
+}
+
+
+
+
+     [HttpGet]
+    public async Task<ActionResult<List<ClaimDetailsDTO>>> GetClaims()
+    {
+        var claims = await _climsRepository.GetClaimsAsync();
+
+        if (claims == null || claims.Count == 0)
+        {
+            return NotFound("No claims found.");
+        }
+
+        return Ok(claims);
+    }
+
+
+
+[HttpGet("by-ensurance-number/{ensuranceNumber}")]
+public async Task<ActionResult<List<ClaimDetailsDTO>>> GetClaimsByEnsuranceNumber(string ensuranceNumber)
+{
+    var claims = await _climsRepository.GetClaimsByEnsuranceNumberAsync(ensuranceNumber);
+
+    if (claims == null || claims.Count == 0)
+    {
+        return NotFound($"No claims found with Ensurance Number '{ensuranceNumber}'.");
+    }
+
+    return Ok(claims);
+}
+
 }}

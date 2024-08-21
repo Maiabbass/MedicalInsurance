@@ -14,7 +14,7 @@ namespace api.Services
     {
           Task <Response> Add (RegisterAnnualDataDTO registerAnnualDataDTO); 
           Task<AnnualDataWithDetails> Get (int  AnnualDataId);
-         Task<IEnumerable<AnnualDataWithDetails>> GetAll() ;
+         Task<IEnumerable<AnnualDataWithDetails>> GetAll(int pageNumber, int pageSize) ;
         
       
         
@@ -27,5 +27,13 @@ namespace api.Services
          
           Task <Response> AddAnnualSettings (AnnualSettingDTO annualSettingDTO); 
            public bool DeleteAnnuaSetting(int year);
+
+           Task<Response> UpdateAnnualSettings( AnnualSettingDTO annualSettingDTO);
+
+           Task<IEnumerable<AnnualDataWithDetails>> GetByYear(int year, int pageNumber, int pageSize);
+
+           Task<(SimpleEngineer engineer, bool? cardStatus, int? payMethod)> GetEngineerDetailsAndCardStatus(string insuranceNumber, int year);
+
+          
     }
 }

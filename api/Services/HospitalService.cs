@@ -37,6 +37,8 @@ namespace api.Services
              Address=hospitalEditDTO.Address,
              Email=hospitalEditDTO.Email,
              Phone=hospitalEditDTO.Phone,
+             Longitude=hospitalEditDTO.Longitude,
+             latitude=hospitalEditDTO.Latitude,
              
             
            };

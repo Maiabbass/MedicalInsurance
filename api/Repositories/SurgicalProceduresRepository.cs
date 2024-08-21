@@ -27,6 +27,7 @@ namespace api.Repositories
                Pathological_specialization=surgicalProcedures.Pathological_specialization,
                EnduranceRatio=surgicalProcedures.EnduranceRatio,
                Limit=surgicalProcedures.Limit,
+               //Date=surgicalProcedures.Date,
 
               
              };
@@ -63,6 +64,7 @@ namespace api.Repositories
        databaseEntity.Pathological_specialization=surgicalProceduresEditDTO.Pathological_specialization;
        databaseEntity.Limit=surgicalProceduresEditDTO.Limit;
        databaseEntity.EnduranceRatio=surgicalProceduresEditDTO.EnduranceRatio;
+      // databaseEntity.Date=surgicalProceduresEditDTO.Date;
   
 
        return _dataContext.SaveChanges()>0;

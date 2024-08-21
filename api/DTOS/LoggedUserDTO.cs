@@ -18,5 +18,9 @@ namespace api.DTOS
           public DateTime expiration {get;set;}
 
           public List<string> Roles {get;set;}
+        public object EnsuranceNumber { get; internal set; }
+
+         public string ErrorMessage { get; set; }
+    public string Message { get; set; } 
     }
 }

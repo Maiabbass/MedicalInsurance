@@ -26,5 +26,7 @@ namespace api.Entities
 
          public ICollection<Claims> Claims{get ; set; }
 
+         ///public  DateTime? Date { get ; set ;}
+
     }
 }

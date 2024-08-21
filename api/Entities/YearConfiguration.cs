@@ -19,6 +19,7 @@ namespace api.Entities
 
         [Column(TypeName = "decimal(18,2)")]
          public decimal? CardPrice { get; set; }
+         public decimal Limit  { get; set; }
 
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Entities;
 
 namespace api.DTOS
 {
@@ -35,7 +36,17 @@ namespace api.DTOS
 
     public decimal? Amount { get; set; }
 
-    // يمكنك إضافة المزيد من الخصائص حسب الحاجة
+    
+    public class EngineerFull
+{
+    public int Id { get; set; }
+    public string EngNumber { get; set; }
+    public string SubNumber { get; set; }
+    public int SpecializationId { get; set; }
+    public int WorkPlaceId { get; set; }
+    public List<Person> Persons { get; set; }
+    
+}
 }
 
 }

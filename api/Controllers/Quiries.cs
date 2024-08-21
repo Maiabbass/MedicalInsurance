@@ -26,17 +26,22 @@ namespace api.Controllers
 
 
         [HttpGet("engineer with HisFamily/{EngNumber}")]
-        public async Task<ActionResult<SimpleEngineer>> GetEngineerWithRelations(string EngNumber) 
-        {
-            var engineer = await _quirieService.GetEngineerWithRelationsAsync(EngNumber);
+public async Task<ActionResult<SimpleEngineer>> GetEngineerWithRelations(string EngNumber)
+{
+    var engineer = await _quirieService.GetEngineerWithRelationsAsync(EngNumber);
 
-            if (engineer == null)
-            {
-                return NotFound("Engineer not found.");
-            }
+    if (engineer == null)
+    {
+        return NotFound("Engineer not found.");
+    }
 
-            return Ok(engineer);
-        }
+    return Ok(engineer);
+}
+
+
+
+
+
 
          [HttpGet("GetEngineer")]
         public async Task<ActionResult<IEnumerable<SimpleEngineer>>> GetEngineersWithDetails(

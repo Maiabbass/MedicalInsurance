@@ -43,9 +43,7 @@ namespace api.Repositories
                 Phone = person.Phone,
                 Mobile = person.Mobile,
                 Email = person.Email,
-                Subscrib = person.Subscrib,
-                Affiliate = person.Affiliate,
-                Beneficiary = person.Beneficiary,
+               
                 GenderId = person.GenderId,
                 StatusId=person.StatusId,
                 Amount=Amount,
@@ -68,10 +66,52 @@ namespace api.Repositories
             return await _dataContext.Persons.Where(x=>x.Id==Id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Person>> GetAll()
-        {
-            return await _dataContext.Persons.ToListAsync();
-        }
+
+
+        public async Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize)
+{
+    // Ensure pageNumber and pageSize are valid
+    if (pageNumber <= 0)
+        pageNumber = 1;
+    if (pageSize <= 0)
+        pageSize = 10;
+
+    var totalCount = await _dataContext.Persons.CountAsync();
+
+    // Calculate the range of rows to fetch
+    int skip = (pageNumber - 1) * pageSize;
+    int take = pageSize;
+
+    var query = @"
+        SELECT *
+        FROM (
+            SELECT 
+                ROW_NUMBER() OVER (ORDER BY Id) AS RowNum,
+                *
+            FROM Persons
+        ) AS Result
+        WHERE RowNum > @Skip AND RowNum <= @Skip + @Take
+        ORDER BY RowNum";
+
+    var items = await _dataContext.Persons
+        .FromSqlRaw(query, new SqlParameter("@Skip", skip), new SqlParameter("@Take", take))
+        .ToListAsync();
+
+    var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+    return new PagedResult<Person>
+    {
+        Items = items,
+        TotalCount = totalCount,
+        TotalPages = totalPages,
+        CurrentPage = pageNumber,
+        PageSize = pageSize
+    };
+}
+
+
+
+
         public void   Delete(int Id)
         {
             
@@ -118,9 +158,7 @@ namespace api.Repositories
     databaseEntity.EnsuranceNumber = PersonEditDTO.EnsuranceNumber;
     databaseEntity.Address = PersonEditDTO.Address;
     databaseEntity.Phone = PersonEditDTO.Phone;
-    databaseEntity.Subscrib = PersonEditDTO.Subscrib;
-    databaseEntity.Affiliate = PersonEditDTO.Affiliate;
-    databaseEntity.Beneficiary = PersonEditDTO.Beneficiary;
+   
     databaseEntity.GenderId = PersonEditDTO.GenderId;
     databaseEntity.StatusId = PersonEditDTO.StatusId;
     

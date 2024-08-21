@@ -14,7 +14,12 @@ namespace api.DTOS
          #nullable enable
         public string? Username { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        //[Required(ErrorMessage = "Password is required")]
         public string? Password { get; set; }
+
+       // [Required(ErrorMessage = "Password is required")] 
+        public string? EngineerNumber { get; set;}
+        public string LoginType { get; set; }
+        public string? Email { get;  set; }
     }
 }

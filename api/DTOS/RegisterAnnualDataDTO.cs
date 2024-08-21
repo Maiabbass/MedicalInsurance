@@ -22,15 +22,24 @@ namespace api.DTOS
          public int Year { get; set; }
          public  DateTime? HisDic { get; set; }
 
-         public decimal Limit { get; set; }
+         
 
           public int PayMethodId { get; set; }
+
+          public bool CardStatuse {get ; set ;}
 
           //for edit 
 
           public int WorkPlaceId { get; set; }
           public int EngineeringUnitsId { get; set; }
         public decimal  Amount { get; set; }
+
+        public bool Subscrib { get; set; }
+
+        public bool Affiliate  { get; set; }
+
+        public bool Beneficiary { get; set; }
+        
 
           public class AnnualDataWithDetails
 {

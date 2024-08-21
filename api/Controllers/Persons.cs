@@ -35,6 +35,7 @@ public class Persons : ControllerBase
         {
             try
             {
+                /*
                 var existingPerson = await _personService.GetEngId(personEditDTO.EngineereId);
 
                 if (existingPerson == null)
@@ -51,7 +52,7 @@ public class Persons : ControllerBase
                 {
                     personEditDTO.Beneficiary = true;
                 }
-
+*/
                 var response = await _personService.Add(personEditDTO);
 
                 if (response.ErrorMessage != null)
@@ -76,34 +77,41 @@ public class Persons : ControllerBase
 
 
         
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<PersonForView>>> GetAll()
+   [HttpGet]
+public async Task<ActionResult<PagedResult<PersonForView>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+{
+    var pagedPersons = await _personService.GetAll(pageNumber, pageSize);
+    var personForViews = pagedPersons.Items.Select(item => new PersonForView
     {
-         var Persons=await _personService.GetAll();
-        List<PersonForView> personForViews=new List<PersonForView> ();
-        foreach(var item in Persons)
-        {
-            PersonForView personForViewnewitem=new  PersonForView()
-            {
-              Id=item.Id,
-              FirstName=item.FirstName,
-              FatherName=item.FatherName,
-              LastName=item.LastName,
-              MotherName=item.MotherName,
-              BirthDate=item.BirthDate,
-              EnsuranceNumber=item.EnsuranceNumber,
-              NationalId=item.NationalId,
-              Address=item.Address,
-              Phone=item.Phone,
-              GenderId=item.GenderId,
-              Mobile=item.Mobile,
-              Email=item.Email,
-            
-            };
-            personForViews.Add(personForViewnewitem);
-        }
-      return Ok(personForViews);
-    }
+        Id = item.Id,
+        FirstName = item.FirstName,
+        FatherName = item.FatherName,
+        LastName = item.LastName,
+        MotherName = item.MotherName,
+        BirthDate = item.BirthDate,
+        EnsuranceNumber = item.EnsuranceNumber,
+        NationalId = item.NationalId,
+        Address = item.Address,
+        Phone = item.Phone,
+        GenderId = item.GenderId,
+        Mobile = item.Mobile,
+        Email = item.Email,
+        StatusId=item.StatusId,
+    }).ToList();
+
+    var result = new PagedResult<PersonForView>
+    {
+        Items = personForViews,
+        TotalCount = pagedPersons.TotalCount,
+        TotalPages = pagedPersons.TotalPages,
+        CurrentPage = pagedPersons.CurrentPage,
+        PageSize = pagedPersons.PageSize
+    };
+
+    return Ok(result);
+}
+
+
 
 [HttpGet("{Id}")]
 public async Task<ActionResult<Person?>>GetWithId( int Id){

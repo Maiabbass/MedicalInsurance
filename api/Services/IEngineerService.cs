@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.DTOS;
 using api.Entities;
+using static api.DTOS.PersonWithEngineereDTO;
 
 namespace api.Services
 {
@@ -11,7 +12,7 @@ namespace api.Services
     {
          Task <Response> Add (EngineerPersonEditDTO engineerPersonEditDTO);
 
-          Task <IEnumerable<Engineere>> GetAll();
+           Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize);
          Task<Engineere?>Get(int Id);
          public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO);
 

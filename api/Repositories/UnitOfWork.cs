@@ -48,7 +48,7 @@ namespace api.Repositories
 
         public ISearchRepository  SearchRepository => new SearchRepository(_dataContext);
 
-        public ICashRepository CashRepository => new CashRepository(_dataContext);
+        public IUploadRepository UploadRepository => new UploadRepository(_dataContext);
         public ISpecializationRepository SpecializationRepository=> new SpecializationRepository(_dataContext);
 
         public IQuiriesRepositories QuiriesRepositories => new QuiriesRepositories(_dataContext);

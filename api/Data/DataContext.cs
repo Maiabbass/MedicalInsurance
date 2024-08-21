@@ -42,6 +42,8 @@ namespace api.Data
 
          public DbSet<Recovered> Recovereds { get; set; }
 
+         public DbSet<PasswordEng> passwordEngs {get ; set;}
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -83,8 +85,27 @@ namespace api.Data
             .WithOne(e => e.Person)
             .HasForeignKey<Engineere>(e => e.Id)
             .OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<AnnualData>().HasIndex(u => u.Year).IsUnique();
+           // builder.Entity<AnnualData>().HasIndex(u => u.Year).IsUnique();
             builder.Entity<AnnualData>().HasIndex(u => u.EngineereId).IsUnique();
+            builder.Entity<AnnualData>()
+            .HasIndex(a => new { a.Year, a.EngineereId })
+            .IsUnique();
+
+            builder.Entity<YearConfiguration>().HasIndex(u => u.Year).IsUnique();
+            builder.Entity<PasswordEng>().HasIndex(u => u.EngineerNumber).IsUnique();
+
+         builder.Entity<User>()
+        .HasOne(u => u.Engineer)
+        .WithOne()
+        .HasForeignKey<User>(u => u.EngineerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+
+        builder.Entity<User>()
+        .HasOne(u => u.Person)
+        .WithOne(p => p.User)
+        .HasForeignKey<User>(u => u.PersonId)
+        .OnDelete(DeleteBehavior.Restrict);
 
 
 

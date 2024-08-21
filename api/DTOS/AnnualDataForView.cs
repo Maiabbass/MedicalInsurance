@@ -38,6 +38,8 @@ namespace api.DTOS
 
         public DateTime? HisDic { get; set; }
 
+        public bool CardStatuse {get ; set;}
+
 
         public List<AnnualDataDetailForView> AnnualDataDetails { get;  set; }
    

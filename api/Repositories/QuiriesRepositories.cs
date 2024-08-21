@@ -51,9 +51,8 @@ namespace api.Repositories
             Phone = engineer.Person.Phone,
             Mobile = engineer.Person.Mobile,
             Email = engineer.Person.Email,
-            Subscrib = engineer.Person.Subscrib,
-            Affiliate = engineer.Person.Affiliate,
-            Beneficiary = engineer.Person.Beneficiary,
+            StatusId= (int)engineer.Person.StatusId,
+            
             GenderId = engineer.Person.GenderId
             
         },
@@ -75,9 +74,8 @@ namespace api.Repositories
                 Phone = r.Person.Phone,
                 Mobile = r.Person.Mobile,
                 Email = r.Person.Email,
-                Subscrib = r.Person.Subscrib,
-                Affiliate = r.Person.Affiliate,
-                Beneficiary = r.Person.Beneficiary,
+                StatusId= (int)r.Person.StatusId,
+              
                 GenderId = r.Person.GenderId
             }
         }).ToList()
@@ -128,9 +126,8 @@ namespace api.Repositories
                     Phone = e.Person.Phone,
                     Mobile = e.Person.Mobile,
                     Email = e.Person.Email,
-                    Subscrib = e.Person.Subscrib,
-                    Affiliate = e.Person.Affiliate,
-                    Beneficiary = e.Person.Beneficiary,
+                    
+                    StatusId= (int)e.Person.StatusId,
                     GenderId = e.Person.GenderId
                 },
             
@@ -168,9 +165,8 @@ namespace api.Repositories
                     Phone = e.Person.Phone,
                     Mobile = e.Person.Mobile,
                     Email = e.Person.Email,
-                    Subscrib = e.Person.Subscrib,
-                    Affiliate = e.Person.Affiliate,
-                    Beneficiary = e.Person.Beneficiary,
+                    StatusId= (int)e.Person.StatusId,
+                    
                     GenderId = e.Person.GenderId
                 },
             
@@ -208,9 +204,8 @@ namespace api.Repositories
             Phone = e.Person.Phone,
             Mobile = e.Person.Mobile,
             Email = e.Person.Email,
-            Subscrib = e.Person.Subscrib,
-            Affiliate = e.Person.Affiliate,
-            Beneficiary = e.Person.Beneficiary,
+            StatusId= (int)e.Person.StatusId,
+           
             GenderId = e.Person.GenderId
         }
     }).ToList();
@@ -247,9 +242,8 @@ namespace api.Repositories
             Phone = e.Person.Phone,
             Mobile = e.Person.Mobile,
             Email = e.Person.Email,
-            Subscrib = e.Person.Subscrib,
-            Affiliate = e.Person.Affiliate,
-            Beneficiary = e.Person.Beneficiary,
+            StatusId= (int)e.Person.StatusId,
+           
             GenderId = e.Person.GenderId
         }
     }).ToList();
@@ -286,9 +280,8 @@ namespace api.Repositories
             Phone = e.Person.Phone,
             Mobile = e.Person.Mobile,
             Email = e.Person.Email,
-            Subscrib = e.Person.Subscrib,
-            Affiliate = e.Person.Affiliate,
-            Beneficiary = e.Person.Beneficiary,
+            StatusId= (int)e.Person.StatusId,
+           
             GenderId = e.Person.GenderId
         },
     
@@ -327,9 +320,7 @@ namespace api.Repositories
                     Phone = e.Person.Phone,
                     Mobile = e.Person.Mobile,
                     Email = e.Person.Email,
-                    Subscrib = e.Person.Subscrib,
-                    Affiliate = e.Person.Affiliate,
-                    Beneficiary = e.Person.Beneficiary,
+                    StatusId= (int)e.Person.StatusId,
                     GenderId = e.Person.GenderId
                 },
                
@@ -369,9 +360,8 @@ namespace api.Repositories
                     Phone = e.Person.Phone,
                     Mobile = e.Person.Mobile,
                     Email = e.Person.Email,
-                    Subscrib = e.Person.Subscrib,
-                    Affiliate = e.Person.Affiliate,
-                    Beneficiary = e.Person.Beneficiary,
+                    StatusId= (int)e.Person.StatusId,
+                    
                     GenderId = e.Person.GenderId
                 },
                
@@ -413,9 +403,8 @@ namespace api.Repositories
                     Phone = e.Person.Phone,
                     Mobile = e.Person.Mobile,
                     Email = e.Person.Email,
-                    Subscrib = e.Person.Subscrib,
-                    Affiliate = e.Person.Affiliate,
-                    Beneficiary = e.Person.Beneficiary,
+                    StatusId= (int)e.Person.StatusId,
+                    
                     GenderId = e.Person.GenderId
                 },
                

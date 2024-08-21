@@ -22,21 +22,27 @@ namespace api.Controllers
       _recoveredServices= recoveredServices;
          }
 
-         [HttpPost]
-        public async Task <ActionResult<Response>> Add([FromBody] RecoveredDto   recoveredDto)
-        {
-         
 
-                var response=  await _recoveredServices.Add(recoveredDto);
-               if (response.ErrorMessage!=null)
-               {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                       new Response {  ErrorMessage =response.ErrorMessage});
-               }
-               return Ok (response);
-        
+
+
+        [HttpPost]
+public async Task<ActionResult<Response>> Add([FromBody] RecoveredDto recoveredDto)
+{
+    var response = await _recoveredServices.Add(recoveredDto);
     
-        }
+    if (response.ErrorMessage != null)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { ErrorMessage = response.ErrorMessage });
+    }
+    
+    return Ok(response);
+}
+
+
+
+
+
         [HttpPut("{Id}")]
         public  ActionResult<bool> Update(int Id,[FromBody] RecoveredDto reco){
            bool result= _recoveredServices.Update(Id,reco);
@@ -81,11 +87,16 @@ public async Task<ActionResult<RecoveredSummary>> GetAll()
     
   }
 
-
-  [HttpGet("GetByEnsuranceNumber/{ensuranceNumber}")]
-public async Task<ActionResult<RecoveredSummary>> GetByEnsuranceNumber(string ensuranceNumber)
+ [HttpGet("GetByEnsuranceNumber/{ensuranceNumber}")]
+public async Task<ActionResult<List<RecoveredDto>>> GetByEnsuranceNumber(string ensuranceNumber)
 {
     var data = await _recoveredServices.GetByEnsuranceNumber(ensuranceNumber);
+    
+    if (data == null || !data.Any())
+    {
+        return NotFound($"No records found for Ensurance Number '{ensuranceNumber}'.");
+    }
+
     return Ok(data);
 }
 

@@ -9,7 +9,7 @@ namespace api.DTOS
     {
         #pragma warning disable CS8618
 
-        public int Id {get;set;}
+      //  public int Id {get;set;}
         public string FirstName { get; set; }
         public string FatherName { get; set; }
 
@@ -24,20 +24,16 @@ namespace api.DTOS
 
         public string EnsuranceNumber { get; set; }
 
-        public string  Address { get; set; }
+        public string?  Address { get; set; }
 
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
 
-        public string  Mobile { get; set; }
+        public string?  Mobile { get; set; }
 
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
 
-        public bool Subscrib { get; set; }
-
-        public bool Affiliate  { get; set; }
-
-        public bool Beneficiary { get; set; }
+        
 
             public int GenderId {get; set;}
 

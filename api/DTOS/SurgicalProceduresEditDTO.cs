@@ -21,5 +21,7 @@ namespace api.DTOS
          
 
          public decimal EnduranceRatio { get; set; }
+
+        // public DateTime? Date { get ; set ; }
     }
 }

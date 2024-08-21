@@ -86,6 +86,9 @@ namespace api.Entities
         public SurgicalProcedures? SurgicalProcedures { get; set; }
 
 
+        public DateTime? DateSurgicalProcedures {get  ; set ;}
+
+
         
     }
 }

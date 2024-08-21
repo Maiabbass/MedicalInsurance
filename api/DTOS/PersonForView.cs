@@ -38,9 +38,6 @@ namespace api.DTOS
         public string Email { get; set; }
 
         public int GenderId {get; set;}
-       
-
-       
-
+        public int? StatusId { get;  set; }
     }
 }

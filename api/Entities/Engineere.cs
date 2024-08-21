@@ -44,5 +44,8 @@ namespace api.Entities
 
         public ICollection< AnnualData> AnnualDatas{ get; set;}
        // public ICollection<Claims> Claims { get ; set;}
+
+
+         public User? User { get; set; }
     }
 }
