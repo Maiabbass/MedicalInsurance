@@ -463,6 +463,16 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO reset
         return BadRequest(ModelState);
     }
 
+    // البحث في جدول PasswordEng بناءً على الرقم الهندسي
+    var passwordEngRecord = await _dataContext.passwordEngs
+        .Where(p => p.EngineerNumber == resetPasswordDto.EngineerNumber)
+        .FirstOrDefaultAsync();
+
+    if (passwordEngRecord == null)
+    {
+        return Unauthorized("المستخدم غير موجود.");
+    }
+
     // البحث في جدول Person بناءً على الرقم الهندسي والبريد الإلكتروني
     var personRecord = await _dataContext.Persons
         .Where(p => p.Email == resetPasswordDto.Email && p.Engineere.EngNumber == resetPasswordDto.EngineerNumber)
@@ -479,25 +489,17 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO reset
     // تشفير كلمة المرور الجديدة
     var hashedPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
 
-    // تحديث كلمة المرور في جدول PasswordEng
-    var passwordEngRecord = await _dataContext.passwordEngs
-        .Where(p => p.EngineerNumber == resetPasswordDto.EngineerNumber)
-        .FirstOrDefaultAsync();
-
-    if (passwordEngRecord == null)
-    {
-        return Unauthorized("المستخدم غير موجود.");
-    }
-
+    // تحديث كلمة المرور في سجل PasswordEng
     passwordEngRecord.Password = hashedPassword;
     await _dataContext.SaveChangesAsync();
 
+    // جلب بيانات المهندس لإرسال البريد الإلكتروني
+    var engineer = await _dataContext.Engineeres
+        .Include(e => e.Person)
+        .FirstOrDefaultAsync(e => e.EngNumber == resetPasswordDto.EngineerNumber);
 
-     var engineer = await _dataContext.Engineeres
-            .Include(e => e.Person)
-            .FirstOrDefaultAsync(e => e.EngNumber == resetPasswordDto.EngineerNumber);
-
-     string emailBody = $@"
+    // تحضير نص البريد الإلكتروني
+    string emailBody = $@"
         <!DOCTYPE html>
         <html lang='ar'>
         <head>
@@ -528,10 +530,13 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO reset
             </p>
         </body>
         </html>";
+
+    // إرسال البريد الإلكتروني
     await SendPasswordEmail(resetPasswordDto.Email, emailBody);
 
     return Ok("تم إعادة تعيين كلمة المرور وإرسالها إلى بريدك الإلكتروني.");
 }
+
 
 
 

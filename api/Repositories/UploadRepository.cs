@@ -115,7 +115,7 @@ namespace api.Repositories
     
 
 
-public async Task<List<Person>> ReadExcelFileAsync2(Stream fileStream)
+ public async Task<List<Person>> ReadExcelFileAsync2(Stream fileStream)
 {
     using var package = new ExcelPackage(fileStream);
     var worksheet = package.Workbook.Worksheets[0];
@@ -204,46 +204,54 @@ public async Task<List<Person>> ReadExcelFileAsync2(Stream fileStream)
 
         var rowCount = worksheet.Dimension.Rows ;
         
-
-        for (int row = 2; row <= rowCount; row++)
-        {
-           
-                if (worksheet.Cells[row, 9]?.Text == "م") // تحقق من الخلية
-                {
-                    var genderText = GetCellTextOrNull(worksheet.Cells[row, 8]);
-                    int genderId = (genderText?.Trim() == "ذكر" || genderText?.Trim() == "Male") ? 1 : 2;
-
-                    var person = new Person
-                    {
-                        FirstName = GetCellTextOrNull(worksheet.Cells[row, 4]),
-                        FatherName = GetCellTextOrNull(worksheet.Cells[row, 5]),
-                        LastName = GetCellTextOrNull(worksheet.Cells[row, 6]),
-                        MotherName = GetCellTextOrNull(worksheet.Cells[row, 7]),
-                        NationalId = GetCellTextOrNull(worksheet.Cells[row, 11])?.Length > 11 
-                            ? GetCellTextOrNull(worksheet.Cells[row, 11])?.Substring(0, 11) 
-                            : GetCellTextOrNull(worksheet.Cells[row, 11]),
-                        EnsuranceNumber = GetCellTextOrNull(worksheet.Cells[row, 10]),
-                        Mobile = GetCellTextOrNull(worksheet.Cells[row, 14]),
-                        GenderId = genderId,
-                    };
-
-                    var engineere = new Engineere
-                    {
-                        EngNumber = GetCellTextOrNull(worksheet.Cells[row, 2]),
-                        SubNumber = GetCellTextOrNull(worksheet.Cells[row, 3]),
-                        Person = person
-                    };
-
-                    _dataContext.Persons.Add(person);
-                    await _dataContext.SaveChangesAsync();
-
-                    _dataContext.Engineeres.Add(engineere);
-                    await _dataContext.SaveChangesAsync();
-
-                    people.Add(person);
-                }
-  
+         if (worksheet.Dimension == null)
+{
+    throw new CustomException("Worksheet is empty.");
 }
+   
+        for (int row = 2; row <= rowCount; row++)
+{
+    if (worksheet.Cells[row, 9] != null && worksheet.Cells[row, 9]?.Text == "م")
+    {
+        var genderText = GetCellTextOrNull(worksheet.Cells[row, 8]);
+        int genderId = (genderText?.Trim() == "ذكر" || genderText?.Trim() == "Male") ? 1 : 2;
+
+        if (worksheet.Cells[row, 4] == null || worksheet.Cells[row, 5] == null || worksheet.Cells[row, 6] == null || worksheet.Cells[row, 7] == null || worksheet.Cells[row, 11] == null || worksheet.Cells[row, 10] == null || worksheet.Cells[row, 14] == null || worksheet.Cells[row, 2] == null || worksheet.Cells[row, 3] == null)
+        {
+            throw new CustomException($"Data missing in row {row}.");
+        }
+
+        var person = new Person
+        {
+            FirstName = GetCellTextOrNull(worksheet.Cells[row, 4]),
+            FatherName = GetCellTextOrNull(worksheet.Cells[row, 5]),
+            LastName = GetCellTextOrNull(worksheet.Cells[row, 6]),
+            MotherName = GetCellTextOrNull(worksheet.Cells[row, 7]),
+            NationalId = GetCellTextOrNull(worksheet.Cells[row, 11])?.Length > 11 
+                ? GetCellTextOrNull(worksheet.Cells[row, 11])?.Substring(0, 11) 
+                : GetCellTextOrNull(worksheet.Cells[row, 11]),
+            EnsuranceNumber = GetCellTextOrNull(worksheet.Cells[row, 10]),
+            Mobile = GetCellTextOrNull(worksheet.Cells[row, 14]),
+            GenderId = genderId,
+        };
+
+        var engineere = new Engineere
+        {
+            EngNumber = GetCellTextOrNull(worksheet.Cells[row, 2]),
+            SubNumber = GetCellTextOrNull(worksheet.Cells[row, 3]),
+            Person = person
+        };
+
+        _dataContext.Persons.Add(person);
+        await _dataContext.SaveChangesAsync();
+
+        _dataContext.Engineeres.Add(engineere);
+        await _dataContext.SaveChangesAsync();
+
+        people.Add(person);
+    }
+}
+
 
 return people;
 
