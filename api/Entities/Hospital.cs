@@ -52,10 +52,17 @@ namespace api.Entities
          public decimal? Longitude { get; set; }
 
         public ICollection<Claims> Claims{get ; set; }
+         public int Year { get; set; }
+
+        public  ICollection<Note>? Notes { get ; set ;} 
 
         internal static object FirstOrDefault(Func<object, bool> value)
         {
             throw new NotImplementedException();
         }
+
+       }
+
+
+
     }
-}

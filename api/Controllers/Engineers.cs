@@ -21,47 +21,56 @@ namespace api.Controllers
     {
 
    private readonly IEngineerService _engineerService;
+
+   private readonly IWordRepository _wordRepository;
+   private readonly IImageRepository _imageRepository;
           
         
- public Engineers(IEngineerService engineerService)
+ public Engineers(IEngineerService engineerService , IWordRepository wordRepository, IImageRepository imageRepository)
 {
   _engineerService= engineerService;
+  _wordRepository=wordRepository;
+  _imageRepository=imageRepository;
+
 }
         
 
-         [HttpPost]
-        public async Task <ActionResult<Response>> AddEngineer([FromBody] EngineerPersonEditDTO   engineerPersonEditDTO)
+
+
+
+    [HttpPost]
+public async Task<ActionResult<Response>> AddEngineer([FromForm] EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[]? ContentImage , IFormFile[]? ContentFile)
+{
+    try
+    {
+        var response = await _engineerService.Add(engineerPersonEditDTO, ContentImage, ContentFile);
+        
+        if (response.ErrorMessage != null)
         {
-          try{
-
-
-              var response=  await _engineerService.Add(engineerPersonEditDTO);
-               if (response.ErrorMessage!=null)
-               {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                       new Response {  ErrorMessage =response.ErrorMessage});
-               }
-               return Ok (response);
-          }
-           catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
-            {
-                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
-            }
-            catch (Exception ex)
-            {
-                string Details = System.Text.Json.JsonSerializer.Serialize(engineerPersonEditDTO);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
-            }
-
-
-
-
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new Response { ErrorMessage = response.ErrorMessage });
         }
+        
+        return Ok(response);
+    }
+    catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+    {
+        return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
+    }
+    catch (Exception ex)
+    {
+        string details = System.Text.Json.JsonSerializer.Serialize(engineerPersonEditDTO);
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {details}" });
+    }
+}
+    
 
         
-        [HttpGet("{Id}")]
-public async Task<ActionResult<Engineere?>> Get(int Id)
+
+        
+[HttpGet("{Id}")]
+public async Task<ActionResult<PersonWithEngineereDTO?>> Get(int Id)
 {
     var engineer = await _engineerService.Get(Id);
 
@@ -70,15 +79,7 @@ public async Task<ActionResult<Engineere?>> Get(int Id)
         return NotFound();
     }
 
-    var options = new JsonSerializerOptions
-    {
-        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
-        WriteIndented = true // This is optional, for better readability of JSON output
-    };
-
-    var jsonResult = new JsonResult(engineer, options);
-
-    return jsonResult;
+    return Ok(engineer);
 }
 
 
@@ -87,44 +88,10 @@ public async Task<ActionResult<Engineere?>> Get(int Id)
 
 
 
- [HttpGet]
+[HttpGet]
 public async Task<ActionResult<PagedResult<PersonWithEngineereDTO>>> GetEngineersWithPersons([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
 {
-    var engineers = await _engineerService.GetAll(pageNumber, pageSize);
-    
-    // تحويل البيانات إلى PersonWithEngineereDTO
-    var items = engineers.Select(e => new PersonWithEngineereDTO
-    {
-        PersonId = e.Persons.FirstOrDefault()?.Id ?? 0,
-        FirstName = e.Persons.FirstOrDefault()?.FirstName,
-        FatherName = e.Persons.FirstOrDefault()?.FatherName,
-        LastName = e.Persons.FirstOrDefault()?.LastName,
-        MotherName = e.Persons.FirstOrDefault()?.MotherName,
-        NationalId = e.Persons.FirstOrDefault()?.NationalId,
-        EnsuranceNumber = e.Persons.FirstOrDefault()?.EnsuranceNumber,
-        BirthDate = e.Persons.FirstOrDefault()?.BirthDate,
-        Address = e.Persons.FirstOrDefault()?.Address,
-        Phone = e.Persons.FirstOrDefault()?.Phone,
-        Mobile = e.Persons.FirstOrDefault()?.Mobile,
-        Email = e.Persons.FirstOrDefault()?.Email,
-        StatusId = e.Persons.FirstOrDefault()?.StatusId,
-        GenderId = e.Persons.FirstOrDefault()?.GenderId,
-        EngNumber = e.EngNumber,
-        SubNumber = e.SubNumber,
-        SpecializationId = e.SpecializationId,
-        WorkPlaceId = e.WorkPlaceId,
-        Amount = e.Persons.FirstOrDefault()?.Amount
-    }).ToList();
-
-    // إعداد بيانات النتيجة
-    var pagedResult = new PagedResult<PersonWithEngineereDTO>
-    {
-        CurrentPage = pageNumber,
-        TotalPages = (int)Math.Ceiling(engineers.Count() / (double)pageSize),
-        PageSize = pageSize,
-        TotalCount = engineers.Count(),
-        Items = items
-    };
+    var pagedResult = await _engineerService.GetAll(pageNumber, pageSize);
 
     if (!pagedResult.Items.Any())
     {
@@ -141,8 +108,7 @@ public async Task<ActionResult<PagedResult<PersonWithEngineereDTO>>> GetEngineer
 
 
 
-
- [HttpPut("{Id}")]
+ [HttpPut("{Id}/update-Eng-details")]
         public  ActionResult<bool> Update(int Id,[FromBody] EngineerPersonEditDTO engineerPersonEditDTO){
            bool result= _engineerService.Update(Id,engineerPersonEditDTO);
             if (result)
@@ -159,6 +125,8 @@ return  Ok(result);
          [HttpDelete("{Id}")] 
       public ActionResult Delete(int Id){
       try{
+                 _imageRepository.DeleteByPersonId(Id);
+                 _wordRepository.DeleteByPersonId(Id);
                   _engineerService.Delete(Id);
                   return Ok("delete Successfully");}
 
@@ -170,6 +138,49 @@ return  Ok(result);
   }
 
      
+
+ [HttpPut("{id}/update-imagesAndWords")]
+public async Task<IActionResult> UpdateImagesANDWords(int id, [FromForm] ImageAndWordUpdateDTO DTO)
+{
+    if (DTO.Images == null || !DTO.Images.Any())
+    {
+        return BadRequest("No images provided.");
+    }
+
+    var newImageFilesBase64 = new List<string>();
+    foreach (var imageFile in DTO.Images)
+    {
+        using (var ms = new MemoryStream())
+        {
+            await imageFile.CopyToAsync(ms);
+            var fileBytes = ms.ToArray();
+            newImageFilesBase64.Add(Convert.ToBase64String(fileBytes));
+        }
+    }
+
+    await _imageRepository.UpdateImagesAsync(id, newImageFilesBase64);
+
+    if (DTO.Words != null && DTO.Words.Any())
+    {
+        var newWordFilesBase64 = new List<string>();
+
+        foreach (var wordFile in DTO.Words)
+        {
+            using (var ms = new MemoryStream())
+            {
+                await wordFile.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                newWordFilesBase64.Add(Convert.ToBase64String(fileBytes));
+            }
+        }
+
+        await _wordRepository.UpdateWordFilesAsync(id, newWordFilesBase64);
+    }
+
+    return Ok();
+}
+
+
         
     }
 

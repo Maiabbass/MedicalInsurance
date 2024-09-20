@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api.DTOS;
+using api.Entities;
 using api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -58,19 +59,23 @@ namespace api.Controllers
 
 
 
-     [HttpPut("{claimId}/surgical-procedure")]
-public async Task<IActionResult> EditClaimSurgicalProcedure(int claimId, [FromBody] string surgicalProcedureName, [FromQuery] DateTime? newClaimDate = null)
-{
-    var result = await _climsRepository.UpdateSurgicalProcedureAsync(claimId, surgicalProcedureName, newClaimDate);
-
-    if (!result)
+    [HttpPut("{id}")]
+    public IActionResult UpdateClaim(int id, [FromBody] ClaimEditDTO claimEditDTO)
     {
-        return NotFound($"Either the claim with Id '{claimId}' or the surgical procedure '{surgicalProcedureName}' was not found.");
+        if (claimEditDTO == null)
+        {
+            return BadRequest("Invalid data.");
+        }
+
+        var isUpdated = _climsRepository.UpdateClaim(id, claimEditDTO);
+
+        if (!isUpdated)
+        {
+            return NotFound($"Claim with ID {id} was not found.");
+        }
+
+        return Ok("Claim updated successfully.");
     }
-
-    return Ok($"Claim with Id '{claimId}' has been updated with Surgical Procedure '{surgicalProcedureName}' and new claim date '{newClaimDate?.ToString("yyyy-MM-dd") ?? "unchanged"}'.");
-}
-
 
 
 
@@ -101,5 +106,78 @@ public async Task<ActionResult<List<ClaimDetailsDTO>>> GetClaimsByEnsuranceNumbe
 
     return Ok(claims);
 }
+
+
+
+   [HttpPost]
+   [Route("AddClaim")]
+public async Task<IActionResult> AddClaim([FromBody] ClaimsDto claimsDto)
+{
+    if (claimsDto == null)
+    {
+        return BadRequest("Invalid claim data.");
+    }
+
+    // قم بتحويل DTO إلى الكلاس الرئيسي إذا لزم الأمر
+    var claims = new Claims
+    {
+        EnsuranceNumber = claimsDto.EnsuranceNumber,
+        FullName = claimsDto.FullName,
+        TotalPrice = claimsDto.TotalPrice,
+        Company_fees = claimsDto.Company_fees,
+        ApprovedPrice = claimsDto.ApprovedPrice,
+        non_Add = claimsDto.Non_Add,
+        non_AddForPerson = claimsDto.Non_AddForPerson,
+        EnduranceRatio = claimsDto.EnduranceRatio,
+        HospitalId = claimsDto.HospitalId,
+        LoginDate = claimsDto.LoginDate,
+        ExitDate = claimsDto.ExitDate,
+        PersonId = claimsDto.PersonId,
+        SurgicalProceduresId = claimsDto.SurgicalProceduresId,
+        ClimeData = claimsDto.ClimeData,
+        Number = claimsDto.Number,
+        Year=claimsDto.Year,
+
+    };
+
+    int newClaimId = await _climsRepository.Add(claims);
+    return Ok(new { Id = newClaimId });
+}
+
+
+       [HttpDelete("{Id}")] 
+      public ActionResult Delete(int Id){
+      try{
+                  _climsRepository.Delete(Id);
+                  return Ok("delete Successfully");}
+
+  catch (Exception ex){
+    return StatusCode(StatusCodes.Status500InternalServerError,
+
+                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
+    
+  }
+
+
+
+    [HttpGet("claims-between-dates")]
+    public async Task<IActionResult> GetClaimsBetweenDates([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        if (startDate > endDate)
+        {
+            return BadRequest("Start date must be earlier than or equal to the end date.");
+        }
+
+        var claims = await _climsRepository.GetClaimsBetweenDatesAsync(startDate, endDate);
+
+        if (claims == null || claims.Count == 0)
+        {
+            return NotFound("No claims found between the specified dates.");
+        }
+
+        return Ok(claims);
+    }
+
+
 
 }}

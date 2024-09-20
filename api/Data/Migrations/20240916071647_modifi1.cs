@@ -4,7 +4,7 @@
 
 namespace api.Data.Migrations
 {
-    public partial class modifie4 : Migration
+    public partial class modifi1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

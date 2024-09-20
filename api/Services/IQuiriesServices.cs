@@ -12,6 +12,8 @@ namespace api.Services
 
         Task<SimpleEngineer> GetEngineerWithRelationsAsync(string EngNumber);
        Task<IEnumerable<SimpleEngineer>> GetEngineers(int? workPlaceId ,int? specializationId  , int? engineeringUnitsId , int? PayMethodId  );
+
+        Task<List<Person>> GetPersonsByAgeSegment(int fromYear, int toYear);
         
         
     }

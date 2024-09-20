@@ -32,6 +32,13 @@ namespace api.DTOS
           get ; set;
         }
 
+        public string NameHospital_Out { get ; set ;}
+         
+        public int NumberBOK { get; set;}
+
+        public string Phone { get ; set;}
+
+
 
 
     }

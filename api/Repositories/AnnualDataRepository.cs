@@ -42,7 +42,8 @@ namespace api.Repositories
             CardStatuse=annualData.CardStatuse,
             Subscrib = annualData.Subscrib,
             Affiliate = annualData.Affiliate,
-            Beneficiary = annualData.Beneficiary
+            Beneficiary = annualData.Beneficiary,
+           Waiting=annualData.Waiting
         };
         _dataContext.AnnualDatas.Add(newitem);
         await _dataContext.SaveChangesAsync();
@@ -66,7 +67,14 @@ namespace api.Repositories
                     PersonId  = annualDataDetail.PersonId,
                     AnnualDataId = annualDataDetail.AnnualDataId,
                     IsEngineer = annualDataDetail.IsEngineer,
-                    Amount = annualDataDetail.Amount
+                    Amount = annualDataDetail.Amount,
+                    Beneficiary=annualDataDetail.Beneficiary,
+                    Affiliate=annualDataDetail.Affiliate,
+                    Subscrib=annualDataDetail.Subscrib,
+                    CardStatuse=annualDataDetail.CardStatuse,
+                    Year=annualDataDetail.Year,
+                    ExAmount=annualDataDetail.ExAmount,
+                    Waiting=annualDataDetail.Waiting,
             } ;
 
              _dataContext.AnnualDataDetails.Add(newitem);
@@ -101,6 +109,7 @@ namespace api.Repositories
              WorkPlaceId=data.WorkPlaceId,
              EngineeringUnitsId=data.EngineeringUnitsId,
              TotalAmount=data.TotalAmount,
+             Waiting=data.Waiting,
              };
                List<AnnualDataDetail> annualDataDetails =new  List<AnnualDataDetail>();
 
@@ -113,6 +122,13 @@ namespace api.Repositories
                     AnnualDataId=item.AnnualDataId,
                     IsEngineer=item.IsEngineer,
                     Amount=item.Amount,
+                    Year=item.Year,
+                    CardStatuse=item.CardStatuse,
+                    ExAmount=item.ExAmount,
+                    Affiliate=item.Affiliate,
+                    Subscrib=item.Subscrib,
+                    Beneficiary=item.Beneficiary,
+                    Waiting=item.Waiting,
                 };
                 annualDataDetails.Add(annualDataDetailnew);
                }  
@@ -141,7 +157,7 @@ namespace api.Repositories
         WITH PagedData AS (
              SELECT a.Id, a.Year, a.Amount, a.ExAmount, a.EngineereId, a.PayMethodId, 
                    a.WorkPlaceId, a.EngineeringUnitsId, a.TotalAmount, a.CardStatuse, a.HisDic,
-                   a.Affiliate, a.Subscrib, a.Beneficiary,
+                   a.Affiliate, a.Subscrib, a.Beneficiary, a.Waiting,
                    ROW_NUMBER() OVER (ORDER BY a.Id) AS RowNumber
             FROM AnnualDatas a
         )
@@ -184,7 +200,8 @@ namespace api.Repositories
                 HisDic = item.HisDic,
                 Affiliate = item.Affiliate,
                 Subscrib = item.Subscrib,
-                Beneficiary = item.Beneficiary
+                Beneficiary = item.Beneficiary,
+                Waiting=item.Waiting,
             },
             AnnualDataDetails = annualDataDetails.Select(d => new AnnualDataDetail
             {
@@ -192,7 +209,15 @@ namespace api.Repositories
                 PersonId = d.PersonId,
                 AnnualDataId = d.AnnualDataId,
                 IsEngineer = d.IsEngineer,
-                Amount = d.Amount
+                Amount = d.Amount,
+                Year=d.Year,
+                CardStatuse=d.CardStatuse,
+                ExAmount=d.ExAmount,
+                Affiliate=d.Affiliate,
+                Subscrib=d.Subscrib,
+                Beneficiary=d.Beneficiary,
+                Waiting=d.Waiting,
+
             }).ToList()
         });
     }
@@ -233,7 +258,7 @@ namespace api.Repositories
             }
         }
 
-         public bool Update(int Id, AnnualDataForView annualDataForView )
+         public bool Update(int Id,AnnalDataForEdit  annualDataForEdit )
         {
        var databaseEntity= _dataContext.AnnualDatas.FirstOrDefault(x=>x.Id==Id);
        if(databaseEntity==null){
@@ -241,16 +266,17 @@ namespace api.Repositories
          return false;
 
        }
-       databaseEntity.Amount=annualDataForView.Amount;
-       databaseEntity.ExAmount=annualDataForView.ExAmount;
-       databaseEntity.Year=annualDataForView.Year;
-       databaseEntity.EngineereId=annualDataForView.EngineereId;
-       databaseEntity.PayMethodId=annualDataForView.PayMethodId;
-       databaseEntity.WorkPlaceId=annualDataForView.WorkPlaceId;
-       databaseEntity.EngineeringUnitsId=annualDataForView.EngineeringUnitsId;
-       databaseEntity.TotalAmount=annualDataForView.TotalAmount;
-       databaseEntity.HisDic=annualDataForView.HisDic;
-       databaseEntity.CardStatuse=annualDataForView.CardStatuse;
+       databaseEntity.Amount=annualDataForEdit.Amount;
+       databaseEntity.ExAmount=annualDataForEdit.ExAmount;
+       databaseEntity.Year=annualDataForEdit.Year;
+       databaseEntity.EngineereId=annualDataForEdit.EngineereId;
+       databaseEntity.PayMethodId=annualDataForEdit.PayMethodId;
+       databaseEntity.WorkPlaceId=annualDataForEdit.WorkPlaceId;
+       databaseEntity.EngineeringUnitsId=annualDataForEdit.EngineeringUnitsId;
+       databaseEntity.TotalAmount=annualDataForEdit.TotalAmount;
+       databaseEntity.HisDic=annualDataForEdit.HisDic;
+       databaseEntity.CardStatuse=annualDataForEdit.CardStatuse;
+       databaseEntity.Waiting=annualDataForEdit.Waiting;
        
        
        
@@ -272,6 +298,14 @@ namespace api.Repositories
        databaseEntity.PersonId=annualDataDetailForView.PersonId;
        databaseEntity.AnnualDataId=annualDataDetailForView.AnnualDataId;
        databaseEntity.IsEngineer=annualDataDetailForView.IsEngineer;
+       databaseEntity.Year=annualDataDetailForView.Year;
+       databaseEntity.ExAmount=annualDataDetailForView.ExAmount;
+       databaseEntity.CardStatuse=annualDataDetailForView.CardStatuse;
+       databaseEntity.Beneficiary=annualDataDetailForView.Beneficiary;
+       databaseEntity.Affiliate=annualDataDetailForView.Affiliate;
+       databaseEntity.Subscrib=annualDataDetailForView.Subscrib;
+       databaseEntity.Waiting=annualDataDetailForView.Waiting;
+
 
 
        return _dataContext.SaveChanges()>0;
@@ -288,15 +322,17 @@ namespace api.Repositories
 
         }
 
-        public  void Delete_Year_Configuration(int year)
-        {
-             var yearConfigurationItem=  _dataContext.YearConfigurations.FirstOrDefault(x=>x.Year==year);
-             if (yearConfigurationItem!=null)
-             {
-                _dataContext.YearConfigurations.Remove(yearConfigurationItem);
-             }
+        public async Task Delete_Year_Configuration(int year)
+    {
+        var yearConfiguration = await _dataContext.YearConfigurations
+            .FirstOrDefaultAsync(y => y.Year == year);
 
+        if (yearConfiguration != null)
+        {
+            _dataContext.YearConfigurations.Remove(yearConfiguration);
+            await _dataContext.SaveChangesAsync();
         }
+    }
 
         public async Task Update_Year_Configuration(YearConfiguration yearConfiguration)
 {
@@ -306,10 +342,9 @@ namespace api.Repositories
     if (existingConfig != null)
     {
         existingConfig.Year = yearConfiguration.Year;
-        existingConfig.InsideHospitalPercentage = yearConfiguration.InsideHospitalPercentage;
-        existingConfig.OutsideHospitalPercentage = yearConfiguration.OutsideHospitalPercentage;
+        
         existingConfig.CardPrice = yearConfiguration.CardPrice;
-        existingConfig.Limit=yearConfiguration.Limit;
+       
 
         _dataContext.YearConfigurations.Update(existingConfig);
         await _dataContext.SaveChangesAsync();
@@ -343,6 +378,7 @@ namespace api.Repositories
                 a.Affiliate, 
                 a.Subscrib, 
                 a.Beneficiary,
+                a.Waiting ,
                 ROW_NUMBER() OVER (ORDER BY a.Id) AS RowNumber
             FROM AnnualDatas a
             WHERE a.Year = @year
@@ -361,7 +397,8 @@ namespace api.Repositories
             HisDic,
             Affiliate, 
             Subscrib, 
-            Beneficiary
+            Beneficiary,
+            Waiting,
         FROM PagedData
         WHERE RowNumber > @skip AND RowNumber <= @endRow;
     ";
@@ -395,7 +432,8 @@ namespace api.Repositories
             HisDic = item.HisDic,
             Affiliate = item.Affiliate,
             Subscrib = item.Subscrib,
-            Beneficiary = item.Beneficiary
+            Beneficiary = item.Beneficiary,
+            Waiting=item.Waiting,
         },
         AnnualDataDetails = new List<AnnualDataDetail>() // قائمة فارغة لأن التفاصيل تُعبأ لاحقًا
     }).ToList();
@@ -446,7 +484,8 @@ namespace api.Repositories
             Email = engineer.Person.Email,
             StatusId = engineer.Person.StatusId ?? 0,
             GenderId = engineer.Person.GenderId,
-            Amount = (decimal)engineer.Person.Amount
+            Amount = (decimal)engineer.Person.Amount,
+            
         },
         Relations = engineer.Relations.Select(r => new SimpleRelation
         {
@@ -479,7 +518,81 @@ namespace api.Repositories
 
 
 
-   
+
+
+      //جدول الاستفادة///////////
+
+    public async Task<AnnualDataDetail?> GetAnnualDataDetailAsync(string ensuranceNumber, int year)
+    {
+        var person = await _dataContext.Persons.FirstOrDefaultAsync(p => p.EnsuranceNumber == ensuranceNumber);
+        if (person == null) return null;
+
+        return await _dataContext.AnnualDataDetails
+            .FirstOrDefaultAsync(a => a.PersonId == person.Id && a.Year == year);
+    }
+
+
+
+    public async Task<decimal> GetClaimsSumForPersonAsync(string ensuranceNumber)
+    {
+        var person = await _dataContext.Persons.FirstOrDefaultAsync(p => p.EnsuranceNumber == ensuranceNumber);
+        if (person == null) return 0;
+
+        return await _dataContext.Claims
+            .Where(c => c.PersonId == person.Id)
+            .SumAsync(c => c.non_AddForPerson);
+    }
+
+
+
+
+
+         //التجديد /////////////////
+        public async Task<AnnualData> GetByEngineerIdAndYear(int engineerId, int year)
+        {
+            return await _dataContext.AnnualDatas
+                .FirstOrDefaultAsync(a => a.EngineereId == engineerId && a.Year == year);
+        }
+
+
+
+        public async Task<List<AnnualDataDetail>> GetAnnualDataDetails(int annualDataId)
+        {
+            return await _dataContext.AnnualDataDetails
+                .Where(d => d.AnnualDataId == annualDataId)
+                .ToListAsync();
+        }
+
+
+
+
+        public async Task<Person> GetByInsuranceNumber(string engineerEnsuranceNumber)
+{
+    // استعلام لجلب بيانات الشخص بناءً على الرقم التأميني
+    return await _dataContext.Persons
+        .FirstOrDefaultAsync(p => p.EnsuranceNumber == engineerEnsuranceNumber);
+}
+
+
+     
+
+
+ 
+
+
+        public async Task<PayMethod> GetPayMethodByEngineerId(int engineerId)
+    {
+        var annualData = await _dataContext.AnnualDatas
+            .Where(ad => ad.EngineereId == engineerId)
+            .Select(ad => ad.PayMethod)
+            .FirstOrDefaultAsync();
+
+        return annualData;
+    }
+
+
+
+  
         
     }}
 

@@ -10,6 +10,7 @@ namespace api.DTOS{
 
         #nullable disable
         
+        
         public string FirstName { get; set; }
         public string FatherName { get; set; }
 
@@ -56,7 +57,7 @@ namespace api.DTOS{
 
         public int WorkPlaceId{ get; set;}
 
-        
+    
     
 
     

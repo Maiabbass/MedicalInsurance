@@ -10,10 +10,10 @@ namespace api.Services
 {
     public interface IEngineerService
     {
-         Task <Response> Add (EngineerPersonEditDTO engineerPersonEditDTO);
+         Task<Response> Add(EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[] contentImage, IFormFile[] contentFile);
 
-           Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize);
-         Task<Engineere?>Get(int Id);
+         Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, int pageSize);
+         Task<PersonWithEngineereDTO?> Get(int Id);
          public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO);
 
            public bool Delete(int Id);

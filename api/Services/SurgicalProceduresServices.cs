@@ -31,11 +31,11 @@ namespace api.Services
            {
           
              Name = SurgicalProceduresEditDTO.Name,
-             Technical=SurgicalProceduresEditDTO.Technical,
-             Financial=SurgicalProceduresEditDTO.Financial,
+            
              Pathological_specialization=SurgicalProceduresEditDTO.Pathological_specialization,
-             Limit=SurgicalProceduresEditDTO.Limit,
-             EnduranceRatio=SurgicalProceduresEditDTO.EnduranceRatio,
+             Price=SurgicalProceduresEditDTO.Price,
+             Year= (int)SurgicalProceduresEditDTO.Year,
+             
              //Date=SurgicalProceduresEditDTO.Date,
              
             
@@ -84,21 +84,38 @@ namespace api.Services
              return _unitOfWork.SurgicalProceduresRepository.Update(id, surgicalProceduresEditDTO);
         }
 
-        public bool Delete(int Id)
+
+
+
+
+    public async Task<bool> DeleteAsync(int Id)
 {
     try
     {
-        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            _unitOfWork.SurgicalProceduresRepository.Delete(Id);
+            await _unitOfWork.NoteRepository.DeleteNotesBySurgicalProcedureId(Id);
+            
+            await _unitOfWork.SaveChangesAsync();
+
+            await _unitOfWork.SurgicalProceduresRepository.Delete(Id);
+
+            await _unitOfWork.SaveChangesAsync();
+
             scope.Complete();
             return true;
         }
     }
-    catch (TransactionAbortedException)
+    catch (Exception ex)
     {
+        // يمكنك إضافة سجل هنا أو رسالة توضيحية في حالة الخطأ
+        Console.WriteLine("Error occurred while deleting surgical procedure: " + ex.Message);
         return false;
     }
 }
+
+
+
+
     }
 }

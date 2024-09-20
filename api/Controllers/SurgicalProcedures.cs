@@ -71,18 +71,32 @@ public async Task<ActionResult<IEnumerable<SurgicalProcedures>>> GetAll()
       return Ok(data);
     }
 
-    
-   [HttpDelete("{Id}")] 
-      public ActionResult Delete(int Id){
-      try{
-                  _SurgicalProceduresServices.Delete(Id);
-                  return Ok("delete Successfully");}
 
-  catch (Exception ex){
-    return StatusCode(StatusCodes.Status500InternalServerError,
 
-                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
     
-  }
+  [HttpDelete("{Id}")]
+public async Task<IActionResult> Delete(int Id)
+{
+    try
+    {
+        var result = await _SurgicalProceduresServices.DeleteAsync(Id);
+
+        if (result)
+        {
+            return Ok(new { Status = "Success", Message = "Deleted successfully" });
+        }
+        else
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                new { Status = "Error", Message = "Failed to delete the surgical procedure" });
+        }
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new { Status = "Error", Message = ex.Message });
+    }
+}
+
     }
 }

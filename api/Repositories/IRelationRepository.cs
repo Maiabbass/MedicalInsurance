@@ -11,5 +11,11 @@ namespace api.Repositories
         
         Task<int> Add (Relation relation);
         public void DeleteByPersonId(int PersonId) ;
+
+        Task<bool> Add_RelationType(List<RelationType> ealationType);
+        Task Update_RelationType(RelationType relationType);
+        Task Delete_RelationTypesByYear(int year);
+       
+       
     }
 }

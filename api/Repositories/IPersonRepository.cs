@@ -9,18 +9,23 @@ namespace api.Repositories
 {
     public interface IPersonRepository
     {
-        Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize);
+        Task<PagedResult<PersonForView>> GetAll(int pageNumber, int pageSize);
 
         Task <Person?> Get(int Id);
 
-        Task <int> Add (Person person);
+        Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles);
         Task<int> Add(City city);
         void Delete(int Id);
-        public bool Update(int Id, PersonEditDTO PersonEditDTO);
+
+        Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO);
+      //  Task<bool> Update(int id, PersonEditDTO personEditDTO);
+        
         Task<AnnualData?> GetEngId(int EngineereId);
         Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber);
 
        // public void SavePerson(Person person);
         Task SavePerson(PersonWithEngineereDTO person);
+
+         Task<byte[]> ConvertFileToByteArray(IFormFile file);
     }
 }

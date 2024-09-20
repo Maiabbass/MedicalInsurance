@@ -19,11 +19,14 @@ namespace api.Repositories
 
            
 
-         public void Delete(int Id);
+         Task Delete(int Id);
 
           Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId);
 
            Task<Hospital> GetByNameAsync(string name);
+            Task<IEnumerable<Hospital>> GetHospitalsByYear(int year);
+            Task<bool> Add_Hospital(List<Hospital> hospital);
+            Task Delete_HospitalsByYear(int year);
 
          
     }

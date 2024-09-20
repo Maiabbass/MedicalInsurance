@@ -11,11 +11,16 @@ namespace api.Services
 {
       public class HospitalService : IHospitalService
     {
+
         private  readonly IUnitOfWork _unitOfWork;
 
-        public HospitalService(IUnitOfWork unitOfWork)
+
+        private readonly INoteRepository _noteRepository;
+
+        public HospitalService(IUnitOfWork unitOfWork, INoteRepository noteRepository)
          {
             _unitOfWork=unitOfWork;
+            _noteRepository=noteRepository;
          }
         public async Task<Response> Add(HospitalEditDTO hospitalEditDTO)
         {
@@ -39,6 +44,7 @@ namespace api.Services
              Phone=hospitalEditDTO.Phone,
              Longitude=hospitalEditDTO.Longitude,
              latitude=hospitalEditDTO.Latitude,
+             Year=hospitalEditDTO.Year,
              
             
            };
@@ -80,21 +86,33 @@ namespace api.Services
            return _unitOfWork.HospitalRepository.Update(Id, hospital);
         }
 
-        public bool Delete(int Id){
-      try
-      {
-         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-         {
-       
-      
-        _unitOfWork.HospitalRepository.Delete(Id);
+
+
+        
+
+       public async Task<bool> DeleteAsync(int Id)
+{
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            // Await the DeleteNotesByHospitalId
+            await _unitOfWork.NoteRepository.DeleteNotesByHospitalId(Id);
+            
+            // Await the Delete method in HospitalRepository
+            await _unitOfWork.HospitalRepository.Delete(Id);
+            
             scope.Complete();
             return true;
-         }
-      } 
-          catch (TransactionAbortedException){
-                  return false;
-                 }}
+        }
+    }
+    catch (Exception ex)
+    {
+        // Handle the exception
+        return false;
+    }
+}
+
 
 
 
@@ -103,6 +121,8 @@ namespace api.Services
     }
 
 
-
+   public async Task<IEnumerable<Hospital>> GetHospitalsByYear(int year){
+    return await _unitOfWork.HospitalRepository.GetHospitalsByYear(year);
+   }
     }
 }

@@ -65,6 +65,16 @@ namespace api.Services
             return await _unitOfWork.SearchRepository.GetAllClaims();
          }
 
+         public async Task<PersonWithEngineereDTO> GetEngNumberAndSupNumber(string engNumber , string supNumber)
+         {
+            return await _unitOfWork.SearchRepository.GetEngNumberAndSupNumber(supNumber,engNumber);
+         }
+
+
+         public async Task<PersonWithEngineereDTO> GetSubNumberAsync(string subNumber){
+            return await _unitOfWork.SearchRepository.GetSubNumberAsync(subNumber);
+         }
+
     
     }
 }

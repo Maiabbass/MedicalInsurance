@@ -14,14 +14,23 @@ namespace api.Repositories
         private readonly DataContext _dataContext;
         private readonly IServiceProvider _serviceProvider;
 
-        public UnitOfWork(DataContext dataContext , IServiceProvider serviceProvider)
+         
+
+        public UnitOfWork(DataContext dataContext , IServiceProvider serviceProvider, IImageRepository imageRepository, IWordRepository wordRepository)
         {
             _dataContext = dataContext;
             _serviceProvider = serviceProvider;
             
+            
+            
         }
 
         private IAnnualDataService annualDataService => _serviceProvider.GetRequiredService<IAnnualDataService>();
+        private ICityService cityService => _serviceProvider.GetRequiredService<ICityService>();
+        
+       // private IImageRepository imageRepository => _serviceProvider.GetRequiredService<IImageRepository>(); 
+       // private IWordRepository wordRepository => _serviceProvider.GetRequiredService<IWordRepository>();
+        
 
         
 
@@ -48,18 +57,36 @@ namespace api.Repositories
 
         public ISearchRepository  SearchRepository => new SearchRepository(_dataContext);
 
-        public IUploadRepository UploadRepository => new UploadRepository(_dataContext);
+        public IUploadRepository UploadRepository => new UploadRepository(_dataContext , cityService);
         public ISpecializationRepository SpecializationRepository=> new SpecializationRepository(_dataContext);
 
         public IQuiriesRepositories QuiriesRepositories => new QuiriesRepositories(_dataContext);
 
         public IRecoveredRepository RecoveredRepository => new RecoveredRepository(_dataContext);
 
-        
+      
+
+        public ILimitRepository LimitRepository =>  new LimitRepository(_dataContext);
+
+        public IEnduranceRatioRepository EnduranceRatioRepository => new EnduranceRatioRepository(_dataContext);
+
+        public IWordRepository WordRepository => new WordRepository(_dataContext);
+
+        public IImageRepository ImageRepository => new ImageRepository(_dataContext);
+
+        public IBlockRepository BlockRepository => new BlockRepository(_dataContext);
+        public INoteRepository NoteRepository => new NoteRepository(_dataContext);
 
         public Task<bool> Complete()
         {
             throw new NotImplementedException();
         }
+
+
+        public async Task<int> SaveChangesAsync()
+    {
+        return await _dataContext.SaveChangesAsync();
+    }
+
     }
 }

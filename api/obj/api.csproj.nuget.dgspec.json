@@ -46,6 +46,10 @@
               "target": "Package",
               "version": "[2.1.35, )"
             },
+            "DocumentFormat.OpenXml": {
+              "target": "Package",
+              "version": "[3.1.0, )"
+            },
             "EPPlus": {
               "target": "Package",
               "version": "[7.1.3, )"

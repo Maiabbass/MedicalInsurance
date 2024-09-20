@@ -28,6 +28,10 @@ namespace api.Services
         Task<IEnumerable<Claims>> GetClaimsByDateRange(DateTime startDate, DateTime endDate);
 
         Task<IEnumerable<Claims>> GetAllClaims();
+
+        Task<PersonWithEngineereDTO> GetEngNumberAndSupNumber(string engNumber , string supNumber);
+
+        Task<PersonWithEngineereDTO> GetSubNumberAsync(string subNumber);
     
   
 

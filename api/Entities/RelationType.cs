@@ -12,11 +12,13 @@ namespace api.Entities
         #nullable disable
 
         [Key]
-         [DatabaseGenerated(DatabaseGeneratedOption.None)]
+         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public string Name { get; set; }
+         public int Year { get; set; }
 
         public  ICollection<Relation> Relations { get; set; }
+        public  ICollection<Note>? Notes { get ; set ;}
     }
 }

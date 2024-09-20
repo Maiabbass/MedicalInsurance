@@ -19,6 +19,8 @@ namespace api.Repositories
 
           void DeleteByCityId(int CityId);
           void Delete (int Id);
+
+          Task<int?> GetCityIdByName(string cityName);
     }
 }
  

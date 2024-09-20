@@ -21,7 +21,7 @@ namespace api.Controllers
         }
 
         [HttpPost("uploadCashExcel")]
-        public async Task<IActionResult> UploadSub(IFormFile file)
+        public async Task<IActionResult> UploadSubCash(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
@@ -33,7 +33,7 @@ namespace api.Controllers
                 stream.Position = 0; // إعادة تعيين الموضع إلى البداية
                 
                 // الحصول على قائمة الأشخاص
-                var people = await _uploadRepository.ReadExcelFileAsync(stream);
+                var people = await _uploadRepository.ReadExcelFileCash(stream);
                 
                 // تحميل البيانات إلى قاعدة البيانات
                 await _uploadRepository.LoadSubToDatabase(people);
@@ -65,7 +65,7 @@ namespace api.Controllers
 
 
         [HttpPost("uploadRetirementExcel")]
-        public async Task<IActionResult> UploadSub2(IFormFile file)
+        public async Task<IActionResult> UploadSubRetirement(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
@@ -77,7 +77,7 @@ namespace api.Controllers
                 stream.Position = 0; // إعادة تعيين الموضع إلى البداية
                 
                 // الحصول على قائمة الأشخاص
-                var people = await _uploadRepository.ReadExcelFileAsync2(stream);
+                var people = await _uploadRepository.ReadExcelFileRetirement(stream);
                 
                 // تحميل البيانات إلى قاعدة البيانات
                 await _uploadRepository.LoadSubToDatabase(people);
@@ -105,7 +105,7 @@ namespace api.Controllers
 
 
         [HttpPost("uploadBoxExcel")]
-        public async Task<IActionResult> UploadSub3(IFormFile file)
+        public async Task<IActionResult> UploadSubBox(IFormFile file)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded.");
@@ -114,12 +114,10 @@ namespace api.Controllers
             {
                 using var stream = new MemoryStream();
                 await file.CopyToAsync(stream);
-                stream.Position = 0; // إعادة تعيين الموضع إلى البداية
+                stream.Position = 0; 
                 
-                // الحصول على قائمة الأشخاص
-                var people = await _uploadRepository.ReadExcelFileAsync3(stream);
+                var people = await _uploadRepository.ReadExcelFileBox(stream);
                 
-                // تحميل البيانات إلى قاعدة البيانات
                 await _uploadRepository.LoadSubToDatabase(people);
 
                 return Ok("Data imported successfully.");
@@ -141,6 +139,96 @@ namespace api.Controllers
                 });
             }
         }
+
+
+
+
+     [HttpPost("uploadHospitalExcel")]
+public async Task<IActionResult> UploadSubHospital(IFormFile file)
+{
+    if (file == null || file.Length == 0)
+        return BadRequest("No file uploaded.");
+
+    try
+    {
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        stream.Position = 0;
+
+        var hospitals = await _uploadRepository.ReadExcelFileHospital(stream);
+
+        if (hospitals.Count == 0)
+        {
+            return BadRequest("No valid data found in the file.");
+        }
+
+        await _uploadRepository.LoadSubToHospital(hospitals);
+
+        return Ok("Data imported successfully.");
+    }
+    catch (UploadRepository.CustomException ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, new
+        {
+            message = "A custom error occurred while processing the file.",
+            details = ex.GetFullMessage()
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, new
+        {
+            message = "An unexpected error occurred.",
+            details = ex.Message
+        });
+    }
+}
+
+      [HttpPost("uploadSurgicalExcel")]
+public async Task<IActionResult> UploadSubSurgical(IFormFile file)
+{
+    if (file == null || file.Length == 0)
+        return BadRequest("No file uploaded.");
+
+    try
+    {
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        stream.Position = 0;
+
+        var surgicals = await _uploadRepository.ReadExcelFileSurgical(stream);
+
+        if (surgicals.Count == 0)
+        {
+            return BadRequest("No valid data found in the file.");
+        }
+
+        await _uploadRepository.LoadSubToSurgical(surgicals);
+
+        return Ok("Data imported successfully.");
+    }
+    catch (UploadRepository.CustomException ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, new
+        {
+            message = "A custom error occurred while processing the file.",
+            details = ex.GetFullMessage()
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, new
+        {
+            message = "An unexpected error occurred.",
+            details = ex.Message
+        });
+    }
+}
+
+
+
+
+
     }
 
 }

@@ -7,7 +7,7 @@ namespace api.DTOS
 {
     public class HospitalEditDTO
     {
-         #nullable disable
+        
          public int Id { get; set; }
          public string Name { get; set; }
          public bool Enabled { get; set; }
@@ -18,5 +18,7 @@ namespace api.DTOS
          public string? Phone { get; set; }
          public decimal? Longitude{get ; set ;}
          public decimal? Latitude { get ; set;}
+         public int Year { get ; set;}
+         public string? NoteContent { get; set; } 
     }
 }

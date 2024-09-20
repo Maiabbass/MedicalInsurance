@@ -65,13 +65,18 @@ namespace api.Entities
         public SurgicalProcedures? SurgicalProcedures { get; set; }
 
         public int Number { get; set ;}
+
+        public string Phone { get ; set ;}
         
 
        public DateTime? RecoDate { get; set; }
 
 
        public DateTime? DateSurgicalProcedures { get ; set;}
- 
+
+       public string NameHospital_Out { get ; set ;}
+
+       public int NumberBOK { get ; set;} 
   
         
     }

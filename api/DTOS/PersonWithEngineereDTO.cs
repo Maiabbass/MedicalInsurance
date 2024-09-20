@@ -23,30 +23,21 @@ namespace api.DTOS
     public string? Mobile { get; set; }
     public string? Email { get; set; }
     public int? StatusId { get; set; }
-
     public int? GenderId { get; set; }
 
     // خصائص جدول Engineere
     public string? EngNumber { get; set; }
     public string? SubNumber { get; set; }
     public int? SpecializationId { get; set; }
-
-   
     public int? WorkPlaceId { get; set; }
-
     public decimal? Amount { get; set; }
 
-    
-    public class EngineerFull
-{
-    public int Id { get; set; }
-    public string EngNumber { get; set; }
-    public string SubNumber { get; set; }
-    public int SpecializationId { get; set; }
-    public int WorkPlaceId { get; set; }
-    public List<Person> Persons { get; set; }
-    
-}
+    // لاحتواء الصور بترميز Base64
+    public List<string> Images { get; set; } = new List<string>();
+
+    // لاحتواء ملفات Word بترميز Base64
+    public List<string> WordFiles { get; set; } = new List<string>();
 }
 
 }
+

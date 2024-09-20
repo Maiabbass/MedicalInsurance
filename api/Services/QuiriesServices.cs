@@ -26,6 +26,11 @@ namespace api.Services
             return await _unitOfWork.QuiriesRepositories.GetEngineers(workPlaceId,specializationId,engineeringUnitsId,PayMethodId);
          }
 
+        
+
+          public async Task<List<Person>> GetPersonsByAgeSegment(int fromYear, int toYear){
+            return await _unitOfWork.QuiriesRepositories.GetPersonsByAgeSegment(fromYear,toYear);
+          }
 
 
         

@@ -61,6 +61,30 @@ public async Task<ActionResult<SimpleEngineer>> GetEngineerWithRelations(string 
 
             return Ok(engineers);
         }
+
+
+
+
+         [HttpGet("by-age-segment")]
+        public async Task<IActionResult> GetPersonsByAgeSegment(int fromYear, int toYear)
+        {
+            try
+            {
+                var personsInAgeSegment = await _quirieService.GetPersonsByAgeSegment(fromYear, toYear);
+
+                if (personsInAgeSegment == null || personsInAgeSegment.Count == 0)
+                {
+                    return NotFound("No persons found in the specified age segment.");
+                }
+
+                return Ok(personsInAgeSegment);
+            }
+            catch (Exception ex)
+            {
+                // التعامل مع الاستثناءات غير المتوقعة
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
         
     }
 }

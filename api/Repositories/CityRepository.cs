@@ -24,6 +24,7 @@ namespace api.Repositories
             City newCity =new City()
              {
                Name=city.Name,
+               CallingCode=city.CallingCode
               
              };
 #pragma warning restore IDE0090 // Use 'new(...)'
@@ -58,6 +59,7 @@ namespace api.Repositories
 
        }
        databaseEntity.Name=city.Name;
+       databaseEntity.CallingCode=city.CallingCode;
 
        return _dataContext.SaveChanges()>0;
       
@@ -79,5 +81,13 @@ namespace api.Repositories
         }
 
         
+
+    public async Task<int?> GetCityIdByName(string cityName)
+{
+    var city = await _dataContext.Cities
+                .FirstOrDefaultAsync(c => c.Name == cityName);
+
+    return city?.Id;
+} 
     }
 }

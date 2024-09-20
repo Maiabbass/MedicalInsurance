@@ -33,6 +33,7 @@ namespace api.Services
            {
           
              Name = cityEditDTO.Name,
+             CallingCode=cityEditDTO.CallingCode,
              
             
            };
@@ -91,5 +92,9 @@ namespace api.Services
           catch (TransactionAbortedException){
                   return false;
                  }}
+
+      public async Task<int?> GetCityIdByName(string cityName){
+         return await _unitOfWork.CityRepository.GetCityIdByName(cityName);
+      }
     }
 } 

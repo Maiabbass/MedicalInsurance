@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using api.Data;
 using api.DTOS;
 using api.Entities;
+using DocumentFormat.OpenXml.Bibliography;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -31,6 +32,7 @@ namespace api.Repositories
                Phone=hospital.Phone,
                Longitude=hospital.Longitude,
                latitude=hospital.latitude,
+               Year=hospital.Year,
 
               
              };
@@ -74,6 +76,7 @@ namespace api.Repositories
         databaseEntity.CityId=hospital.CityId;
         databaseEntity.Longitude=hospital.Longitude;
         databaseEntity.latitude=hospital.Latitude;
+        databaseEntity.Year=hospital.Year;
 
        return _dataContext.SaveChanges()>0;
       
@@ -81,23 +84,35 @@ namespace api.Repositories
 
            
 
-         public void Delete(int Id){
-            var result = _dataContext.Hospitals.Where(x=>x.Id==Id).ToList();
 
-            var claims = _dataContext.Claims.Where(c => c.HospitalId == Id).ToList();
-        foreach (var claim in claims)
-        {
-            claim.HospitalId = null;
-        }
-        var Reco = _dataContext.Recovereds.Where(c => c.HospitalId == Id).ToList();
-        foreach ( var Recoe in Reco){
-          Recoe.HospitalId = null;
-        }  
-            if (result!=null){
-                 _dataContext.Hospitals.RemoveRange(result);
-                 _dataContext.SaveChanges();
-            }
-        }
+
+
+
+        public async Task Delete(int Id)
+{
+    var result = await _dataContext.Hospitals.Where(x => x.Id == Id).ToListAsync();  // Asynchronously fetching data
+
+    var claims = await _dataContext.Claims.Where(c => c.HospitalId == Id).ToListAsync();  // Asynchronously fetching claims
+    foreach (var claim in claims)
+    {
+        claim.HospitalId = null;  // Setting foreign key to null
+    }
+
+    var reco = await _dataContext.Recovereds.Where(c => c.HospitalId == Id).ToListAsync();  // Asynchronously fetching Recovereds
+    foreach (var recoe in reco)
+    {
+        recoe.HospitalId = null;
+    }
+
+    if (result != null)
+    {
+        _dataContext.Hospitals.RemoveRange(result);
+        await _dataContext.SaveChangesAsync();  // Asynchronously saving changes
+    }
+}
+
+
+
 
 
          public async Task<IEnumerable<Hospital>> GetHospitalsByCityIdAsync(int cityId)
@@ -112,6 +127,66 @@ namespace api.Repositories
     {
         return await _dataContext.Hospitals.FirstOrDefaultAsync(h => h.Name == name);
     }
+
+
+
+ public async Task<IEnumerable<Hospital>> GetHospitalsByYear(int year)
+        {
+            return await _dataContext.Hospitals
+                .Where(h => h.Year == year)
+                .ToListAsync();
+        }
+
+
+         public async Task<bool> Add_Hospital(List<Hospital> hospital)
+        {
+            
+            await _dataContext.Hospitals.AddRangeAsync(hospital);
+           return  await _dataContext.SaveChangesAsync()>0;
+        }
+
+
+
+
+        public async Task Delete_HospitalsByYear(int year)
+{
+    // الحصول على المستشفيات التي سيتم حذفها بناءً على السنة
+    var hospitals = await _dataContext.Hospitals
+        .Where(h => h.Year == year)
+        .ToListAsync();
+
+    // التحقق من وجود HospitalId في جدول Recovereds وتعيينه إلى NULL
+    var hospitalIds = hospitals.Select(h => h.Id).ToList();
+
+    var recovereds = await _dataContext.Recovereds
+        .Where(r => hospitalIds.Contains((int)r.HospitalId))
+        .ToListAsync();
+
+    foreach (var recovered in recovereds)
+    {
+        recovered.HospitalId = null;
+    }
+
+    // التحقق من وجود HospitalId في جدول Claims وتعيينه إلى NULL
+    var claims = await _dataContext.Claims
+        .Where(c => hospitalIds.Contains((int)c.HospitalId))
+        .ToListAsync();
+
+    foreach (var claim in claims)
+    {
+        claim.HospitalId = null;
+    }
+
+    // تحديث الجداول بعد تعيين القيم إلى NULL
+    await _dataContext.SaveChangesAsync();
+
+    // حذف المستشفيات
+    _dataContext.Hospitals.RemoveRange(hospitals);
+    
+    // حفظ التغييرات
+    await _dataContext.SaveChangesAsync();
+}
+
 
 
  

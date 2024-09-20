@@ -27,48 +27,41 @@ namespace api.Repositories
            return  await _dataContext.SaveChangesAsync()>0;
         }
 
-        public void Delete_Age_Segments(int year)
-        {
-             var segmentsDBItems=_dataContext.AgeSegments.Where(x=>x.Year==year).ToList();
-             if (segmentsDBItems!=null)
-             {
-                _dataContext.AgeSegments.RemoveRange(segmentsDBItems);
-                _dataContext.SaveChanges();
-             }
-             
-        }
 
 
-  public async Task Update_Age_Segments(List<AgeSegments> ageSegments)
+       public async Task Delete_AgeSegmentsByYear(int year)
+            {
+                var ageSegments = await _dataContext.AgeSegments
+                    .Where(a => a.Year == year)
+                    .ToListAsync();
+
+                _dataContext.AgeSegments.RemoveRange(ageSegments);
+               _dataContext.SaveChanges();
+            }
+
+
+
+  public async Task Update_Age_Segment(AgeSegments ageSegment)
 {
-    if (ageSegments == null || ageSegments.Count == 0)
-        throw new ArgumentException("The list of age segments cannot be null or empty.");
+    var existingSegment = await _dataContext.AgeSegments
+        .FirstOrDefaultAsync(a => a.Id == ageSegment.Id);
 
-    // افتراض أن جميع الشرائح العمرية الجديدة لها نفس السنة
-    int year = ageSegments.First().Year;
-
-    // حذف الشرائح العمرية الموجودة للسنة المحددة
-    var existingSegments = await _dataContext.AgeSegments
-        .Where(a => a.Year == year)
-        .ToListAsync();
-    _dataContext.AgeSegments.RemoveRange(existingSegments);
-
-    // إضافة الشرائح العمرية الجديدة
-    foreach (var segment in ageSegments)
+    if (existingSegment != null)
     {
-        var newSegment = new AgeSegments
-        {
-            FromYear = segment.FromYear,
-            ToYear = segment.ToYear,
-            TheAmount = segment.TheAmount,
-            EnduranceRatio = segment.EnduranceRatio,
-            Year = segment.Year // استخدام السنة من الشريحة الجديدة
-        };
+        existingSegment.FromYear = ageSegment.FromYear;
+        existingSegment.ToYear = ageSegment.ToYear;
+        existingSegment.TheAmount = ageSegment.TheAmount;
+        existingSegment.EnduranceRatio = ageSegment.EnduranceRatio;
+        existingSegment.Year = ageSegment.Year; // Update the year if necessary
 
-        await _dataContext.AgeSegments.AddAsync(newSegment);
+        _dataContext.AgeSegments.Update(existingSegment);
+        await _dataContext.SaveChangesAsync();
     }
-
-    await _dataContext.SaveChangesAsync();
+    else
+    {
+        // Handle the case where the AgeSegment with the given Id doesn't exist
+        throw new ArgumentException("Age segment with the provided Id does not exist.");
+    }
 }
 
 

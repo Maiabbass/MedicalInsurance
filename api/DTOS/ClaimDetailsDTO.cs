@@ -24,5 +24,9 @@ namespace api.DTOS
     public SurgicalProceduresEditDTO SurgicalProcedures { get; set; }
 
     public DateTime? DateSurgicalProcedures {get ; set; }
+
+    public int Year{ get;set;}
+    public DateTime? ClimeData { get ; set;}
+    public int? Number { get ; set;}
 }
 }

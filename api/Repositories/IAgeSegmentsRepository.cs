@@ -10,8 +10,8 @@ namespace api.Repositories
     {
         Task<IEnumerable<AgeSegments>> Get(int year);
         Task<bool> Add_Age_Segments(List<AgeSegments> ageSegments);
-        void Delete_Age_Segments(int year);
+        Task Delete_AgeSegmentsByYear(int year);
 
-        Task Update_Age_Segments(List<AgeSegments> ageSegments);
+        Task Update_Age_Segment(AgeSegments ageSegment);
     }
 }

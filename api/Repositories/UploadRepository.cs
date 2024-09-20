@@ -7,6 +7,7 @@ using api.Data;
 using api.Entities;
 using OfficeOpenXml;
 using Microsoft.EntityFrameworkCore;
+using api.Services;
 
 
 namespace api.Repositories
@@ -14,11 +15,14 @@ namespace api.Repositories
     public class UploadRepository : IUploadRepository
     {
         private readonly DataContext _dataContext;
+
+        private readonly ICityService _cityService;
         
 
-        public UploadRepository(DataContext dataContext )
+        public UploadRepository(DataContext dataContext , ICityService cityService )
         {
             _dataContext = dataContext;
+            _cityService= cityService;
               
         }
 
@@ -45,7 +49,9 @@ namespace api.Repositories
             }
         }
 
-        public async Task<List<Person>> ReadExcelFileAsync(Stream fileStream)
+
+
+       public async Task<List<Person>> ReadExcelFileCash(Stream fileStream)
 {
     using var package = new ExcelPackage(fileStream);
     var worksheet = package.Workbook.Worksheets[0];
@@ -54,68 +60,67 @@ namespace api.Repositories
 
     for (int row = 2; row <= rowCount; row++)
     {
-        if (worksheet.Cells[row, 10].Text == "م") // تحقق من الحالة المطلوبة
+        var genderText = worksheet.Cells[row, 9].Text.ToLower(); // اقرأ الجنس من العمود المناسب
+        int genderId = (genderText.Trim() == "ذكر" || genderText.Trim() == "male") ? 1 : 2;
+
+        var person = new Person
         {
-            var genderText = worksheet.Cells[row, 9].Text.ToLower(); // اقرأ الجنس من العمود المناسب
-            int genderId =( genderText.Trim() == "ذكر" || genderText.Trim() == "male") ? 1 : 2;
+            FirstName = worksheet.Cells[row, 5].Text,
+            FatherName = worksheet.Cells[row, 6].Text,
+            LastName = worksheet.Cells[row, 7].Text,
+            MotherName = worksheet.Cells[row, 8].Text,
+            NationalId = worksheet.Cells[row, 12].Text.Length > 11 ? worksheet.Cells[row, 12].Text.Substring(0, 11) : worksheet.Cells[row, 12].Text,
+            EnsuranceNumber = worksheet.Cells[row, 11].Text,
+            Mobile = worksheet.Cells[row, 14].Text,
+            GenderId = genderId // تعيين GenderId هنا
+        };
 
-            var person = new Person
-            {
-                FirstName = worksheet.Cells[row, 5].Text,
-                FatherName = worksheet.Cells[row, 6].Text,
-                LastName = worksheet.Cells[row, 7].Text,
-                MotherName = worksheet.Cells[row, 8].Text,
-                NationalId = worksheet.Cells[row, 12].Text.Length > 11 ? worksheet.Cells[row, 12].Text.Substring(0, 11) : worksheet.Cells[row, 12].Text,
-                EnsuranceNumber = worksheet.Cells[row, 11].Text,
-                Mobile = worksheet.Cells[row, 14].Text,
-                GenderId = genderId, // تعيين GenderId هنا
-            };
-/*
-            var birthDateText = worksheet.Cells[row, 13].Text;
-            if (DateTime.TryParseExact(birthDateText, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
-            {
-                person.BirthDate = birthDate;
-            }
-            else
-            {
-                person.BirthDate = null;
-            }
-*/
-            var engineere = new Engineere
-            {
-                EngNumber = worksheet.Cells[row, 3].Text,
-                SubNumber = worksheet.Cells[row, 4].Text,
-                Person = person
-            };
-
-            try
-            {
-                _dataContext.Persons.Add(person);
-                await _dataContext.SaveChangesAsync();
-
-                _dataContext.Engineeres.Add(engineere);
-                await _dataContext.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new CustomException($"Database update error occurred while processing row {row}", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new CustomException($"Error occurred while processing row {row}", ex);
-            }
-
-            people.Add(person);
+        // Handle birth date from cell 13
+        var birthDateText = worksheet.Cells[row, 13].Text;
+        if (!string.IsNullOrEmpty(birthDateText) && DateTime.TryParseExact(birthDateText, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+        {
+            person.BirthDate = birthDate;
         }
+        else
+        {
+            // If parsing fails or birth date is missing, set it to null or handle accordingly
+            person.BirthDate = null;
+        }
+
+        var engineere = new Engineere
+        {
+            EngNumber = worksheet.Cells[row, 3].Text,
+            SubNumber = worksheet.Cells[row, 4].Text,
+            Person = person
+        };
+
+        try
+        {
+            _dataContext.Persons.Add(person);
+            await _dataContext.SaveChangesAsync();
+
+            _dataContext.Engineeres.Add(engineere);
+            await _dataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new CustomException($"Database update error occurred while processing row {row}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new CustomException($"Error occurred while processing row {row}", ex);
+        }
+
+        people.Add(person);
     }
 
     return people;
 }
-      
     
 
 
- public async Task<List<Person>> ReadExcelFileAsync2(Stream fileStream)
+
+ public async Task<List<Person>> ReadExcelFileRetirement(Stream fileStream)
 {
     using var package = new ExcelPackage(fileStream);
     var worksheet = package.Workbook.Worksheets[0];
@@ -189,7 +194,7 @@ namespace api.Repositories
 
 
 
-   public async Task<List<Person>> ReadExcelFileAsync3(Stream fileStream)
+   public async Task<List<Person>> ReadExcelFileBox(Stream fileStream)
 {
     var people = new List<Person>();
 
@@ -201,13 +206,13 @@ namespace api.Repositories
         {
             throw new CustomException("Worksheet not found in the Excel file.");
         }
-
+ if (worksheet.Dimension == null || worksheet.Dimension.Rows < 2)
+    {
+        throw new CustomException("Worksheet is empty or does not contain data.");
+    }
         var rowCount = worksheet.Dimension.Rows ;
         
-         if (worksheet.Dimension == null)
-{
-    throw new CustomException("Worksheet is empty.");
-}
+  
    
         for (int row = 2; row <= rowCount; row++)
 {
@@ -242,11 +247,26 @@ namespace api.Repositories
             Person = person
         };
 
-        _dataContext.Persons.Add(person);
+
+
+         try
+         {
+ _dataContext.Persons.Add(person);
         await _dataContext.SaveChangesAsync();
 
         _dataContext.Engineeres.Add(engineere);
         await _dataContext.SaveChangesAsync();
+         }
+         catch (DbUpdateException ex)
+            {
+                throw new CustomException($"Database update error occurred while processing row {row}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException($"Error occurred while processing row {row}", ex);
+            }
+
+       
 
         people.Add(person);
     }
@@ -263,8 +283,95 @@ private string GetCellTextOrNull(ExcelRange cell)
 
 
 
+ public async Task<List<Hospital>> ReadExcelFileHospital(Stream fileStream)
+{
+    using var package = new ExcelPackage(fileStream);
+    var worksheet = package.Workbook.Worksheets[0];
+    var rowCount = worksheet.Dimension.Rows;
+    var hospitals = new List<Hospital>();
 
-public async Task LoadSubToDatabase(List<Person> list)
+    for (int row = 2; row <= rowCount; row++)
+    {
+        var hospitalName = worksheet.Cells[row, 1].Text;
+        var phone = worksheet.Cells[row, 2].Text;
+        var address = worksheet.Cells[row, 3].Text;
+        var cityName = worksheet.Cells[row, 4].Text;
+
+
+        if (string.IsNullOrEmpty(hospitalName) && string.IsNullOrEmpty(phone) &&
+            string.IsNullOrEmpty(address) && string.IsNullOrEmpty(cityName))
+        {
+            break; // الخروج من الحلقة عند الوصول إلى صف فارغ
+        }
+
+
+        var cityId = await _cityService.GetCityIdByName(cityName);
+        if (cityId == null)
+        {
+            throw new CustomException($"City not found for name '{cityName}' in row {row}");
+        }
+
+
+
+        var hospital = new Hospital
+        {
+            Name = hospitalName,
+            Phone = phone,
+            Address = address,
+            CityId = cityId.Value,
+        };
+
+        hospitals.Add(hospital);
+    }
+
+    return hospitals; // إرجاع قائمة المستشفيات التي تم قراءتها
+}
+
+
+
+
+
+
+
+
+public async Task<List<SurgicalProcedures>> ReadExcelFileSurgical(Stream fileStream)
+{
+    using var package = new ExcelPackage(fileStream);
+    var worksheet = package.Workbook.Worksheets[0];
+    var rowCount = worksheet.Dimension.Rows;
+    var surgicals = new List<SurgicalProcedures>();
+
+    for (int row = 2; row <= rowCount; row++)
+    {
+        var name = worksheet.Cells[row, 1].Text;
+        var priceText = worksheet.Cells[row, 2].Text;
+
+
+        if (string.IsNullOrEmpty(name) && string.IsNullOrEmpty(priceText))
+        {
+            break; // الخروج من الحلقة عند الوصول  
+        }
+
+        if (!decimal.TryParse(priceText, out var price))
+        {
+            throw new CustomException($"Invalid price format in row {row}");
+        }
+
+        var surgical = new SurgicalProcedures
+        {
+            Name = name,
+            Price = price, // تخزين القيمة كـ decimal
+        };
+
+        surgicals.Add(surgical);
+    }
+
+    return surgicals; 
+
+}
+
+
+   public async Task LoadSubToDatabase(List<Person> list)
         {
             try
             {
@@ -280,7 +387,49 @@ public async Task LoadSubToDatabase(List<Person> list)
                 throw new CustomException("An unexpected error occurred while saving the data", ex);
             }
         }
+
+
+
+
+
+         public async Task LoadSubToHospital(List<Hospital> list)
+        {
+            try
+            {
+                _dataContext.Hospitals.AddRange(list);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new CustomException("An error occurred while saving the data to the database", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException("An unexpected error occurred while saving the data", ex);
+            }
+        }
     
+    
+
+         public async Task LoadSubToSurgical(List<SurgicalProcedures> list)
+        {
+            try
+            {
+                _dataContext.SurgicalProcedures.AddRange(list);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new CustomException("An error occurred while saving the data to the database", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException("An unexpected error occurred while saving the data", ex);
+            }
+        }
+    
+
+
         }
     
     }

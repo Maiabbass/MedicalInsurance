@@ -19,21 +19,49 @@ namespace api.Services
       
         
          public bool Delete(int Id);
-         public bool Update(int Id,   AnnualDataForView annualDataForViews);
+         public bool Update(int Id,AnnalDataForEdit annualDataForEdit);
          public bool Update(int Id,AnnualDataDetailForView annualDataDetailForView);
          
           public decimal calcualteAmount(DateTime? birthDate,int year);
 
          
           Task <Response> AddAnnualSettings (AnnualSettingDTO annualSettingDTO); 
-           public bool DeleteAnnuaSetting(int year);
+           Task<bool> DeleteAnnuaSetting(int year);
 
-           Task<Response> UpdateAnnualSettings( AnnualSettingDTO annualSettingDTO);
+           //Task<Response> UpdateAnnualSettings( AnnualSettingDTO annualSettingDTO);
 
            Task<IEnumerable<AnnualDataWithDetails>> GetByYear(int year, int pageNumber, int pageSize);
 
            Task<(SimpleEngineer engineer, bool? cardStatus, int? payMethod)> GetEngineerDetailsAndCardStatus(string insuranceNumber, int year);
 
-          
+
+
+            Task<AnnualDataDetail?> GetAnnualDataDetailAsync(string ensuranceNumber, int year);
+
+
+         Task<decimal> GetClaimsSumForPersonAsync(string ensuranceNumber);
+
+
+         Task<Entities.AnnualData> GetByEngineerIdAndYear(int engineerId, int year);
+
+         Task<List<AnnualDataDetail>> GetAnnualDataDetails(int annualDataId);
+
+        Task<Response> CopyAnnualDataForNewYear(
+            int previousYear, 
+            int newYear, 
+            string ensuranceNumber, 
+            bool waiting, 
+            bool cardStatus, 
+            bool copyAnnualData, 
+            bool copyAnnualDataDetails,
+            List<AnnualNewDTO> detailIdsToCopy // استخدام DTO هنا
+        );
+
+            Task<PayMethod> GetPayMethodByEngineerIdAsync(int engineerId);
+
+            Task UpdateYearConfigurationAsync(YearConfiguration yearConfiguration);
+
+            Task AddNoteToYearConfigAsync(int yearConfigId, NoteCreateDTO noteDto);
+
     }
 }

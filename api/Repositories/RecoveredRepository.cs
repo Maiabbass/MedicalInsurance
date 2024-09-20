@@ -26,14 +26,7 @@ namespace api.Repositories
 
       public async Task<int> Add(Recovered recovered)
 {
-    // الحصول على القيمة الأخيرة لـ Number
-    var lastNumber = await _dataContext.Recovereds
-        .OrderByDescending(r => r.Number)
-        .Select(r => r.Number)
-        .FirstOrDefaultAsync();
-
-    // زيادة الرقم بمقدار واحد
-    int newNumber = lastNumber + 1;
+    
 
     Recovered newRE = new Recovered()
     {
@@ -52,8 +45,13 @@ namespace api.Repositories
         PersonId = recovered.PersonId,
         SurgicalProceduresId = recovered.SurgicalProceduresId,
         RecoDate = recovered.RecoDate,
-        Number = newNumber, // تعيين الرقم الجديد هنا
-        DateSurgicalProcedures=recovered.DateSurgicalProcedures
+        Number = recovered.Number, 
+        DateSurgicalProcedures=recovered.DateSurgicalProcedures,
+        NameHospital_Out=recovered.NameHospital_Out,
+        NumberBOK=recovered.NumberBOK,
+        Phone=recovered.Phone,
+
+
     };
 
 #pragma warning restore IDE0090 // Use 'new(...)'
@@ -125,6 +123,9 @@ namespace api.Repositories
        databaseEntity.RecoDate=recoveredDto.RecoDate;
        databaseEntity.Number=recoveredDto.Number;
        databaseEntity.DateSurgicalProcedures=recoveredDto.DateSurgicalProcedures;
+       databaseEntity.NameHospital_Out=recoveredDto.NameHospital_Out;
+       databaseEntity.NumberBOK=recoveredDto.NumberBOK;
+       databaseEntity.Phone=recoveredDto.Phone;
 
 
        return _dataContext.SaveChanges()>0;
@@ -153,21 +154,30 @@ namespace api.Repositories
         non_AddForPerson = r.non_AddForPerson,
         EnduranceRatio = r.EnduranceRatio,
         DateSurgicalProcedures=r.DateSurgicalProcedures,
+        NameHospital_Out=r.NameHospital_Out,
+        NumberBOK=r.NumberBOK,
+        Phone=r.Phone,
         HospitalName = r.Hospital != null ? r.Hospital.Name : null, // اسم المستشفى
         SurgicalProcedures = r.SurgicalProcedures != null ? new SurgicalProceduresEditDTO
         {
             Id = r.SurgicalProcedures.Id,
             Name = r.SurgicalProcedures.Name,
-            Technical = r.SurgicalProcedures.Technical,
-            Financial = r.SurgicalProcedures.Financial,
-            Limit = r.SurgicalProcedures.Limit,
-            EnduranceRatio = r.SurgicalProcedures.EnduranceRatio,
+          
             Pathological_specialization = r.SurgicalProcedures.Pathological_specialization
         } : null // بيانات SurgicalProcedures
     }).ToList();
 
     return recoveredDtos;
 }
+
+
+public async Task<List<Recovered>> GetRecoveredBetweenDatesAsync(DateTime startDate, DateTime endDate)
+{
+    return await _dataContext.Recovereds
+                         .Where(r => r.RecoDate >= startDate && r.RecoDate <= endDate)
+                         .ToListAsync();
+}
+
 
          
     

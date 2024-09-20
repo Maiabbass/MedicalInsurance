@@ -85,6 +85,7 @@ public async Task<ActionResult<IEnumerable<CityEditDTO>>> GetAll()
             {
               Id=item.Id,
               Name=item.Name,
+              CallingCode=item.CallingCode,
             };
             dataForViews.Add(ForViewnewitem);
         }

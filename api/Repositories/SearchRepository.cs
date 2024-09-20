@@ -218,6 +218,83 @@ namespace api.Repositories
 
     
 
+
+public async Task<PersonWithEngineereDTO> GetEngNumberAndSupNumber(string engNumber , string supNumber)
+{
+    var person = await _dataContext.Engineeres
+        .Where(e => e.EngNumber == engNumber && e.SubNumber == supNumber)
+        .Include(e => e.Person)
+        .Select(e => new PersonWithEngineereDTO
+        {
+            PersonId = e.Person.Id,
+            FirstName = e.Person.FirstName,
+            FatherName = e.Person.FatherName,
+            LastName = e.Person.LastName,
+            MotherName = e.Person.MotherName,
+            BirthDate = e.Person.BirthDate,
+            Address = e.Person.Address,
+            Mobile = e.Person.Mobile,
+            Phone = e.Person.Phone,
+            Email = e.Person.Email,
+            NationalId = e.Person.NationalId,
+            EnsuranceNumber = e.Person.EnsuranceNumber,
+            StatusId = e.Person.StatusId,
+            GenderId = e.Person.GenderId,
+
+            EngNumber = e.EngNumber,
+            SubNumber = e.SubNumber,
+            SpecializationId = e.SpecializationId,
+            WorkPlaceId = e.WorkPlaceId,
+        })
+        .FirstOrDefaultAsync();
+
+    if (person == null)
+    {
+        throw new KeyNotFoundException("No person found with the specified engineering number.");
+    }
+
+    return person;
+}
+
+
+
+ public async Task<PersonWithEngineereDTO> GetSubNumberAsync(string subNumber)
+{
+    var person = await _dataContext.Engineeres
+        .Where(e => e.SubNumber == subNumber )
+        .Include(e => e.Person)
+        .Select(e => new PersonWithEngineereDTO
+        {
+            PersonId = e.Person.Id,
+            FirstName = e.Person.FirstName,
+            FatherName = e.Person.FatherName,
+            LastName = e.Person.LastName,
+            MotherName = e.Person.MotherName,
+            BirthDate = e.Person.BirthDate,
+            Address = e.Person.Address,
+            Mobile = e.Person.Mobile,
+            Phone = e.Person.Phone,
+            Email = e.Person.Email,
+            NationalId = e.Person.NationalId,
+            EnsuranceNumber = e.Person.EnsuranceNumber,
+            StatusId = e.Person.StatusId,
+            GenderId = e.Person.GenderId,
+
+            EngNumber = e.EngNumber,
+            SubNumber = e.SubNumber,
+            SpecializationId = e.SpecializationId,
+            WorkPlaceId = e.WorkPlaceId,
+        })
+        .FirstOrDefaultAsync();
+
+    if (person == null)
+    {
+        throw new KeyNotFoundException("No person found with the specified Sub number.");
+    }
+
+    return person;
+}
+
      
 
 

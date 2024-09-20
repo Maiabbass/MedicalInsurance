@@ -39,5 +39,12 @@ namespace api.DTOS
 
         public int GenderId {get; set;}
         public int? StatusId { get;  set; }
-    }
+
+        public decimal Amount { get; set; }
+
+        public List<string> Images { get; set; } = new List<string>();
+
+         public List<string> WordFiles { get; set; } = new List<string>();
 }
+
+    }

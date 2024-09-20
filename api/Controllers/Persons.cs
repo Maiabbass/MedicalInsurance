@@ -11,118 +11,115 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace api.Controllers;
+namespace api.Controllers
+{
+
 
 [ApiController]
 [Route("api/[controller]")]
 public class Persons : ControllerBase
 {
     private readonly IPersonService  _personService;
+
+    private readonly IWordRepository _wordRepository;
+
+    private readonly IImageRepository _imageRepository;
+
+    private readonly INoteRepository _noteRepository;
    
 
-    public Persons(IPersonService  personService)
+    public Persons(IPersonService  personService , IWordRepository wordRepository , IImageRepository imageRepository, INoteRepository noteRepository)
     {
         _personService = personService;
+        _imageRepository=imageRepository;
+        _wordRepository=wordRepository;
+        _noteRepository=noteRepository;
     }
 
    
 
 
+   [HttpPost]
+public async Task<IActionResult> CreatePerson([FromForm] PersonEditDTO personEditDTO, IFormFile[]? ImageFiles, IFormFile[]? WordFiles)
+{
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(ModelState);
+    }
+
+    var response = await _personService.Add(personEditDTO, ImageFiles, WordFiles);
+
+    if (!string.IsNullOrEmpty(response.ErrorMessage))
+    {
+        return StatusCode(500, new { message = response.ErrorMessage });
+    }
+
+    return Ok(new { Id = response.InsertedId });
+}
 
 
-     [HttpPost]
-        public async Task<ActionResult<Response>> AddPerson([FromBody] PersonEditDTO personEditDTO)
-        {
-            try
-            {
-                /*
-                var existingPerson = await _personService.GetEngId(personEditDTO.EngineereId);
-
-                if (existingPerson == null)
-                {
-                    personEditDTO.Subscrib = true;
-                }
-                else
-                {
-                    personEditDTO.Affiliate = true;
-                }
-
-                bool isInClaims = await _personService.IsEnsuranceNumberInClaimsAsync(personEditDTO.EnsuranceNumber);
-                if (isInClaims)
-                {
-                    personEditDTO.Beneficiary = true;
-                }
-*/
-                var response = await _personService.Add(personEditDTO);
-
-                if (response.ErrorMessage != null)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                        new Response { ErrorMessage = response.ErrorMessage });
-                }
-
-                return Ok(response);
-            }
-            catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
-            {
-                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
-            }
-            catch (Exception ex)
-            {
-                string personDetails = System.Text.Json.JsonSerializer.Serialize(personEditDTO);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {personDetails}" });
-            }
-        }
 
 
         
-   [HttpGet]
+  [HttpGet]
 public async Task<ActionResult<PagedResult<PersonForView>>> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
 {
     var pagedPersons = await _personService.GetAll(pageNumber, pageSize);
-    var personForViews = pagedPersons.Items.Select(item => new PersonForView
-    {
-        Id = item.Id,
-        FirstName = item.FirstName,
-        FatherName = item.FatherName,
-        LastName = item.LastName,
-        MotherName = item.MotherName,
-        BirthDate = item.BirthDate,
-        EnsuranceNumber = item.EnsuranceNumber,
-        NationalId = item.NationalId,
-        Address = item.Address,
-        Phone = item.Phone,
-        GenderId = item.GenderId,
-        Mobile = item.Mobile,
-        Email = item.Email,
-        StatusId=item.StatusId,
-    }).ToList();
 
-    var result = new PagedResult<PersonForView>
+    if (!pagedPersons.Items.Any())
     {
-        Items = personForViews,
-        TotalCount = pagedPersons.TotalCount,
-        TotalPages = pagedPersons.TotalPages,
-        CurrentPage = pagedPersons.CurrentPage,
-        PageSize = pagedPersons.PageSize
-    };
+        return NotFound();
+    }
 
-    return Ok(result);
+    return Ok(pagedPersons);
 }
+
 
 
 
 [HttpGet("{Id}")]
-public async Task<ActionResult<Person?>>GetWithId( int Id){
-   return await _personService.GetWithId(Id);
+public async Task<ActionResult<Person?>> GetWithId(int Id)
+{
+    var person = await _personService.GetWithId(Id);
+
+    if (person == null)
+    {
+        return NotFound();
+    }
+
+    var personForView  = new PersonForView
+    {
+        Id = person.Id,
+        FirstName = person.FirstName,
+        FatherName = person.FatherName,
+        MotherName = person.MotherName,
+        LastName = person.LastName,
+        BirthDate = person.BirthDate,
+        NationalId = person.NationalId,
+        EnsuranceNumber = person.EnsuranceNumber,
+        Address = person.Address,
+        Phone = person.Phone,
+        Mobile = person.Mobile,
+        Email = person.Email,
+        GenderId = person.GenderId,
+        StatusId = person.StatusId,
+        Amount = (decimal)person.Amount,
+        Images = person.Images.Select(i => Convert.ToBase64String(i.Image)).ToList(),
+        WordFiles = person.Words.Select(w => Convert.ToBase64String(w.Content)).ToList()
+    };
+
+    return Ok(personForView);
 }
 
 
 
-[HttpDelete("{Id}")] 
+ 
+ [HttpDelete("{Id}")] 
 public ActionResult Delete(int Id){
   try{
+   
+    _imageRepository.DeleteByPersonId(Id);
+    _wordRepository.DeleteByPersonId(Id);
      _personService.Delete(Id);
     return NoContent();
 
@@ -136,23 +133,68 @@ public ActionResult Delete(int Id){
 
 
 
-      
-     [HttpPut("{Id}")]
-
-
-     public  ActionResult<bool> Update(int Id,[FromBody]  PersonEditDTO PersonEditDTO){
-           bool result= _personService.Update(Id,PersonEditDTO);
-            if (result)
-            {
-return  Ok(result);
-            }
-            else{
-                return StatusCode(StatusCodes.Status500InternalServerError,result);
-            }
-
-        }
+   [HttpPut("{id}/update-person-details")]
+public async Task<IActionResult> UpdatePersonDetails(int id, [FromBody] PersonEditDTO personDetailsDTO)
+{
+    var updatePersonResult = await _personService.UpdatePersonDetails(id, personDetailsDTO);
     
-  }
+    if (!updatePersonResult)
+    {
+        return NotFound(); // إذا لم يتم العثور على الشخص
+    }
+    
+    return Ok(); // في حال نجاح التحديث
+}
+
+
+
+
+    [HttpPut("{id}/update-imagesAndWords")]
+public async Task<IActionResult> UpdateImagesANDWords(int id, [FromForm] ImageAndWordUpdateDTO DTO)
+{
+    if (DTO.Images == null || !DTO.Images.Any())
+    {
+        return BadRequest("No images provided.");
+    }
+
+    var newImageFilesBase64 = new List<string>();
+    foreach (var imageFile in DTO.Images)
+    {
+        using (var ms = new MemoryStream())
+        {
+            await imageFile.CopyToAsync(ms);
+            var fileBytes = ms.ToArray();
+            newImageFilesBase64.Add(Convert.ToBase64String(fileBytes));
+        }
+    }
+
+    await _imageRepository.UpdateImagesAsync(id, newImageFilesBase64);
+
+    if (DTO.Words != null && DTO.Words.Any())
+    {
+        var newWordFilesBase64 = new List<string>();
+
+        foreach (var wordFile in DTO.Words)
+        {
+            using (var ms = new MemoryStream())
+            {
+                await wordFile.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                newWordFilesBase64.Add(Convert.ToBase64String(fileBytes));
+            }
+        }
+
+        await _wordRepository.UpdateWordFilesAsync(id, newWordFilesBase64);
+    }
+
+    return Ok();
+}
+
+
+
+
+}
+}
 
   
 

@@ -47,6 +47,9 @@ namespace api.Services
             RecoDate=recoveredDto.RecoDate,
             Number=recoveredDto.Number,
             DateSurgicalProcedures=recoveredDto.DateSurgicalProcedures,
+            NameHospital_Out=recoveredDto.NameHospital_Out,
+            NumberBOK=recoveredDto.NumberBOK,
+            Phone=recoveredDto.Phone,
 
             
           
@@ -110,6 +113,12 @@ namespace api.Services
 
                   public async Task<List<RecoveredDto>> GetByEnsuranceNumber(string ensuranceNumber){
                     return await _unitOfWork.RecoveredRepository.GetByEnsuranceNumber(ensuranceNumber);
+                  }
+
+
+
+                  public async Task<List<Recovered>> GetRecoveredBetweenDatesAsync(DateTime startDate, DateTime endDate){
+                    return await _unitOfWork.RecoveredRepository.GetRecoveredBetweenDatesAsync(startDate,endDate);
                   }
     }
 }

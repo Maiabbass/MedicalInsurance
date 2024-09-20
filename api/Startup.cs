@@ -137,6 +137,18 @@ namespace API
               services.AddScoped<IQuiriesServices,QuiriesServices>();
               services.AddScoped<IPersonRepository,PersonRepository>();
               services.AddScoped<IRecoveredServices,RecoveredServices>();
+              services.AddScoped<IRelationRepository,RelationRepository>();
+              services.AddScoped<ILimitRepository,LimitRepository>();
+              services.AddScoped<IEnduranceRatioRepository,EnduranceRatioRepository>();
+              services.AddScoped<IWordRepository,WordRepository>();
+              services.AddScoped<IImageRepository,ImageRepository>();
+              services.AddScoped<IBlockService,BlockService>();
+              services.AddScoped<INoteRepository,NoteRepository>();
+              services.AddScoped<INoteService,NoteService>();
+              services.AddScoped<IAgeSegmentsRepository,AgeSegmentsRepository>();
+              services.AddScoped<IRelationRepository,RelationRepository>();
+    
+
             
               
             services.AddSwaggerGen(c =>

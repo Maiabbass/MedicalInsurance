@@ -16,6 +16,7 @@ namespace api.Repositories
           public void   Delete(int Id);
           public bool Update(int Id, RecoveredDto recoveredDto);
             Task<List<RecoveredDto>> GetByEnsuranceNumber(string ensuranceNumber);
+             Task<List<Recovered>> GetRecoveredBetweenDatesAsync(DateTime startDate, DateTime endDate);
         
     }
 }

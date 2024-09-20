@@ -10,9 +10,9 @@ namespace api.Repositories
 {
     public interface IEngineerRepository
     {
-           Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize);
+      Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, int pageSize);
 
-        Task <Engineere?> Get(int Id);
+       Task<PersonWithEngineereDTO?> Get(int Id);
 
         Task <int> Add (Engineere person);
          public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO);

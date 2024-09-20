@@ -10,6 +10,7 @@ namespace api.DTOS
     {
         #nullable disable
         public int Id { get; set; } 
-        public String  Name  { get; set; }
+        public string  Name  { get; set; }
+        public string CallingCode { get ; set;}
     }
 }

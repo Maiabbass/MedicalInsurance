@@ -11,15 +11,13 @@ namespace api.Entities
          public int Id { get; set; }
         public int Year { get; set; }
 
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? InsideHospitalPercentage { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-         public decimal? OutsideHospitalPercentage { get; set; }
+       
 
         [Column(TypeName = "decimal(18,2)")]
          public decimal? CardPrice { get; set; }
-         public decimal Limit  { get; set; }
+
+         public ICollection<Note>? Notes { get ; set ;}
+        
 
     }
 }

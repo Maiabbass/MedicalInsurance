@@ -80,5 +80,16 @@ namespace api.Entities
 
         public virtual User User { get; set; }
 
+         
+
+         public ICollection<Words>? Words{get; set;}
+         public ICollection<Images>? Images{ get; set;}
+         public  ICollection<BlockList>? blockLists{get; set;}
+
+
+         public ICollection<Note>Notes{get ; set ;}
+
+
+
     }
 }

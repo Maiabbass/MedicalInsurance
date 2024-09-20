@@ -16,12 +16,12 @@ namespace api.DTOS
 
         public string Pathological_specialization { get; set; }
 
-        
-         public decimal Limit { get; set; }
-         
+        public decimal Price { get ; set;}
 
-         public decimal EnduranceRatio { get; set; }
+       public string? NoteContent { get; set; } 
 
-        // public DateTime? Date { get ; set ; }
+       public int? Year { get ; set ;}
+
+
     }
-}
+    }

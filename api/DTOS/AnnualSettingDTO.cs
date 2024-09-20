@@ -15,10 +15,18 @@ namespace api.DTOS
     {
         public int Id { get; set; }
          public int Year { get; set; }
-         public decimal? InsideHospitalPercentage { get; set; }
-         public decimal? OutsideHospitalPercentage { get; set; }
+         
          public decimal? CardPrice { get; set; }
-         public List<AgeSegments>? AgeSegments{get;set;}
-          public decimal Limit  { get; set; }
+         
+         public List<AgeSegmentDTO> AgeSegments { get; set; }
+
+          
+          
+          public List<RelationTypeDTO> RelationTypes { get; set; } 
+     
+          public List<HospitalEditDTO> Hospitals  {get ; set;}
+         
+
+          public List<SurgicalProceduresEditDTO> Surgicals {get ; set;}
     }
 }

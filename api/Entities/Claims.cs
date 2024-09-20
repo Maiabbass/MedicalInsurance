@@ -31,10 +31,10 @@ namespace api.Entities
         }
         public int Id { get; set; }
 
-
+       
         public string EnsuranceNumber { get; set; }
 
-         
+        public int? Year { get ; set;}
         public  string FullName{ get; set; }
 
  
@@ -87,6 +87,10 @@ namespace api.Entities
 
 
         public DateTime? DateSurgicalProcedures {get  ; set ;}
+
+        public  DateTime? ClimeData {get ; set ;}
+
+        public int? Number { get ; set;}
 
 
         

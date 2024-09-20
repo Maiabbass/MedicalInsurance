@@ -87,6 +87,9 @@ public async Task<ActionResult<RecoveredSummary>> GetAll()
     
   }
 
+
+  
+
  [HttpGet("GetByEnsuranceNumber/{ensuranceNumber}")]
 public async Task<ActionResult<List<RecoveredDto>>> GetByEnsuranceNumber(string ensuranceNumber)
 {
@@ -99,6 +102,28 @@ public async Task<ActionResult<List<RecoveredDto>>> GetByEnsuranceNumber(string 
 
     return Ok(data);
 }
+
+
+
+
+        [HttpGet("recovered-between-dates")]
+        public async Task<IActionResult> GetRecoveredBetweenDates([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        {
+            if (startDate > endDate)
+            {
+                return BadRequest("Start date must be earlier than or equal to the end date.");
+            }
+
+            var recovered = await _recoveredServices.GetRecoveredBetweenDatesAsync(startDate, endDate);
+
+            if (recovered == null || recovered.Count == 0)
+            {
+                return NotFound("No recovered records found between the specified dates.");
+            }
+
+            return Ok(recovered);
+        }
+
 
         
         

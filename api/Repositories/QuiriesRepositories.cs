@@ -21,7 +21,8 @@ namespace api.Repositories
          }
 
           
-         public async Task<SimpleEngineer> GetEngineerWithRelationsAsync(string EngNumber)
+         public async Task<SimpleEngineer> 
+         GetEngineerWithRelationsAsync(string EngNumber)
 {
     var engineer = await _dataContext.Engineeres
         .Include(e => e.Person)
@@ -419,6 +420,25 @@ namespace api.Repositories
 
            }
     }
+
+
+
+    public async Task<List<Person>> GetPersonsByAgeSegment(int fromYear, int toYear)
+{
+    var currentDate = DateTime.Now;
+
+    // حساب تاريخ الميلاد بناءً على الفئة العمرية المطلوبة
+    var fromBirthDate = currentDate.AddYears(-toYear); // العمر الأكبر
+    var toBirthDate = currentDate.AddYears(-fromYear); // العمر الأصغر
+
+    // استعلام للحصول على الأشخاص الذين يقع تاريخ ميلادهم ضمن النطاق المطلوب
+    var personsInAgeSegment = await _dataContext.Persons
+        .Where(p => p.BirthDate >= fromBirthDate && p.BirthDate <= toBirthDate)
+        .ToListAsync();
+
+    return personsInAgeSegment;
+}
+
 
 
     } }

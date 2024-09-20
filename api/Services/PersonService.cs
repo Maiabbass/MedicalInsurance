@@ -25,67 +25,99 @@ namespace api.Services
 
         public object Person => throw new NotImplementedException();
 
-        public async Task<Response> Add(PersonEditDTO personEditDTO)
+       public async Task<Response> Add(PersonEditDTO personEditDTO,  IFormFile[] imageFiles, IFormFile[] wordFiles)
+{
+    Response response = new Response();
+    int insertedId = 0;
+
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            Response response =new Response ();
-              int insertedId=0; 
-                 
+            // إضافة بيانات الشخص
+            Person person = new Person()
+            {
+                FirstName = personEditDTO.FirstName,
+                FatherName = personEditDTO.FatherName,
+                MotherName = personEditDTO.MotherName,
+                LastName = personEditDTO.LastName,
+                BirthDate = personEditDTO.BirthDate,
+                NationalId = personEditDTO.NationalId,
+                EnsuranceNumber = personEditDTO.EnsuranceNumber,
+                Address = personEditDTO.Address,
+                Phone = personEditDTO.Phone,
+                Mobile = personEditDTO.Mobile,
+                Email = personEditDTO.Email,
+                GenderId = personEditDTO.GenderId,
+                StatusId = personEditDTO.StatusId,
+            };
 
-                 try 
-                 {
-                using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-                 {
-                            // add person 
-                              Person person =new Person ()
-           {
-          
-             FirstName = personEditDTO.FirstName,
-             FatherName =personEditDTO.FatherName,
-             MotherName =personEditDTO.MotherName,
-             LastName = personEditDTO.LastName,
-             BirthDate = personEditDTO.BirthDate,
-             NationalId = personEditDTO.NationalId,
-             EnsuranceNumber = personEditDTO.EnsuranceNumber,
-             Address = personEditDTO.Address,
-             Phone = personEditDTO.Phone,
-             Mobile=personEditDTO.Mobile,
-             Email=personEditDTO.Email,
-             
-             GenderId = personEditDTO.GenderId,
-             StatusId=personEditDTO.StatusId,
-                 };
+            insertedId = await _unitOfWork.PersonRepository.AddPerson(person,imageFiles,wordFiles);
+ 
+ /*
+            // حفظ الصورة إذا كانت موجودة
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var image = new Images
+                {
+                    Image = await _unitOfWork.PersonRepository.ConvertFileToByteArray(imageFile),
+                    PersonId = insertedId
+                };
+                //await _unitOfWork.ImageRepository.AddImageAsync(image);
+            }
 
-                  insertedId=  await _unitOfWork.PersonRepository.Add(person);
+            // حفظ ملف Word إذا كان موجودًا
+            if (wordFile != null && wordFile.Length > 0)
+            {
+                var word = new Words
+                {
+                    Content = await _unitOfWork.PersonRepository.ConvertFileToByteArray(wordFile),
+                    PersonId = insertedId
+                };
+               // await _unitOfWork.WordRepository.AddWordAsync(word);
+            }
 
-                  // add relation data ...
-                  Relation relation =new Relation()
-                  {
-                    Name="",
-                    PersonId = insertedId,
-                    EngineereId = personEditDTO.EngineereId,
-                    RelationTypeId  =personEditDTO.RelationTypeId
-                  };
+*/            
 
-                    await _unitOfWork.RelationRepository.Add(relation);
+            // إضافة بيانات العلاقة
+            Relation relation = new Relation()
+            {
+                Name = "",
+                PersonId = insertedId,
+                EngineereId = personEditDTO.EngineereId,
+                RelationTypeId = personEditDTO.RelationTypeId
+            };
 
-                    scope.Complete();
-                    
+            await _unitOfWork.RelationRepository.Add(relation);
 
-                 }
-                 }
-                   catch(TransactionAbortedException ex)
-                 {
-                   response.ErrorMessage = ex.Message;
-                 }
-                 catch(Exception exx){  response.ErrorMessage = exx.Message;}
-                response.InsertedId  =insertedId;
-             return response;
+            scope.Complete();
         }
+    }
+    catch (TransactionAbortedException ex)
+    {
+        response.ErrorMessage = ex.Message;
+    }
+    catch (Exception exx)
+    {
+        response.ErrorMessage = exx.Message;
+    }
 
-        public async Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize)
-        {
-            return  await _unitOfWork.PersonRepository.GetAll(pageNumber,pageSize) ;
-        }
+    response.InsertedId = insertedId;
+    return response;
+}
+
+
+
+
+
+
+       public async Task<PagedResult<PersonForView>> GetAll(int pageNumber, int pageSize)
+{
+    return await _unitOfWork.PersonRepository.GetAll(pageNumber, pageSize);
+}
+
+
+
 
      public async Task<Person?>GetWithId(int Id)
      {
@@ -100,10 +132,11 @@ namespace api.Services
       {
          using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
          {
-            _unitOfWork.AnnualDataRepository.DeleteByPersonId(Id);
-           _unitOfWork.RelationRepository.DeleteByPersonId(Id);
-      
-        _unitOfWork.PersonRepository.Delete(Id);
+         
+         _unitOfWork.AnnualDataRepository.DeleteByPersonId(Id);
+         _unitOfWork.RelationRepository.DeleteByPersonId(Id);
+        _unitOfWork.NoteRepository.DeleteNotesByPersonId(Id);
+         _unitOfWork.PersonRepository.Delete(Id);
             scope.Complete();
             return true;
          }
@@ -117,9 +150,13 @@ namespace api.Services
                  
     
      }
-      public bool Update(int Id, PersonEditDTO personEditDTO){
-           return _unitOfWork.PersonRepository.Update(Id, personEditDTO);
-        }
+
+
+     public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO)
+    {
+        return await _unitOfWork.PersonRepository.UpdatePersonDetails(id, personEditDTO);
+    }
+
 
         public async Task<AnnualData?> GetEngId(int EngineereId){
           return await _unitOfWork.PersonRepository.GetEngId(EngineereId);

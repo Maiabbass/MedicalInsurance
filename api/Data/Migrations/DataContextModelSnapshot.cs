@@ -91,6 +91,9 @@ namespace api.Data.Migrations
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("Waiting")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("WorkPlaceId")
                         .HasColumnType("int");
 
@@ -99,17 +102,13 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EngineereId")
-                        .IsUnique();
+                    b.HasIndex("EngineereId");
 
                     b.HasIndex("EngineeringUnitsId");
 
                     b.HasIndex("PayMethodId");
 
                     b.HasIndex("WorkPlaceId");
-
-                    b.HasIndex("Year", "EngineereId")
-                        .IsUnique();
 
                     b.ToTable("AnnualDatas");
                 });
@@ -122,16 +121,37 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<bool>("Affiliate")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("AnnualDataId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Beneficiary")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("CardStatuse")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("ExAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<bool>("IsEngineer")
                         .HasColumnType("bit");
 
                     b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Subscrib")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Waiting")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -143,6 +163,33 @@ namespace api.Data.Migrations
                     b.ToTable("AnnualDataDetails");
                 });
 
+            modelBuilder.Entity("api.Entities.BlockList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("blockLists");
+                });
+
             modelBuilder.Entity("api.Entities.City", b =>
                 {
                     b.Property<int>("Id")
@@ -150,6 +197,10 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CallingCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -170,6 +221,9 @@ namespace api.Data.Migrations
 
                     b.Property<decimal>("ApprovedPrice")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ClimeData")
+                        .HasColumnType("datetime2");
 
                     b.Property<decimal>("Company_fees")
                         .HasColumnType("decimal(18,2)");
@@ -197,6 +251,9 @@ namespace api.Data.Migrations
                     b.Property<DateTime?>("LoginDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("Number")
+                        .HasColumnType("int");
+
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
@@ -208,6 +265,9 @@ namespace api.Data.Migrations
 
                     b.Property<bool>("Trust")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("Year")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("non_Add")
                         .HasColumnType("decimal(18,2)");
@@ -224,6 +284,29 @@ namespace api.Data.Migrations
                     b.HasIndex("SurgicalProceduresId");
 
                     b.ToTable("Claims");
+                });
+
+            modelBuilder.Entity("api.Entities.EnduranceRatio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EnduranceRatios");
                 });
 
             modelBuilder.Entity("api.Entities.Engineere", b =>
@@ -359,6 +442,9 @@ namespace api.Data.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("latitude")
                         .HasColumnType("decimal(18,6)");
 
@@ -367,6 +453,106 @@ namespace api.Data.Migrations
                     b.HasIndex("CityId");
 
                     b.ToTable("Hospitals");
+                });
+
+            modelBuilder.Entity("api.Entities.Images", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("api.Entities.Limits", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("limits");
+                });
+
+            modelBuilder.Entity("api.Entities.Note", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("AgeSegmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AgeSegmentsId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("HospitalId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelationId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RelationTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SurgicalProcedureId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("YearConfigId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("YearConfigurationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgeSegmentsId");
+
+                    b.HasIndex("HospitalId");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("RelationTypeId");
+
+                    b.HasIndex("SurgicalProcedureId");
+
+                    b.HasIndex("YearConfigurationId");
+
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("api.Entities.PasswordEng", b =>
@@ -516,11 +702,22 @@ namespace api.Data.Migrations
                     b.Property<DateTime?>("LoginDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("NameHospital_Out")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberBOK")
                         .HasColumnType("int");
 
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RecoDate")
                         .HasColumnType("datetime2");
@@ -585,10 +782,16 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.RelationType", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -642,23 +845,17 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<decimal>("EnduranceRatio")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("Financial")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Limit")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Pathological_specialization")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Technical")
-                        .HasColumnType("bit");
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -747,6 +944,27 @@ namespace api.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("api.Entities.Words", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<byte[]>("Content")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Words");
+                });
+
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
                 {
                     b.Property<int>("Id")
@@ -787,15 +1005,6 @@ namespace api.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<decimal?>("CardPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("InsideHospitalPercentage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Limit")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("OutsideHospitalPercentage")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Year")
@@ -992,6 +1201,17 @@ namespace api.Data.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("api.Entities.BlockList", b =>
+                {
+                    b.HasOne("api.Entities.Person", "person")
+                        .WithMany("blockLists")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("person");
+                });
+
             modelBuilder.Entity("api.Entities.Claims", b =>
                 {
                     b.HasOne("api.Entities.Hospital", "Hospital")
@@ -1054,6 +1274,57 @@ namespace api.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("City");
+                });
+
+            modelBuilder.Entity("api.Entities.Images", b =>
+                {
+                    b.HasOne("api.Entities.Person", "Person")
+                        .WithMany("Images")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("api.Entities.Note", b =>
+                {
+                    b.HasOne("api.Entities.AgeSegments", "AgeSegments")
+                        .WithMany("Notes")
+                        .HasForeignKey("AgeSegmentsId");
+
+                    b.HasOne("api.Entities.Hospital", "Hospital")
+                        .WithMany("Notes")
+                        .HasForeignKey("HospitalId");
+
+                    b.HasOne("api.Entities.Person", "person")
+                        .WithMany("Notes")
+                        .HasForeignKey("PersonId");
+
+                    b.HasOne("api.Entities.RelationType", "RelationType")
+                        .WithMany("Notes")
+                        .HasForeignKey("RelationTypeId");
+
+                    b.HasOne("api.Entities.SurgicalProcedures", "SurgicalProcedures")
+                        .WithMany("Notes")
+                        .HasForeignKey("SurgicalProcedureId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("api.Entities.YearConfiguration", "YearConfiguration")
+                        .WithMany("Notes")
+                        .HasForeignKey("YearConfigurationId");
+
+                    b.Navigation("AgeSegments");
+
+                    b.Navigation("Hospital");
+
+                    b.Navigation("RelationType");
+
+                    b.Navigation("SurgicalProcedures");
+
+                    b.Navigation("YearConfiguration");
+
+                    b.Navigation("person");
                 });
 
             modelBuilder.Entity("api.Entities.Person", b =>
@@ -1151,6 +1422,17 @@ namespace api.Data.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("api.Entities.Words", b =>
+                {
+                    b.HasOne("api.Entities.Person", "Person")
+                        .WithMany("Words")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
                 {
                     b.HasOne("api.Entities.EngineeringUnits", "EngineeringUnits")
@@ -1213,6 +1495,11 @@ namespace api.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("api.Entities.AgeSegments", b =>
+                {
+                    b.Navigation("Notes");
+                });
+
             modelBuilder.Entity("api.Entities.AnnualData", b =>
                 {
                     b.Navigation("AnnualDataDetails");
@@ -1250,6 +1537,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.Hospital", b =>
                 {
                     b.Navigation("Claims");
+
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("api.Entities.PayMethod", b =>
@@ -1265,14 +1554,24 @@ namespace api.Data.Migrations
 
                     b.Navigation("Engineere");
 
+                    b.Navigation("Images");
+
+                    b.Navigation("Notes");
+
                     b.Navigation("Relations");
 
                     b.Navigation("User")
                         .IsRequired();
+
+                    b.Navigation("Words");
+
+                    b.Navigation("blockLists");
                 });
 
             modelBuilder.Entity("api.Entities.RelationType", b =>
                 {
+                    b.Navigation("Notes");
+
                     b.Navigation("Relations");
                 });
 
@@ -1284,6 +1583,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.SurgicalProcedures", b =>
                 {
                     b.Navigation("Claims");
+
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("api.Entities.WorkPlace", b =>
@@ -1291,6 +1592,11 @@ namespace api.Data.Migrations
                     b.Navigation("AnnualDatas");
 
                     b.Navigation("Engineeres");
+                });
+
+            modelBuilder.Entity("api.Entities.YearConfiguration", b =>
+                {
+                    b.Navigation("Notes");
                 });
 #pragma warning restore 612, 618
         }

@@ -68,11 +68,43 @@ namespace api.Repositories
 
 
 
-        public async Task<Engineere?> Get(int Id)
+      public async Task<PersonWithEngineereDTO?> Get(int Id)
 {
     return await _dataContext.Engineeres
-        .Include(e => e.Person)  // تضمين بيانات الـ Person المرتبطة
-        .FirstOrDefaultAsync(x => x.Id == Id);
+        .Where(x => x.Id == Id)
+        .Select(e => new PersonWithEngineereDTO
+        {
+            // خصائص جدول Person
+            PersonId = e.Person.Id,
+            FirstName = e.Person.FirstName,
+            FatherName = e.Person.FatherName,
+            LastName = e.Person.LastName,
+            MotherName = e.Person.MotherName,
+            NationalId = e.Person.NationalId,
+            EnsuranceNumber = e.Person.EnsuranceNumber,
+            BirthDate = e.Person.BirthDate,
+            Address = e.Person.Address,
+            Phone = e.Person.Phone,
+            Mobile = e.Person.Mobile,
+            Email = e.Person.Email,
+            StatusId = e.Person.StatusId,
+            GenderId = e.Person.GenderId,
+
+            // خصائص جدول Engineere
+            EngNumber = e.EngNumber,
+            SubNumber = e.SubNumber,
+            SpecializationId = e.SpecializationId,
+            WorkPlaceId = e.WorkPlaceId,
+            Amount = e.Person.Amount,
+
+            // تضمين الصور المرتبطة
+            Images = e.Person.Images.Select(i => Convert.ToBase64String(i.Image)).ToList(),
+
+            // تضمين ملفات Word المرتبطة
+            WordFiles = e.Person.Words.Select(w => Convert.ToBase64String(w.Content)).ToList()
+
+        })
+        .FirstOrDefaultAsync();
 }
 
 
@@ -80,25 +112,25 @@ namespace api.Repositories
 
 
 
-        
-    public async Task<IEnumerable<EngineerFull>> GetAll(int pageNumber, int pageSize)
+
+
+
+  public async Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, int pageSize)
 {
     int skip = (pageNumber - 1) * pageSize;
-    int take = pageSize;
 
-    // استعلام SQL لاستخدام ROW_NUMBER لتطبيق Paging على Engineers فقط
     var query = @"
         WITH PagedData AS (
             SELECT e.Id, e.EngNumber, e.SubNumber, e.SpecializationId, e.WorkPlaceId, e.UserId,
                    ROW_NUMBER() OVER (ORDER BY e.Id) AS RowNumber
-            FROM dbo.Engineeres e  -- تأكد من استخدام الاسم الكامل للجدول
+            FROM dbo.Engineeres e
         )
         SELECT * FROM PagedData
         WHERE RowNumber BETWEEN @startRow AND @endRow;
     ";
 
     var startRow = skip + 1;
-    var endRow = skip + take;
+    var endRow = skip + pageSize;
 
     var rawData = await _dataContext.Engineeres
         .FromSqlRaw(query, 
@@ -106,46 +138,62 @@ namespace api.Repositories
             new SqlParameter("@endRow", endRow))
         .ToListAsync();
 
-    // تحويل البيانات إلى النموذج المطلوب (PersonWithEngineerDTO) مع تحميل التفاصيل لاحقًا
-    var result = new List<EngineerFull>();
+    var items = new List<PersonWithEngineereDTO>();
 
     foreach (var item in rawData)
     {
-        var persons = await _dataContext.Persons
-            .Where(p => p.Id == item.Id)
+        var person = await _dataContext.Persons.FirstOrDefaultAsync(p => p.Id == item.Id);
+
+        var images = await _dataContext.Images
+            .Where(img => img.PersonId == item.Id)
+            .Select(img => Convert.ToBase64String(img.Image)) 
             .ToListAsync();
 
-        result.Add(new EngineerFull
+
+        var wordFiles = await _dataContext.Words
+            .Where(wf => wf.PersonId == item.Id)
+            .Select(wf => Convert.ToBase64String(wf.Content))  
+            .ToListAsync();
+
+        if (person != null)
         {
-            Id = item.Id,
-            EngNumber = item.EngNumber,
-            SubNumber = item.SubNumber,
-            SpecializationId = item.SpecializationId.HasValue ? item.SpecializationId.Value : 0, // تحقق من القيمة nullable
-            WorkPlaceId = item.WorkPlaceId.HasValue ? item.WorkPlaceId.Value : 0,               // تحقق من القيمة nullable
-            
-            Persons = persons.Select(p => new Person
+            items.Add(new PersonWithEngineereDTO
             {
-                Id = p.Id,
-                FirstName = p.FirstName,
-                FatherName = p.FatherName,
-                LastName = p.LastName,
-                MotherName = p.MotherName,
-                BirthDate = p.BirthDate,
-                NationalId = p.NationalId,
-                EnsuranceNumber = p.EnsuranceNumber,
-                Address = p.Address,
-                Phone = p.Phone,
-                Mobile = p.Mobile,
-                Email = p.Email,
-                GenderId = p.GenderId,
-                Gender = p.Gender,
-                Amount = p.Amount
-                // يجب إدراج الخصائص الأخرى إذا كانت موجودة
-            }).ToList()
-        });
+                PersonId = person.Id,
+                FirstName = person.FirstName,
+                FatherName = person.FatherName,
+                LastName = person.LastName,
+                MotherName = person.MotherName,
+                NationalId = person.NationalId,
+                EnsuranceNumber = person.EnsuranceNumber,
+                BirthDate = person.BirthDate,
+                Address = person.Address,
+                Phone = person.Phone,
+                Mobile = person.Mobile,
+                Email = person.Email,
+                StatusId = person.StatusId,
+                GenderId = person.GenderId,
+                EngNumber = item.EngNumber,
+                SubNumber = item.SubNumber,
+                SpecializationId = item.SpecializationId,
+                WorkPlaceId = item.WorkPlaceId,
+                Amount = person.Amount,
+                Images = images,
+                WordFiles = wordFiles
+            });
+        }
     }
 
-    return result;
+    var totalCount = await _dataContext.Engineeres.CountAsync();
+
+    return new PagedResult<PersonWithEngineereDTO>
+    {
+        CurrentPage = pageNumber,
+        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+        PageSize = pageSize,
+        TotalCount = totalCount,
+        Items = items
+    };
 }
 
 
@@ -202,6 +250,8 @@ namespace api.Repositories
     // حفظ التغييرات في قاعدة البيانات
     return _dataContext.SaveChanges() > 0;
 }
+
+
 
 
               public void DeleteByEngId(int EngineereId){

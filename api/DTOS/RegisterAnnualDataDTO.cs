@@ -14,7 +14,7 @@ namespace api.DTOS
 
          public bool EngineerIsRegistered { get; set; }
          
-         public List<int>? PersonsIds { get; set; }
+         public List<PersonDetailDTO> Persons { get; set; } 
 
          public decimal  ExAmount { get; set; }
        
@@ -39,6 +39,8 @@ namespace api.DTOS
         public bool Affiliate  { get; set; }
 
         public bool Beneficiary { get; set; }
+
+        public bool Waiting { get; set; }
         
 
           public class AnnualDataWithDetails

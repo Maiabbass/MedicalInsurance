@@ -12,6 +12,8 @@ namespace api.Entities
 
         
 
+        
+        public int Year { get; set; }
 
          public int PersonId { get; set; }
 
@@ -29,9 +31,18 @@ namespace api.Entities
            [Column(TypeName = "decimal(18,2)")]
           public decimal Amount { get; set; }
 
+          public bool Subscrib { get; set; }
 
+
+        public bool Affiliate  { get; set; }
+
+        public bool Beneficiary { get; set; }
+        public bool CardStatuse { get; set; }
         
-        
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal ExAmount  { get; set; }
+
+        public bool Waiting { get ; set;}
 
 
 

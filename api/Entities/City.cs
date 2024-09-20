@@ -24,6 +24,7 @@ namespace api.Entities
         public int Id { get; set; }
 
         public string Name  { get; set; }
+        public string  CallingCode { get; set;}
 
 
         public ICollection<Hospital>Hospitals{get; set;}

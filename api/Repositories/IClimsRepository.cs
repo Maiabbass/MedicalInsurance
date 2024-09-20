@@ -11,10 +11,15 @@ namespace api.Repositories
     {
          List<Claims> ReadDataFromExcel(Stream fileStream);
         Task LoadClaimsToDatabase(List<Claims> claimsList);
-        Task<bool> ExistsAsync(int engineerId);
-        Task<bool> UpdateSurgicalProcedureAsync(int claimId, string surgicalProcedureName, DateTime? newClaimDate = null);
+        Task<bool> ExistsAsync(int engineerId, int year);
+       public bool UpdateClaim(int id, ClaimEditDTO claimEditDTO);
 
         Task<List<ClaimDetailsDTO>> GetClaimsAsync();
         Task<List<ClaimDetailsDTO>> GetClaimsByEnsuranceNumberAsync(string ensuranceNumber);
+        Task<int> Add(Claims claims);
+        public void   Delete(int Id);
+        Task<List<Claims>> GetClaimsBetweenDatesAsync(DateTime startDate, DateTime endDate);
+
+        Task<bool> CheckClaimExistsAsync(int id, int year);
     }
 }

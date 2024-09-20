@@ -138,6 +138,26 @@ namespace api.Controllers
         }
 
 
+       [HttpGet]
+[Route("find/ByEngNumberAndSupNumber/{engNumber}/{supNumber}")]
+public async Task<ActionResult<PersonWithEngineereDTO>> GetByEngNumberAndSupNumberAsync(string engNumber, string supNumber)
+{
+    return Ok(await _searchService.GetEngNumberAndSupNumber(engNumber, supNumber));
+}
+
+
+
+
+
+       [HttpGet]
+    [Route("find/BySubNumber/{subNumber}")]   
+    public async Task<ActionResult<PersonWithEngineereDTO>> GetBySubNumber(string subNumber){
+    return Ok(await _searchService.GetSubNumberAsync(subNumber));
+    }
+
+
+
+
         
     }
 

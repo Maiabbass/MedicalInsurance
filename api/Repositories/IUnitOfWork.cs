@@ -37,7 +37,18 @@ namespace api.Repositories
         IQuiriesRepositories QuiriesRepositories{get ;}
 
         IRecoveredRepository RecoveredRepository{get ;}
-       
+         
+        ILimitRepository LimitRepository{get ;}
+        IEnduranceRatioRepository EnduranceRatioRepository{get;}
+
+        IWordRepository WordRepository {get;}
+        IImageRepository ImageRepository{get;}
+
+        IBlockRepository BlockRepository { get ;}
+
+        INoteRepository NoteRepository {get ;}
+
+        Task<int> SaveChangesAsync();
 
         Task<bool> Complete();
        

@@ -27,14 +27,21 @@ namespace api.Controllers
         private readonly ISearchService _searchService;
 
         private readonly DataContext _dataContext ;
+
+        private readonly IAgeSegmentsRepository _ageSegmentsRepository;
+
+        private readonly IRelationRepository _relationRepository;
+
         
 
-        public AnnualData(IAnnualDataService AnnualDataService,IPersonRepository personRepository , ISearchService searchService , DataContext dataContext )
+        public AnnualData(IAnnualDataService AnnualDataService,IPersonRepository personRepository , ISearchService searchService , DataContext dataContext , IAgeSegmentsRepository ageSegmentsRepository , IRelationRepository relationRepository )
         {
             _AnnualDataService =AnnualDataService;
             _personRepository=personRepository;
             _searchService = searchService;
             _dataContext = dataContext;
+            _ageSegmentsRepository=ageSegmentsRepository;
+            _relationRepository=relationRepository;
             
         }
 
@@ -59,12 +66,7 @@ namespace api.Controllers
     {
         return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
     }
-    catch (Exception ex)
-    {
-        string details = System.Text.Json.JsonSerializer.Serialize(registerAnnualDataDTO);
-        return StatusCode(StatusCodes.Status500InternalServerError,
-            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {details}" });
-    }
+    
 }
         
 
@@ -146,10 +148,10 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll(
 
 
         [HttpPut]
-        [Route("UpdateAllFields/{Id}")]
+        [Route("UpdateAnnualDataEng/{Id}")]
    
-        public  ActionResult<bool> UpdateAllFields(int Id,  AnnualDataForView annualDataForView){
-           bool result= _AnnualDataService.Update(Id,annualDataForView);
+        public  ActionResult<bool> UpdateAllFields(int Id,  AnnalDataForEdit annualDataForEdit){
+           bool result= _AnnualDataService.Update(Id,annualDataForEdit);
             if (result)
             {
             return  Ok(result);
@@ -164,7 +166,7 @@ public async Task<ActionResult<IEnumerable<AnnualDataForView>>> GetAll(
 
 
           [HttpPut]
-          [Route("UpdateAmount/{Id}")]
+          [Route("UpdateAnnualDataPerson/{Id}")]
          
         public  ActionResult<bool> UpdateAmount(int Id, AnnualDataDetailForView annualDataDetailForView){
            bool result= _AnnualDataService.Update(Id,annualDataDetailForView);
@@ -220,25 +222,29 @@ public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdat
 
 
 
-       [HttpDelete("AnnualSetting/{year}")] 
-      public ActionResult DeleteAnnualSetting(int year)
-      
-      {
-      try     
-                {
-                bool completed=   _AnnualDataService.DeleteAnnuaSetting(year);
-                if (completed)
-                { return Ok("delete Successfully");}
-                
-                   return StatusCode(StatusCodes.Status500InternalServerError,
+     [HttpDelete("DeleteAnnualSetting/{year}")]
+public async Task<ActionResult> DeleteAnnualSetting(int year)
+{
+    try
+    {
+        // Call the asynchronous delete method
+        bool completed = await _AnnualDataService.DeleteAnnuaSetting(year);
 
-                    new Response { Status = "Error", ErrorMessage = "Delete Failed" }) ;
-                }
-                 catch (Exception ex){
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
-                    
-         }
+        if (completed)
+        {
+            return Ok("Deleted successfully");
+        }
+
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new Response { Status = "Error", ErrorMessage = "Delete failed" });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new Response { Status = "Error", ErrorMessage = ex.Message });
+    }
+}
+
 
 
 
@@ -255,29 +261,98 @@ public async Task<ActionResult<decimal>> CalculateAmountAsync(DateTime? birthdat
                 return Ok(response);
         } 
 
-    [HttpPut]
-    [Route("UpdateAnnualSettings")]
-    public async Task<IActionResult> UpdateAnnualSettings( [FromBody] AnnualSettingDTO annualSettingDTO)
+
+
+
+
+
+       [HttpPut("UpdateYearConfiguration")]
+    public async Task<IActionResult> UpdateYearConfiguration([FromBody] YearConfigurationDTO yearConfigurationDTO)
     {
-        if (annualSettingDTO == null)
+        if (yearConfigurationDTO == null)
         {
-            return BadRequest("Invalid data.");
+            return BadRequest("Invalid YearConfiguration data.");
         }
 
-        
-
-        var response = await _AnnualDataService.UpdateAnnualSettings( annualSettingDTO);
-
-        if (response.Status == "Success")
+        try
         {
-            return Ok(response);
+            // Convert DTO to the actual entity
+            var yearConfiguration = new YearConfiguration
+            {
+                Id = yearConfigurationDTO.Id,
+                Year = yearConfigurationDTO.Year,
+                CardPrice = yearConfigurationDTO.CardPrice
+            };
+
+            await _AnnualDataService.UpdateYearConfigurationAsync(yearConfiguration);
+            return Ok("Year configuration updated successfully.");
         }
-        else
+        catch (Exception ex)
         {
-            return BadRequest(response.ErrorMessage);
+            return StatusCode(500, $"Internal server error: {ex.Message}");
         }
-   }
-   
+    }
+
+
+
+    
+    [HttpPut("UpdateAgeSegments")]
+    public async Task<IActionResult> UpdateAgeSegment([FromBody] AgeSegments ageSegment)
+    {
+        if (ageSegment == null)
+        {
+            return BadRequest("Invalid age segment data.");
+        }
+
+        try
+        {
+            await _ageSegmentsRepository.Update_Age_Segment(ageSegment);
+            return Ok("Age segment updated successfully.");
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message); // If the age segment doesn't exist
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+
+
+
+[HttpPut("update-relation-type")]
+public async Task<IActionResult> UpdateRelationType([FromBody] RelationTypeDTO relationTypeDTO)
+{
+    if (relationTypeDTO == null)
+        return BadRequest("Relation type cannot be null.");
+
+    try
+    {
+        var relationType = new RelationType
+        {
+            Id = relationTypeDTO.Id,
+            Name = relationTypeDTO.Name,
+            Year = relationTypeDTO.Year
+        };
+
+        await _relationRepository.Update_RelationType(relationType);
+        return Ok("Relation type updated successfully.");
+    }
+    catch (ArgumentException ex)
+    {
+        return BadRequest(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+
+
+
    
       [HttpGet("GetByYear")]
 public async Task<ActionResult<IEnumerable<AnnualDataWithDetails>>> GetByYear(
@@ -405,6 +480,210 @@ public async Task<IActionResult> GetEngineerDetailsAndCardStatusByInsuranceNumbe
 
             return Ok(ageSegments);
         }
+
+
+
+        [HttpGet("GetRelationType")]
+public async Task<ActionResult<List<object>>> GetRelationType()
+{
+    var items = await _dataContext.RelationTypes
+                                   .Select(rt => new 
+                                   {
+                                       rt.Id,
+                                       rt.Name,
+                                       rt.Year
+                                   })
+                                   .ToListAsync();
+
+    if (items == null || items.Count == 0)
+    {
+        return NotFound("No relation types found.");
+    }
+
+    return Ok(items);
+}
+
+
+
+
+          
+
+
+       [HttpGet("GetAllConfigData/{year}")]
+public async Task<ActionResult> GetAllData(int year)
+{
+    var yearConfigurations = await _dataContext.YearConfigurations
+        .Where(yc => yc.Year == year)
+        .ToListAsync();
+
+    var ageSegments = await _dataContext.AgeSegments
+        .Where(asg => asg.Year == year)
+        .ToListAsync();
+
+     var items = await _dataContext.RelationTypes
+                                   .Select(rt => new 
+                                   {
+                                       rt.Id,
+                                       rt.Name,
+                                       rt.Year
+                                   }).Where(i => i.Year==year)
+                                   .ToListAsync();
+
+
+  
+
+    var result = new
+    {
+        YearConfigurations = yearConfigurations,
+        AgeSegments = ageSegments,
+        RelationTypes = items,
+       
+    };
+
+    if (!result.YearConfigurations.Any() && !result.AgeSegments.Any() &&
+        !result.RelationTypes.Any() )
+    {
+        return NotFound($"No data found for the year {year}.");
+    }
+
+    return Ok(result);
+}
+
+
+
+
+        
+    [HttpGet("get-allPayMethode")]
+    public async Task<IActionResult> GetAllPayMethods()
+    {
+        var payMethods = await _dataContext.PayMethods.ToListAsync();
+
+        if (payMethods == null || payMethods.Count == 0)
+        {
+            return NotFound("No pay methods found.");
+        }
+
+        return Ok(payMethods);
+    }
+
+
+
+
+
+    [HttpGet("check/{ensuranceNumber}/{year}")]
+    public async Task<IActionResult> CheckPersonStatus(string ensuranceNumber, int year)
+    {
+        var annualData = await _AnnualDataService.GetAnnualDataDetailAsync(ensuranceNumber, year);
+        
+        if (annualData == null)
+        {
+            return NotFound(new { Message = "  صاحب الرقم التأميني غير مسجل لهذا العام" });
+        }
+
+
+
+        if (annualData.Subscrib && annualData.Affiliate && !annualData.Beneficiary)
+        {
+            return Ok(new { Message = "  صاحب الرقم التأميني مسجل"   });
+        }
+        else if (annualData.Subscrib && annualData.Affiliate && annualData.Beneficiary)
+        {
+            var totalNonAdd = await _AnnualDataService.GetClaimsSumForPersonAsync(ensuranceNumber);
+            return Ok(new
+            {
+                Message = "صاحب الرقم التأميني مستفيد",
+                TotalNonAddForPerson = totalNonAdd,
+                Year = year
+            });
+        }
+
+        return BadRequest(new { Message = "حالة غير معروفة" });
+    }
+
+
+     
+
+
+  [HttpPost("CopyAnnualDataForNewYear")]
+public async Task<ActionResult<Response>> CopyAnnualDataForNewYear(
+    [FromQuery] int previousYear, 
+    [FromQuery] int newYear, 
+    [FromQuery] string ensuranceNumber, 
+    [FromQuery] bool waiting = false,  // القيمة الافتراضية False
+    [FromQuery] bool cardStatus = false,
+    [FromQuery] bool copyAnnualData = true, 
+    [FromQuery] bool copyAnnualDataDetails = true,
+    [FromBody] List<AnnualNewDTO> detailIdsToCopy = null // استخدام DTO هنا
+)  
+{
+    try
+    {
+        var response = await _AnnualDataService.CopyAnnualDataForNewYear(
+            previousYear, 
+            newYear, 
+            ensuranceNumber, 
+            waiting, 
+            cardStatus,     
+            copyAnnualData, 
+            copyAnnualDataDetails,
+            detailIdsToCopy // تمرير قائمة الـ DTO إلى الخدمة
+        );
+
+        if (response.ErrorMessage != null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                new Response { ErrorMessage = response.ErrorMessage });
+        }
+
+        return Ok(response);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. InsuranceNumber: {ensuranceNumber}, PreviousYear: {previousYear}, NewYear: {newYear}" });
+    }
+}
+
+
+[HttpGet("GetPayMethodByEngineerId")]
+public async Task<ActionResult<PayMethod>> GetPayMethodByEngineerId(int engineerId)
+{
+    try
+    {
+        var payMethod = await _AnnualDataService.GetPayMethodByEngineerIdAsync(engineerId);
+        if (payMethod == null)
+        {
+            return NotFound("No payment method found for the given engineer.");
+        }
+        return Ok(payMethod);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+    }
+}
+
+
+
+
+
+ [HttpPost("{yearConfigId}/notes")]
+    public async Task<IActionResult> AddNoteToYearConfig(int yearConfigId, [FromBody] NoteCreateDTO noteDto)
+    {
+        try
+        {
+            await _AnnualDataService.AddNoteToYearConfigAsync(yearConfigId, noteDto);
+            return Ok("Note added successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+   
+
     }
    
    }

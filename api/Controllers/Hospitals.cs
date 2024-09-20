@@ -71,7 +71,7 @@ return  Ok(result);
          [HttpDelete("{Id}")] 
       public ActionResult Delete(int Id){
       try{
-                  _hospitalService.Delete(Id);
+                  _hospitalService.DeleteAsync(Id);
                   return Ok("delete Successfully");}
 
   catch (Exception ex){
@@ -81,7 +81,9 @@ return  Ok(result);
     
   }
 
-   [HttpGet("hospitals in City With CityId/{id}")]
+
+
+   [HttpGet("hospitalsInCityWithCityId/{id}")]
         public async Task<ActionResult<IEnumerable<Hospitals>>> GetHospitalsByCityId(int id)
         {
             var hospitals = await _hospitalService.GetHospitalsByCityIdAsync(id);
@@ -89,6 +91,22 @@ return  Ok(result);
             if (hospitals == null || !hospitals.Any())
             {
                 return NotFound("No hospitals found for the given city.");
+            }
+
+            return Ok(hospitals);
+        }
+
+
+
+
+         [HttpGet("hospitalsInYear/{year}")]
+        public async Task<ActionResult<IEnumerable<Hospitals>>> GetHospitalsByYear(int year)
+        {
+            var hospitals = await _hospitalService.GetHospitalsByYear(year);
+
+            if (hospitals == null || !hospitals.Any())
+            {
+                return NotFound("No hospitals found for the This Year.");
             }
 
             return Ok(hospitals);

@@ -14,6 +14,6 @@ namespace api.Services
           Task <IEnumerable<SurgicalProcedures>> GetAll();
           Task<SurgicalProcedures?> Get (int id);
         bool Update(int id, SurgicalProceduresEditDTO surgicalProceduresEditDTO);
-        public bool Delete(int Id);
+        Task<bool> DeleteAsync(int Id);
     }
 }

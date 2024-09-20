@@ -44,6 +44,17 @@ namespace api.Data
 
          public DbSet<PasswordEng> passwordEngs {get ; set;}
 
+         public DbSet<Limits> limits { get ; set;}
+         public DbSet<EnduranceRatio> EnduranceRatios { get ; set;}
+
+         public DbSet<Images>Images{ get ; set; }
+         public DbSet<Words> Words {get;set;}
+
+         public DbSet<BlockList> blockLists{ get ; set;}
+
+        public DbSet<Note>Notes{ get ; set ;}
+
+         
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -57,6 +68,7 @@ namespace api.Data
 
              builder.Entity<Person>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Person).OnDelete(DeleteBehavior.NoAction);
              builder.Entity<Engineere>().HasMany(tg=>tg.Relations).WithOne(tg=>tg.Engineere).OnDelete(DeleteBehavior.NoAction);
+             
 
 
 
@@ -85,12 +97,14 @@ namespace api.Data
             .WithOne(e => e.Person)
             .HasForeignKey<Engineere>(e => e.Id)
             .OnDelete(DeleteBehavior.Cascade);
+           
            // builder.Entity<AnnualData>().HasIndex(u => u.Year).IsUnique();
+            /*
             builder.Entity<AnnualData>().HasIndex(u => u.EngineereId).IsUnique();
             builder.Entity<AnnualData>()
             .HasIndex(a => new { a.Year, a.EngineereId })
             .IsUnique();
-
+*/
             builder.Entity<YearConfiguration>().HasIndex(u => u.Year).IsUnique();
             builder.Entity<PasswordEng>().HasIndex(u => u.EngineerNumber).IsUnique();
 
@@ -106,6 +120,12 @@ namespace api.Data
         .WithOne(p => p.User)
         .HasForeignKey<User>(u => u.PersonId)
         .OnDelete(DeleteBehavior.Restrict);
+
+         builder.Entity<Note>()
+        .HasOne(n => n.SurgicalProcedures)
+        .WithMany(s => s.Notes)
+        .HasForeignKey(n => n.SurgicalProcedureId)
+        .OnDelete(DeleteBehavior.Cascade);
 
 
 

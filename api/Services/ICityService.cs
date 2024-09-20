@@ -16,6 +16,7 @@ namespace api.Services
           Task<City?> Get (int id);
           public bool Update(int Id, CityEditDTO city);
           public bool Delete(int Id);
+          Task<int?> GetCityIdByName(string cityName);
 
          
     }

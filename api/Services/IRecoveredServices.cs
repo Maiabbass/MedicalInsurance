@@ -17,6 +17,7 @@ namespace api.Services
         public bool Delete(int Id);
 
         Task<List<RecoveredDto>> GetByEnsuranceNumber(string ensuranceNumber);
+         Task<List<Recovered>> GetRecoveredBetweenDatesAsync(DateTime startDate, DateTime endDate);
         
         
     }

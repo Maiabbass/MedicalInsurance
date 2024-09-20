@@ -16,59 +16,123 @@ namespace api.Repositories
 
         private readonly DataContext _dataContext;
         private readonly IAnnualDataService _nnualDataService;
+      
 
 
-        public PersonRepository(DataContext dataContext , IAnnualDataService nnualDataService)
+        public PersonRepository(DataContext dataContext , IAnnualDataService nnualDataService ) 
         {
             _dataContext = dataContext;
             _nnualDataService = nnualDataService;
+           
         }
 
        
-        public async Task<int> Add(Person person)
+       public async Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles)
+{
+    try
     {
-        try
+        var amount = _nnualDataService.calcualteAmount(person.BirthDate, 2024);
+
+        // إنشاء كائن جديد من نوع Person
+        Person newPerson = new Person()
         {
-            var Amount = _nnualDataService.calcualteAmount(person.BirthDate,2024);
-            Person newPerson = new Person()
+            FirstName = person.FirstName,
+            FatherName = person.FatherName,
+            MotherName = person.MotherName,
+            LastName = person.LastName,
+            BirthDate = person.BirthDate,
+            NationalId = person.NationalId,
+            EnsuranceNumber = person.EnsuranceNumber,
+            Address = person.Address,
+            Phone = person.Phone,
+            Mobile = person.Mobile,
+            Email = person.Email,
+            GenderId = person.GenderId,
+            StatusId = person.StatusId,
+            Amount = amount,
+        };
+
+        // إضافة الشخص الجديد إلى قاعدة البيانات
+        _dataContext.Persons.Add(newPerson);
+        await _dataContext.SaveChangesAsync();
+
+        // حفظ الصور إذا كانت موجودة
+        if (imageFiles != null && imageFiles.Length > 0)
+        {
+            foreach (var imageFile in imageFiles)
             {
-                FirstName = person.FirstName,
-                FatherName = person.FatherName,
-                MotherName = person.MotherName,
-                LastName = person.LastName,
-                BirthDate = person.BirthDate,
-                NationalId = person.NationalId,
-                EnsuranceNumber = person.EnsuranceNumber,
-                Address = person.Address,
-                Phone = person.Phone,
-                Mobile = person.Mobile,
-                Email = person.Email,
-               
-                GenderId = person.GenderId,
-                StatusId=person.StatusId,
-                Amount=Amount,
-            };
-
-            _dataContext.Persons.Add(newPerson);
-            await _dataContext.SaveChangesAsync();
-
-            return newPerson.Id;
+                if (imageFile.Length > 0)
+                {
+                    var image = new Images
+                    {
+                        Image = await ConvertFileToByteArray(imageFile),
+                        PersonId = newPerson.Id
+                    };
+                    _dataContext.Images.Add(image);
+                }
+            }
         }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+
+        // حفظ ملفات Word إذا كانت موجودة
+        if (wordFiles != null && wordFiles.Length > 0)
         {
-            throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+            foreach (var wordFile in wordFiles)
+            {
+                if (wordFile.Length > 0)
+                {
+                    var word = new Words
+                    {
+                        Content = await ConvertFileToByteArray(wordFile),
+                        PersonId = newPerson.Id
+                    };
+                    _dataContext.Words.Add(word);
+                }
+            }
         }
+
+        // حفظ التغييرات في قاعدة البيانات
+        await _dataContext.SaveChangesAsync();
+
+        return newPerson.Id;
     }
+    catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+    {
+        throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
+    }
+}
+
+
+
+
+
+    public async Task<byte[]> ConvertFileToByteArray(IFormFile file)
+{
+    if (file == null || file.Length == 0)
+    {
+        return null;
+    }
+
+    using (var memoryStream = new MemoryStream())
+    {
+        await file.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
+    }
+}
+
 
      
         public async Task<Person?> Get(int Id)
-        {
-            return await _dataContext.Persons.Where(x=>x.Id==Id).FirstOrDefaultAsync();
-        }
+{
+    return await _dataContext.Persons
+        .Include(x => x.Images) // تضمين الصور
+        .Include(x => x.Words) // تضمين ملفات Word
+        .Where(x => x.Id == Id)
+        .FirstOrDefaultAsync();
+}
 
 
 
-        public async Task<PagedResult<Person>> GetAll(int pageNumber, int pageSize)
+      public async Task<PagedResult<PersonForView>> GetAll(int pageNumber, int pageSize)
 {
     // Ensure pageNumber and pageSize are valid
     if (pageNumber <= 0)
@@ -82,24 +146,36 @@ namespace api.Repositories
     int skip = (pageNumber - 1) * pageSize;
     int take = pageSize;
 
-    var query = @"
-        SELECT *
-        FROM (
-            SELECT 
-                ROW_NUMBER() OVER (ORDER BY Id) AS RowNum,
-                *
-            FROM Persons
-        ) AS Result
-        WHERE RowNum > @Skip AND RowNum <= @Skip + @Take
-        ORDER BY RowNum";
-
-    var items = await _dataContext.Persons
-        .FromSqlRaw(query, new SqlParameter("@Skip", skip), new SqlParameter("@Take", take))
+    var persons = await _dataContext.Persons
+        .Skip(skip)
+        .Take(take)
+        .Include(p => p.Images)
+        .Include(p => p.Words)
         .ToListAsync();
+
+    var items = persons.Select(person => new PersonForView
+    {
+        Id = person.Id,
+        FirstName = person.FirstName,
+        FatherName = person.FatherName,
+        LastName = person.LastName,
+        MotherName = person.MotherName,
+        BirthDate = person.BirthDate,
+        NationalId = person.NationalId,
+        EnsuranceNumber = person.EnsuranceNumber,
+        Address = person.Address,
+        Phone = person.Phone,
+        Mobile = person.Mobile,
+        Email = person.Email,
+        StatusId = person.StatusId,
+        GenderId = person.GenderId,
+        Images = person.Images.Select(img => Convert.ToBase64String(img.Image)).ToList(), // تحويل كل ImageData إلى Base64
+        WordFiles = person.Words.Select(wf => Convert.ToBase64String(wf.Content)).ToList() // تحويل كل Base64Data إلى Base64
+    }).ToList();
 
     var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-    return new PagedResult<Person>
+    return new PagedResult<PersonForView>
     {
         Items = items,
         TotalCount = totalCount,
@@ -108,7 +184,6 @@ namespace api.Repositories
         PageSize = pageSize
     };
 }
-
 
 
 
@@ -135,41 +210,42 @@ namespace api.Repositories
 
 
 
-    
- public bool Update(int Id, PersonEditDTO PersonEditDTO)
+
+
+ public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO)
 {
-    // البحث عن الشخص في قاعدة البيانات
-    var databaseEntity = _dataContext.Persons.FirstOrDefault(x => x.Id == Id);
+    var databaseEntity = await _dataContext.Persons
+        .FirstOrDefaultAsync(x => x.Id == id);
+
     if (databaseEntity == null)
     {
         return false; // في حال عدم وجود الشخص، قم بإرجاع false
     }
 
-    // حساب المبلغ بناءً على تاريخ الميلاد الجديد
-    var Amount = _nnualDataService.calcualteAmount(PersonEditDTO.BirthDate, 2024);
-    
     // تحديث الحقول الخاصة بالشخص
-    databaseEntity.FirstName = PersonEditDTO.FirstName;
-    databaseEntity.FatherName = PersonEditDTO.FatherName;
-    databaseEntity.LastName = PersonEditDTO.LastName;
-    databaseEntity.MotherName = PersonEditDTO.MotherName;
-    databaseEntity.BirthDate = PersonEditDTO.BirthDate;
-    databaseEntity.NationalId = PersonEditDTO.NationalId;
-    databaseEntity.EnsuranceNumber = PersonEditDTO.EnsuranceNumber;
-    databaseEntity.Address = PersonEditDTO.Address;
-    databaseEntity.Phone = PersonEditDTO.Phone;
-   
-    databaseEntity.GenderId = PersonEditDTO.GenderId;
-    databaseEntity.StatusId = PersonEditDTO.StatusId;
-    
-    // تحديث المبلغ الجديد
-    databaseEntity.Amount = Amount;
+    databaseEntity.FirstName = personEditDTO.FirstName;
+    databaseEntity.FatherName = personEditDTO.FatherName;
+    databaseEntity.LastName = personEditDTO.LastName;
+    databaseEntity.MotherName = personEditDTO.MotherName;
+    databaseEntity.BirthDate = personEditDTO.BirthDate;
+    databaseEntity.NationalId = personEditDTO.NationalId;
+    databaseEntity.EnsuranceNumber = personEditDTO.EnsuranceNumber;
+    databaseEntity.Address = personEditDTO.Address;
+    databaseEntity.Phone = personEditDTO.Phone;
+    databaseEntity.Mobile = personEditDTO.Mobile;
+    databaseEntity.Email = personEditDTO.Email;
+    databaseEntity.GenderId = personEditDTO.GenderId;
+    databaseEntity.StatusId = personEditDTO.StatusId;
 
-    // حفظ التغييرات في قاعدة البيانات
-    return _dataContext.SaveChanges() > 0;
+    // حفظ التغييرات الخاصة بالشخص
+    return await _dataContext.SaveChangesAsync() > 0;
 }
 
 
+
+
+
+ 
 
 
 
@@ -177,6 +253,8 @@ namespace api.Repositories
         return await _dataContext.AnnualDatas.Where(x=>x.Id==EngineereId).FirstOrDefaultAsync();
 
        }
+
+
       public async Task<bool> IsEnsuranceNumberInClaimsAsync(string ensuranceNumber)
 {
     return await _dataContext.Claims.AnyAsync(c => c.EnsuranceNumber == ensuranceNumber);
@@ -253,8 +331,8 @@ public async Task SavePerson(PersonWithEngineereDTO dto)
     }
 }
 
-        
 
-       
+  
+
     }
 }

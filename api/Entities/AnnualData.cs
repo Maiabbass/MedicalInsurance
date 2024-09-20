@@ -54,6 +54,9 @@ namespace api.Entities
         public bool CardStatuse { get; set; }
 
 
+        public bool Waiting {get ; set ;}
+ 
+
 
         public int? EngineeringUnitsId { get; set;} 
         public  EngineeringUnits? EngineeringUnits{ get; set;}

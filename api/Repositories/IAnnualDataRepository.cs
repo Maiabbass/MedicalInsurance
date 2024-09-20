@@ -25,12 +25,12 @@ namespace api.Repositories
 
          void Delete(int Id);
        
-        bool Update(int id, AnnualDataForView annualDataForView);
+        public bool Update(int Id,AnnalDataForEdit  annualDataForEdit );
         public bool Update(int Id, AnnualDataDetailForView annualDataDetailForView  );
 
 
         Task<int> Add_Year_Configuration(YearConfiguration yearConfiguration);
-        void Delete_Year_Configuration(int year);
+        Task Delete_Year_Configuration(int year);
 
         Task Update_Year_Configuration(YearConfiguration yearConfiguration);
         Task<IEnumerable<AnnualDataWithDetails>> GetByYear(int year, int pageNumber, int pageSize);
@@ -38,7 +38,16 @@ namespace api.Repositories
        Task<(SimpleEngineer engineer, bool? cardStatus, int? payMethod)> GetEngineerDetailsAndCardStatus(string insuranceNumber, int year);
 
 
-    
+        Task<AnnualDataDetail?> GetAnnualDataDetailAsync(string ensuranceNumber, int year);
+
+       Task<decimal> GetClaimsSumForPersonAsync(string ensuranceNumber);
+
+     Task<AnnualData> GetByEngineerIdAndYear(int engineerId, int year);
+     Task<List<AnnualDataDetail>> GetAnnualDataDetails(int annualDataId);
+      Task<Person> GetByInsuranceNumber(string engineerEnsuranceNumber);
+
+      
+     Task<PayMethod> GetPayMethodByEngineerId(int engineerId);
 
          
    
