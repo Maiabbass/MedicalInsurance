@@ -32,9 +32,15 @@ namespace api.Services
          
          
 
-           public async Task<PersonWithEngineereDTO> GetByNationalIdAsync(string nationalId){
-             return  await _unitOfWork.SearchRepository.GetByNationalIdAsync(nationalId) ;
+            public async Task<PersonWithEngineereDTO> GetByNationalIdAsync(string nationalId)
+    {
+        if (string.IsNullOrWhiteSpace(nationalId))
+        {
+            throw new ArgumentException("NationalId cannot be null or empty.", nameof(nationalId));
         }
+
+        return await _unitOfWork.SearchRepository.GetByNationalIdAsync(nationalId);
+    }
 
         public async Task<PersonWithEngineereDTO> GetEngNumberAsync(string engNumber){
             return await _unitOfWork.SearchRepository.GetEngNumberAsync(engNumber);
@@ -75,6 +81,60 @@ namespace api.Services
             return await _unitOfWork.SearchRepository.GetSubNumberAsync(subNumber);
          }
 
-    
-    }
+
+
+
+        public async Task<PersonWithEngineereDTO?> GetPersonWithEngineerByNationalIdAsync(string nationalId)
+{
+    var person = await _unitOfWork.SearchRepository.GetPersonWithEngineerByNationalIdAsync(nationalId);
+    if (person == null) return null;
+
+    // Map the data from person and engineer to PersonWithEngineereDTO
+    var dto = new PersonWithEngineereDTO
+    {
+        // Mapping Person data
+        PersonId = person.Id,
+        FirstName = person.FirstName,
+        FatherName = person.FatherName,
+        LastName = person.LastName,
+        MotherName = person.MotherName,
+        NationalId = person.NationalId,
+        EnsuranceNumber = person.EnsuranceNumber,
+        BirthDate = person.BirthDate,
+        Address = person.Address,
+        Phone = person.Phone,
+        Mobile = person.Mobile,
+        Email = person.Email,
+        StatusId = person.StatusId,
+        GenderId = person.GenderId,
+
+        // Mapping Engineer data
+        EngNumber = person.Engineere?.EngNumber,
+        SubNumber = person.Engineere?.SubNumber,
+        SpecializationId = person.Engineere?.SpecializationId,
+        WorkPlaceId = person.Engineere?.WorkPlaceId,
+        Amount = person.Amount,
+
+        // Mapping images to ImageDTO
+        Images = person.Images?.Select(image => new ImageDTO
+        {
+            Id = image.Id,
+            
+            FileName = image.Image        // محتويات الصورة كـ byte[]
+        }).ToList(),
+
+        // Mapping word files to WordDTO
+        Words = person.Words?.Select(word => new WordDTO
+        {
+            Id = word.Id,
+              
+            FileName = word.Content       // محتويات الملف كـ byte[]
+        }).ToList()
+    };
+
+    return dto;
 }
+
+
+    
+    } }

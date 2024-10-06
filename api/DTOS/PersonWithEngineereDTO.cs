@@ -32,11 +32,9 @@ namespace api.DTOS
     public int? WorkPlaceId { get; set; }
     public decimal? Amount { get; set; }
 
-    // لاحتواء الصور بترميز Base64
-    public List<string> Images { get; set; } = new List<string>();
-
-    // لاحتواء ملفات Word بترميز Base64
-    public List<string> WordFiles { get; set; } = new List<string>();
+    // New properties for Words and Images
+    public List<WordDTO> Words { get; set; }
+    public List<ImageDTO> Images { get; set; }
 }
 
 }

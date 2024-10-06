@@ -9,6 +9,8 @@ using api.Repositories;
 using api.Extensions;
 using static api.Repositories.AnnualDataRepository;
 using static api.DTOS.RegisterAnnualDataDTO;
+using Org.BouncyCastle.Crypto.Fpe;
+using api.Data;
 
 namespace api.Services
 {
@@ -23,13 +25,16 @@ namespace api.Services
      
         private readonly IEnduranceRatioRepository _enduranceRatioRepository;
 
-        public AnnualDataService(IUnitOfWork unitOfWork, IClimsRepository climsRepository , IRelationRepository relationRepository,ILimitRepository limitRepository, IEnduranceRatioRepository enduranceRatioRepository)
+         private readonly DataContext _dataContext;
+
+        public AnnualDataService(IUnitOfWork unitOfWork, IClimsRepository climsRepository , IRelationRepository relationRepository,ILimitRepository limitRepository, IEnduranceRatioRepository enduranceRatioRepository , DataContext dataContext)
          {
             _unitOfWork = unitOfWork;
             _climsRepository=climsRepository;
             _relationRepository = relationRepository;
             _limitRepository=limitRepository;
             _enduranceRatioRepository=enduranceRatioRepository;
+            _dataContext=dataContext;
          }
 
 
@@ -237,7 +242,9 @@ namespace api.Services
 
 
 
-       public async Task<Response> AddAnnualSettings(AnnualSettingDTO annualSettingDTO)
+
+
+  public async Task<Response> AddAnnualSettings(AnnualSettingDTO annualSettingDTO)
 {
     Response response = new Response();
 
@@ -254,98 +261,124 @@ namespace api.Services
             };
             await _unitOfWork.AnnualDataRepository.Add_Year_Configuration(yearConfiguration);
 
-            // إضافة AgeSegments
-            var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
+            // تحقق من أن AgeSegments ليست null قبل التعامل معها
+            if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
             {
-                Id = 0,  // Set Id to 0 for new entries
-                FromYear = dto.FromYear,
-                ToYear = dto.ToYear,
-                TheAmount = dto.TheAmount,
-                EnduranceRatio = dto.EnduranceRatio,
-                Year = annualSettingDTO.Year
-            }).ToList();
+                var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
+                {
+                    Id = 0,  // Set Id to 0 for new entries
+                    FromYear = dto.FromYear,
+                    ToYear = dto.ToYear,
+                    TheAmount = dto.TheAmount,
+                    EnduranceRatio = dto.EnduranceRatio,
+                    Year = annualSettingDTO.Year
+                }).ToList();
 
-            await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
+                await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
+            }
 
-            // إضافة RelationTypes
-            var relationTypes = annualSettingDTO.RelationTypes.Select(dto => new RelationType
+            // تحقق من أن RelationTypes ليست null قبل التعامل معها
+            if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
             {
-                Id = 0,  // Set Id to 0 for new entries
-                Name = dto.Name,
-                Relations = null,
-                Year = annualSettingDTO.Year
-            }).ToList();
+                var relationTypes = annualSettingDTO.RelationTypes.Select(dto => new RelationType
+                {
+                    Id = 0,  // Set Id to 0 for new entries
+                    Name = dto.Name,
+                    Relations = null,
+                    Year = annualSettingDTO.Year
+                }).ToList();
 
-            await _unitOfWork.RelationRepository.Add_RelationType(relationTypes);
+                await _unitOfWork.RelationRepository.Add_RelationType(relationTypes);
+            }
 
-            // إضافة Hospitals
-            var hospitals = annualSettingDTO.Hospitals.Select(dto => new Hospital
+            // تحقق من أن Hospitals ليست null قبل التعامل معها
+            if (annualSettingDTO.Hospitals != null && annualSettingDTO.Hospitals.Any())
             {
-                Id = 0,  // Set Id to 0 for new entries
-                Name = dto.Name,
-                Address = dto.Address,
-                Enabled = dto.Enabled,
-                Inside = dto.Inside,
-                CityId = dto.CityId,
-                Phone = dto.Phone,
-                Email = dto.Email,
-                Year = yearConfiguration.Year,
-                latitude = dto.Latitude,
-                Longitude = dto.Longitude
-            }).ToList();
+                var hospitals = annualSettingDTO.Hospitals.Select(dto => new Hospital
+                {
+                    Id = 0,  // Set Id to 0 for new entries
+                    Name = dto.Name,
+                    Address = dto.Address,
+                    Enabled = dto.Enabled,
+                    Inside = dto.Inside,
+                    CityId = dto.CityId,
+                    Phone = dto.Phone,
+                    Email = dto.Email,
+                    Year = yearConfiguration.Year,
+                    latitude = dto.Latitude,
+                    Longitude = dto.Longitude
+                }).ToList();
 
-            // Save hospitals to the database to get their IDs
-            await _unitOfWork.HospitalRepository.Add_Hospital(hospitals);
+                await _unitOfWork.HospitalRepository.Add_Hospital(hospitals);
+            }
 
-            // إضافة SurgicalProcedures
-            var surgicalProceduresEntities = annualSettingDTO.Surgicals.Select(dto => new SurgicalProcedures
+            // تحقق من أن SurgicalProcedures ليست null قبل التعامل معها
+            if (annualSettingDTO.Surgicals != null && annualSettingDTO.Surgicals.Any())
             {
-                Id = 0,  // Set Id to 0 for new entries
-                Name = dto.Name,
-                Pathological_specialization = dto.Pathological_specialization,
-                Price = dto.Price,
-                Year = annualSettingDTO.Year
-            }).ToList();
+                var surgicalProceduresEntities = annualSettingDTO.Surgicals.Select(dto => new SurgicalProcedures
+                {
+                    Id = 0,  // Set Id to 0 for new entries
+                    Name = dto.Name,
+                    Pathological_specialization = dto.Pathological_specialization,
+                    Price = dto.Price,
+                    Year = annualSettingDTO.Year
+                }).ToList();
 
-            await _unitOfWork.SurgicalProceduresRepository.Add_SurgicalProceduers(surgicalProceduresEntities);
+                await _unitOfWork.SurgicalProceduresRepository.Add_SurgicalProceduers(surgicalProceduresEntities);
+            }
 
             // تجميع وإضافة جميع الملاحظات (Notes)
             var notes = new List<Note>();
 
             // ملاحظات AgeSegments
-            notes.AddRange(annualSettingDTO.AgeSegments.Select(dto => new Note
+            if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
             {
-                Content = dto.NoteContent,
-                AgeSegmentId = ageSegmentsEntities.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,  // Ensure correct ID mapping
-                YearConfigId = yearConfiguration.Id
-            }));
+                notes.AddRange(annualSettingDTO.AgeSegments.Select(dto => new Note
+                {
+                    Content = dto.NoteContent,
+                    AgeSegmentId = _dataContext.AgeSegments.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,  // Ensure correct ID mapping
+                    YearConfigId = yearConfiguration.Id
+                }));
+            }
 
             // ملاحظات RelationTypes
-            notes.AddRange(annualSettingDTO.RelationTypes.Select(dto => new Note
+            if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
             {
-                Content = dto.NoteContent,
-                RelationId = relationTypes.FirstOrDefault(r => r.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                YearConfigId = yearConfiguration.Id
-            }));
+                notes.AddRange(annualSettingDTO.RelationTypes.Select(dto => new Note
+                {
+                    Content = dto.NoteContent,
+                    RelationId = _dataContext.RelationTypes.FirstOrDefault(r => r.Name == dto.Name)?.Id,  // Ensure correct ID mapping
+                    YearConfigId = yearConfiguration.Id
+                }));
+            }
 
             // ملاحظات Hospitals
-            notes.AddRange(annualSettingDTO.Hospitals.Select(dto => new Note
+            if (annualSettingDTO.Hospitals != null && annualSettingDTO.Hospitals.Any())
             {
-                Content = dto.NoteContent,
-                HospitalId = hospitals.FirstOrDefault(h => h.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                YearConfigId = yearConfiguration.Id
-            }));
+                notes.AddRange(annualSettingDTO.Hospitals.Select(dto => new Note
+                {
+                    Content = dto.NoteContent,
+                    HospitalId = _dataContext.Hospitals.FirstOrDefault(h => h.Name == dto.Name)?.Id,  // Ensure correct ID mapping
+                    YearConfigId = yearConfiguration.Id
+                }));
+            }
 
             // ملاحظات SurgicalProcedures
-            notes.AddRange(annualSettingDTO.Surgicals.Select(dto => new Note
+            if (annualSettingDTO.Surgicals != null && annualSettingDTO.Surgicals.Any())
             {
-                Content = dto.NoteContent,
-                SurgicalProcedureId = surgicalProceduresEntities.FirstOrDefault(s => s.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                YearConfigId = yearConfiguration.Id
-            }));
+                notes.AddRange(annualSettingDTO.Surgicals.Select(dto => new Note
+                {
+                    Content = dto.NoteContent,
+                    SurgicalProcedureId = _dataContext.SurgicalProcedures.FirstOrDefault(s => s.Name == dto.Name)?.Id,  // Ensure correct ID mapping
+                    YearConfigId = yearConfiguration.Id
+                }));
+            }
 
             // إضافة جميع الملاحظات دفعة واحدة
-            await _unitOfWork.NoteRepository.AddNotesAsyncList(notes);
+            if (notes.Any())
+            {
+                await _unitOfWork.NoteRepository.AddNotesAsyncList(notes);
+            }
 
             // إكمال المعاملة إذا تم كل شيء بنجاح
             scope.Complete();
@@ -370,6 +403,8 @@ namespace api.Services
 
     return response;
 }
+
+
 
 
 
@@ -554,7 +589,7 @@ namespace api.Services
 
 
 
-
+/*
 
    public async Task<Response> CopyAnnualDataForNewYear(
     int previousYear, 
@@ -679,7 +714,7 @@ namespace api.Services
     return response;
 }
 
-
+*/
 
 
   public async Task<AnnualData> GetByEngineerIdAndYear(int engineerId, int year){
@@ -725,10 +760,218 @@ namespace api.Services
 
         await _unitOfWork.NoteRepository.AddNoteAsync(note);
     }
+    
+
+
+
+
+ public async Task<Response> RenewEngineerAnnualData(
+    int previousYear, 
+    int newYear, 
+    string insuranceNumber, 
+    bool waiting, 
+    bool cardStatus)
+{
+    Response response = new Response();
+    try
+    {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var engineer = await _unitOfWork.AnnualDataRepository.GetByInsuranceNumber(insuranceNumber);
+            if (engineer == null)
+            {
+                response.ErrorMessage = "Engineer not found.";
+                return response;
+            }
+
+            var previousAnnualData = await _unitOfWork.AnnualDataRepository.GetByEngineerIdAndYear(engineer.Id, previousYear);
+            if (previousAnnualData == null)
+            {
+                response.ErrorMessage = "Previous annual data not found.";
+                return response;
+            }
+
+            bool isBeneficiary = await _unitOfWork.ClimsRepository.CheckClaimExistsAsync(engineer.Id, previousYear);
+
+            AnnualData newAnnualData = new AnnualData
+            {
+                Year = newYear,
+                ExAmount = previousAnnualData.ExAmount,
+                HisDic = previousAnnualData.HisDic,
+                CardStatuse = cardStatus,
+                Subscrib = previousAnnualData.Subscrib,
+                Affiliate = previousAnnualData.Affiliate,
+                Beneficiary = false,
+                Waiting = waiting,
+                EngineereId = previousAnnualData.EngineereId,
+                WorkPlaceId = previousAnnualData.WorkPlaceId,
+                PayMethodId = previousAnnualData.PayMethodId,
+                Amount = previousAnnualData.Amount,
+                TotalAmount = previousAnnualData.TotalAmount
+            };
+
+            int newAnnualDataId = await _unitOfWork.AnnualDataRepository.Add_AnnualData(newAnnualData);
+            response.InsertedId = newAnnualDataId;
+
+            scope.Complete();
+        }
+    }
+    catch (Exception ex)
+    {
+        response.ErrorMessage = ex.Message;
+    }
+    return response;
 }
 
 
+
+public async Task<Response> RenewFamilyMembersAnnualData(
+    int engineerId,
+    int previousYear,
+    int newYear,
+    List<FamilyMemberRenewalDTO> familyMembersToRenew)
+{
+    Response response = new Response();
+    try
+    {
+        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+        {
+            var engineerAnnualData = await _unitOfWork.AnnualDataRepository.GetByEngineerIdAndYear(engineerId, newYear);
+            if (engineerAnnualData == null)
+            {
+                response.ErrorMessage = $"Engineer's annual data for the year {newYear} not found. Please ensure the engineer's data is renewed first.";
+                return response;
+            }
+
+            var renewedMembers = new List<int>();
+
+            foreach (var familyMember in familyMembersToRenew)
+            {
+                var previousDetail = await _unitOfWork.AnnualDataRepository.GetAnnualDataDetailByPersonIdAndYear(familyMember.PersonId, previousYear);
+                if (previousDetail == null)
+                {
+                    response.ErrorMessage += $"No previous data found for family member with PersonId: {familyMember.PersonId}. Skipping this member. ";
+                    continue;
+                }
+
+                // Check if the detail for the new year already exists
+                var existingNewDetail = await _unitOfWork.AnnualDataRepository.GetAnnualDataDetailByPersonIdAndYear(familyMember.PersonId, newYear);
+                if (existingNewDetail != null)
+                {
+                    response.ErrorMessage += $"Data for year {newYear} already exists for family member with PersonId: {familyMember.PersonId}. Skipping this member. ";
+                    continue;
+                }
+
+                bool isDetailBeneficiary = await _unitOfWork.ClimsRepository.CheckClaimExistsAsync(familyMember.PersonId, previousYear);
+
+                AnnualDataDetail newDetail = new AnnualDataDetail
+                {
+                    AnnualDataId = engineerAnnualData.Id,
+                    PersonId = familyMember.PersonId,
+                    Year = newYear,
+                    CardStatuse = familyMember.CardStatus,
+                    ExAmount = previousDetail.ExAmount,
+                    Subscrib = previousDetail.Subscrib,
+                    Affiliate = false,
+                    Beneficiary = isDetailBeneficiary,
+                    Waiting = familyMember.Waiting,
+                    Amount = previousDetail.Amount,
+                    IsEngineer = false
+                };
+
+                await _unitOfWork.AnnualDataRepository.Add_AnnualDataDetail(newDetail);
+                renewedMembers.Add(familyMember.PersonId);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            scope.Complete();
+
+            response.Message = $"Successfully renewed data for {renewedMembers.Count} family members.";
+            response.Data = renewedMembers;
+        }
     }
+    catch (Exception ex)
+    {
+        response.ErrorMessage = $"An error occurred while renewing family members' data: {ex.Message}";
+        // Log the full exception details here
+    }
+    return response;
+}
+
+
+
+
+
+  public async Task<Response> UpdateBeneficiaryStatus(int year)
+    {
+        var response = new Response();
+        try
+        {
+            using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                // Get all persons who have claims in the specified year
+                var personsWithClaims = await _unitOfWork.AnnualDataRepository.GetPersonsWithClaimsByYearAsync(year);
+
+                if (personsWithClaims == null || !personsWithClaims.Any())
+                {
+                    response.ErrorMessage = $"No claims found for the year: {year}.";
+                }
+                else
+                {
+                    foreach (var personId in personsWithClaims)
+                    {
+                        // Update AnnualData (for engineers)
+                        var annualData = await _unitOfWork.AnnualDataRepository.GetByEngineerIdAndYear(personId, year);
+                        if (annualData != null)
+                        {
+                            annualData.Beneficiary = true;
+                            await _unitOfWork.AnnualDataRepository.UpdateAnnualData(annualData);
+                            response.Message += $"Updated Beneficiary status for Engineer (PersonId: {personId}) in AnnualData. ";
+                        }
+
+                        // Update AnnualDataDetail (for family members or engineers)
+                        var annualDataDetail = await _unitOfWork.AnnualDataRepository.GetAnnualDataDetailByPersonIdAndYear(personId, year);
+                        if (annualDataDetail != null)
+                        {
+                            annualDataDetail.Beneficiary = true;
+                            await _unitOfWork.AnnualDataRepository.UpdateAnnualDataDetail(annualDataDetail);
+                            response.Message += $"Updated Beneficiary status for Person (PersonId: {personId}) in AnnualDataDetail. ";
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                    scope.Complete();
+                    response.Message += "Changes saved successfully.";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            response.ErrorMessage = $"An error occurred while updating Beneficiary status: {ex.Message}";
+            // Log the full exception details here
+        }
+        return response;
+    }
+
+
+
+
+    public async Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId){
+        return await _unitOfWork.AnnualDataRepository.GetEngineerStatusByYear(engineerId);
+    }
+
+
+    public async Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId){
+        return await _unitOfWork.AnnualDataRepository.GetFamilyMemberStatusByYear(personId);
+    }
+}
+
+
+
+}
+
+
+    
     
     
     

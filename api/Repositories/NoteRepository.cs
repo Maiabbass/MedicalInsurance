@@ -140,10 +140,89 @@ namespace api.Repositories
     {
         await _dataContext.SaveChangesAsync();
     }
+    
+
+  public async Task<bool> DeleteNoteAsync(int? personId = null, int? ageSegmentId = null, int? relationId = null, int? hospitalId = null, int? surgicalProcedureId = null)
+    {
+        Note noteToDelete = null;
+
+        // البحث عن الـ Note حسب نوع المعرف الذي تم تمريره
+        if (personId.HasValue)
+        {
+            noteToDelete = await _dataContext.Notes.FirstOrDefaultAsync(n => n.PersonId == personId.Value);
+        }
+        else if (ageSegmentId.HasValue)
+        {
+            noteToDelete = await _dataContext.Notes.FirstOrDefaultAsync(n => n.AgeSegmentId == ageSegmentId.Value);
+        }
+        else if (relationId.HasValue)
+        {
+            noteToDelete = await _dataContext.Notes.FirstOrDefaultAsync(n => n.RelationId == relationId.Value);
+        }
+        else if (hospitalId.HasValue)
+        {
+            noteToDelete = await _dataContext.Notes.FirstOrDefaultAsync(n => n.HospitalId == hospitalId.Value);
+        }
+        else if (surgicalProcedureId.HasValue)
+        {
+            noteToDelete = await _dataContext.Notes.FirstOrDefaultAsync(n => n.SurgicalProcedureId == surgicalProcedureId.Value);
+        }
+
+        // إذا لم يتم العثور على السجل، ارجع false
+        if (noteToDelete == null)
+        {
+            return false;
+        }
+
+        // حذف السجل
+        _dataContext.Notes.Remove(noteToDelete);
+        await _dataContext.SaveChangesAsync();
+
+        return true;
+    }
 
 
+      public async Task<bool> DeleteNoteByIdAsync(int id)
+    {
+        var noteToDelete = await _dataContext.Notes.FindAsync(id);
+
+        // إذا لم يتم العثور على الملاحظة، ارجع false
+        if (noteToDelete == null)
+        {
+            return false;
+        }
+
+        // حذف الملاحظة
+        _dataContext.Notes.Remove(noteToDelete);
+        await _dataContext.SaveChangesAsync();
+
+        return true;
+    }
+
+
+
+
+      public async Task<bool> EditNoteAsync(int id, string newContent)
+    {
+        var noteToEdit = await _dataContext.Notes.FindAsync(id);
+
+        // إذا لم يتم العثور على الملاحظة، ارجع false
+        if (noteToEdit == null)
+        {
+            return false;
+        }
+
+        // تعديل محتوى الملاحظة
+        noteToEdit.Content = newContent;
+
+        // حفظ التعديلات
+        _dataContext.Notes.Update(noteToEdit);
+        await _dataContext.SaveChangesAsync();
+
+        return true;
+    }
+}
 
 
         
     }
-}

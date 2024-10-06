@@ -369,7 +369,6 @@ namespace api.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Emailpresident")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -384,7 +383,6 @@ namespace api.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Phonepresident")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -623,6 +621,9 @@ namespace api.Data.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("EngineeringUnitsId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EnsuranceNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -651,6 +652,9 @@ namespace api.Data.Migrations
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
+                    b.Property<int?>("PayMethodId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
@@ -659,7 +663,11 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EngineeringUnitsId");
+
                     b.HasIndex("GenderId");
+
+                    b.HasIndex("PayMethodId");
 
                     b.HasIndex("StatusId");
 
@@ -835,6 +843,31 @@ namespace api.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("api.Entities.Subscribers2024", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EnsuranceNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NationalId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("subscribers2024s");
                 });
 
             modelBuilder.Entity("api.Entities.SurgicalProcedures", b =>
@@ -1329,17 +1362,29 @@ namespace api.Data.Migrations
 
             modelBuilder.Entity("api.Entities.Person", b =>
                 {
+                    b.HasOne("api.Entities.EngineeringUnits", "EngineeringUnits")
+                        .WithMany("Persons")
+                        .HasForeignKey("EngineeringUnitsId");
+
                     b.HasOne("api.Entities.Gender", "Gender")
                         .WithMany("Persons")
                         .HasForeignKey("GenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("api.Entities.PayMethod", "PayMethod")
+                        .WithMany("Persons")
+                        .HasForeignKey("PayMethodId");
+
                     b.HasOne("api.Entities.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId");
 
+                    b.Navigation("EngineeringUnits");
+
                     b.Navigation("Gender");
+
+                    b.Navigation("PayMethod");
 
                     b.Navigation("Status");
                 });
@@ -1526,6 +1571,8 @@ namespace api.Data.Migrations
                 {
                     b.Navigation("AnnualDatas");
 
+                    b.Navigation("Persons");
+
                     b.Navigation("WorkPlaces");
                 });
 
@@ -1544,6 +1591,8 @@ namespace api.Data.Migrations
             modelBuilder.Entity("api.Entities.PayMethod", b =>
                 {
                     b.Navigation("AnnualDatas");
+
+                    b.Navigation("Persons");
                 });
 
             modelBuilder.Entity("api.Entities.Person", b =>

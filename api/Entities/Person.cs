@@ -89,6 +89,13 @@ namespace api.Entities
 
          public ICollection<Note>Notes{get ; set ;}
 
+        public int? EngineeringUnitsId { get; set;} 
+        public  EngineeringUnits? EngineeringUnits{ get; set;}
+
+
+        public int? PayMethodId{ get; set;}
+        public PayMethod? PayMethod { get; set;}
+
 
 
     }

@@ -32,6 +32,7 @@ namespace api.Services
         Task<PersonWithEngineereDTO> GetEngNumberAndSupNumber(string engNumber , string supNumber);
 
         Task<PersonWithEngineereDTO> GetSubNumberAsync(string subNumber);
+        Task<PersonWithEngineereDTO?> GetPersonWithEngineerByNationalIdAsync(string nationalId);
     
   
 

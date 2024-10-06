@@ -49,6 +49,13 @@ namespace api.Repositories
       
      Task<PayMethod> GetPayMethodByEngineerId(int engineerId);
 
+      Task<AnnualDataDetail> GetAnnualDataDetailByPersonIdAndYear(int personId, int year);
+      Task<List<int>> GetPersonsWithClaimsByYearAsync(int year);
+      Task UpdateAnnualData(AnnualData annualData);
+       Task UpdateAnnualDataDetail(AnnualDataDetail annualDataDetail);
+       Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId);
+       Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId);
+
          
    
     }

@@ -33,6 +33,8 @@ namespace api.Repositories
          
              Task<PersonWithEngineereDTO> GetSubNumberAsync(string subNumber);
 
+             Task<Person?> GetPersonWithEngineerByNationalIdAsync(string nationalId);
+
              
          
        

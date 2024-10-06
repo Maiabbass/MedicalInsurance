@@ -89,5 +89,16 @@ namespace api.Repositories
 
     return city?.Id;
 } 
+
+
+
+    public async Task<List<int>> GetExistingCityIds(List<int> cityIds)
+    {
+        return await _dataContext.Cities
+            .Where(c => cityIds.Contains(c.Id))
+            .Select(c => c.Id)
+            .ToListAsync();
+    }
+    
     }
 }

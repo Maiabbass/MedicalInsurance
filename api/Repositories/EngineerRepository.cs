@@ -68,7 +68,7 @@ namespace api.Repositories
 
 
 
-      public async Task<PersonWithEngineereDTO?> Get(int Id)
+     public async Task<PersonWithEngineereDTO?> Get(int Id)
 {
     return await _dataContext.Engineeres
         .Where(x => x.Id == Id)
@@ -90,7 +90,7 @@ namespace api.Repositories
             StatusId = e.Person.StatusId,
             GenderId = e.Person.GenderId,
 
-            // خصائص جدول Engineere
+            // خصائص جدول Engineer
             EngNumber = e.EngNumber,
             SubNumber = e.SubNumber,
             SpecializationId = e.SpecializationId,
@@ -98,10 +98,20 @@ namespace api.Repositories
             Amount = e.Person.Amount,
 
             // تضمين الصور المرتبطة
-            Images = e.Person.Images.Select(i => Convert.ToBase64String(i.Image)).ToList(),
+            Images = e.Person.Images.Select(i => new ImageDTO
+            {
+                Id = i.Id,
+               
+                FileName = i.Image       // البيانات الفعلية للصورة
+            }).ToList(),
 
             // تضمين ملفات Word المرتبطة
-            WordFiles = e.Person.Words.Select(w => Convert.ToBase64String(w.Content)).ToList()
+            Words = e.Person.Words.Select(w => new WordDTO
+            {
+                Id = w.Id,
+                
+                FileName = w.Content    // البيانات الفعلية للملف
+            }).ToList()
 
         })
         .FirstOrDefaultAsync();
@@ -114,8 +124,7 @@ namespace api.Repositories
 
 
 
-
-  public async Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, int pageSize)
+ public async Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, int pageSize)
 {
     int skip = (pageNumber - 1) * pageSize;
 
@@ -144,15 +153,26 @@ namespace api.Repositories
     {
         var person = await _dataContext.Persons.FirstOrDefaultAsync(p => p.Id == item.Id);
 
+        // جلب الصور ككائنات ImageDTO
         var images = await _dataContext.Images
             .Where(img => img.PersonId == item.Id)
-            .Select(img => Convert.ToBase64String(img.Image)) 
+            .Select(img => new ImageDTO
+            {
+                Id = img.Id,
+                
+                FileName = img.Image       // البيانات الفعلية للصورة
+            })
             .ToListAsync();
 
-
+        // جلب ملفات Word ككائنات WordDTO
         var wordFiles = await _dataContext.Words
             .Where(wf => wf.PersonId == item.Id)
-            .Select(wf => Convert.ToBase64String(wf.Content))  
+            .Select(wf => new WordDTO
+            {
+                Id = wf.Id,
+               
+                FileName = wf.Content      // البيانات الفعلية للملف
+            })
             .ToListAsync();
 
         if (person != null)
@@ -178,8 +198,8 @@ namespace api.Repositories
                 SpecializationId = item.SpecializationId,
                 WorkPlaceId = item.WorkPlaceId,
                 Amount = person.Amount,
-                Images = images,
-                WordFiles = wordFiles
+                Images = images,        // تضمين الصور كـ ImageDTO
+                Words = wordFiles   // تضمين ملفات Word كـ WordDTO
             });
         }
     }

@@ -17,10 +17,15 @@ namespace api.Repositories
 
           bool Update ( int Id, CityEditDTO city );
 
+
           void DeleteByCityId(int CityId);
           void Delete (int Id);
 
           Task<int?> GetCityIdByName(string cityName);
+
+
+
+          Task<List<int>> GetExistingCityIds(List<int> cityIds);
     }
 }
  

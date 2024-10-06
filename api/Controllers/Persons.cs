@@ -7,6 +7,7 @@ using api.DTOS;
 using api.Entities;
 using api.Repositories;
 using api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,8 @@ public class Persons : ControllerBase
    
 
 
-   [HttpPost]
+
+ [HttpPost]
 public async Task<IActionResult> CreatePerson([FromForm] PersonEditDTO personEditDTO, IFormFile[]? ImageFiles, IFormFile[]? WordFiles)
 {
     if (!ModelState.IsValid)

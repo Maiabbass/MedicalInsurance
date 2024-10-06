@@ -23,7 +23,7 @@ namespace api.Repositories
             _dataContext = dataContext;
         }
 
-     public List<Claims> ReadDataFromExcel(Stream fileStream)
+    public List<Claims> ReadDataFromExcel(Stream fileStream, int year)
 {
     try
     {
@@ -31,7 +31,7 @@ namespace api.Repositories
 
         using (var package = new ExcelPackage(fileStream))
         {
-            var worksheet = package.Workbook.Worksheets.FirstOrDefault(); // Get the first worksheet
+            var worksheet = package.Workbook.Worksheets.FirstOrDefault();
             if (worksheet == null)
             {
                 throw new Exception("The Excel file does not contain any worksheets.");
@@ -77,7 +77,7 @@ namespace api.Repositories
                 }
 
                 // Parse optional value for nonAddForPerson
-                decimal? nonAddForPerson = null;
+                decimal nonAddForPerson = 0;
                 if (decimal.TryParse(nonAddForPersonText, out var nonAddForPersonValue))
                 {
                     nonAddForPerson = nonAddForPersonValue;
@@ -94,13 +94,14 @@ namespace api.Repositories
                     EnduranceRatio = enduranceRatio,
                     non_Add = nonAdd,
                     Company_fees = companyFees,
-                    non_AddForPerson = nonAddForPersonValue,
+                    non_AddForPerson = nonAddForPerson,
                     Trust = true,
                     LoginDate = null,
                     ExitDate = null,
                     SurgicalProceduresId = null,
                     DateSurgicalProcedures = null,
-
+                    Year = year, // Add the year parameter here
+                    ClimeData = DateTime.Now // Set the claim date to current date and time
                 };
 
                 claims.Add(newClaim);
@@ -114,7 +115,6 @@ namespace api.Repositories
         throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
     }
 }
-
 
 
 
@@ -345,6 +345,11 @@ public async Task<bool> CheckClaimExistsAsync(int id, int year)
     
     return claim != null;
 }
+
+
+
+
+
 
      
     }

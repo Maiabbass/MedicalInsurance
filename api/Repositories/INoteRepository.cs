@@ -24,6 +24,8 @@ namespace api.Repositories
         Task Delete_NotesByYearAsync(int year);
         Task<YearConfiguration> GetYearConfigurationByIdAsync(int yearConfigId);
         Task SaveChangesAsync();
-        
+        Task<bool> DeleteNoteAsync(int? personId = null, int? ageSegmentId = null, int? relationId = null, int? hospitalId = null, int? surgicalProcedureId = null);
+        Task<bool> DeleteNoteByIdAsync(int id);
+        Task<bool> EditNoteAsync(int id, string newContent);
     }
 }

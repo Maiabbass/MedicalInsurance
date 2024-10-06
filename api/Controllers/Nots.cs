@@ -68,4 +68,57 @@ namespace api.Controllers
             return StatusCode(500, new { message = "حدث خطأ أثناء جلب الملاحظات", error = ex.Message });
         }
     }
+
+
+
+
+
+    [HttpDelete]
+public async Task<IActionResult> DeleteNote(int? personId = null, int? ageSegmentId = null, int? relationId = null, int? hospitalId = null, int? surgicalProcedureId = null)
+{
+    var result = await _noteService.DeleteNoteByIdAsync(personId, ageSegmentId, relationId, hospitalId, surgicalProcedureId);
+    
+    if (result == "Note not found.")
+    {
+        return NotFound(result);
+    }
+
+    return Ok(result);
+}
+
+
+
+
+
+[HttpDelete("{id}")]
+public async Task<IActionResult> DeleteNoteById(int id)
+{
+    var result = await _noteService.DeleteNoteAsync(id);
+    
+    if (result == "Note not found.")
+    {
+        return NotFound(result);
+    }
+
+    return Ok(result);
+}
+
+
+
+
+[HttpPut("{id}")]
+public async Task<IActionResult> EditNoteById(int id, [FromBody] string newContent)
+{
+    var result = await _noteService.EditNoteAsync(id, newContent);
+    
+    if (result == "Note not found.")
+    {
+        return NotFound(result);
+    }
+
+    return Ok(result);
+}
+
+
+
     } }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using api.DTOS;
 using api.Entities;
 using api.Repositories;
+using api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -18,44 +19,56 @@ namespace api.Controllers
     {
 
     private readonly IClimsRepository _climsRepository;
+    private readonly IAnnualDataService _annualDataService;
           
         
-    public ClaimsExcel(IClimsRepository climsRepository)
+    public ClaimsExcel(IClimsRepository climsRepository , IAnnualDataService annualDataService)
       {
       _climsRepository= climsRepository;
+      _annualDataService=annualDataService;
          }
 
-      [HttpPost("upload")]
-        public async Task<IActionResult> UploadClaims(IFormFile file)
+
+
+     [HttpPost("upload")]
+public async Task<IActionResult> UploadClaims(IFormFile file, [FromQuery] int year)
+{
+    try
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Please upload a valid Excel file.");
+
+        if (year <= 0)
+            return BadRequest("Please provide a valid year.");
+
+        using (var stream = new MemoryStream())
         {
-            try{
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
 
-            
-            if (file == null || file.Length == 0)
-                return BadRequest("Please upload a valid Excel file.");
-
-            using (var stream = new MemoryStream())
-            {
-                await file.CopyToAsync(stream);
-                stream.Position = 0;
-                var claimsList = _climsRepository.ReadDataFromExcel(stream);
-                await _climsRepository.LoadClaimsToDatabase(claimsList);
-            }
-
-            return Ok("Operation accomplished successfully");
+            // Step 1: Process and load claims from Excel
+            var claimsList = _climsRepository.ReadDataFromExcel(stream, year);
+            await _climsRepository.LoadClaimsToDatabase(claimsList);
         }
-        
-        catch (Exception ex) when (ex is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
-            {
-                return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
-            }
-            catch (Exception ex)
-            {
-                string Details = System.Text.Json.JsonSerializer.Serialize(file);
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {Details}" });
-            }
+
+        // Step 2: Update Beneficiary status for all persons in the claims for the given year
+        await _annualDataService.UpdateBeneficiaryStatus(year);
+
+        return Ok(new Response { Message = "Claims uploaded, processed, and beneficiary status updated successfully." });
     }
+    catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx && (sqlEx.Number == 2601 || sqlEx.Number == 2627))
+    {
+        return Conflict(new Response { ErrorMessage = "Duplicate entry detected for unique index or constraint." });
+    }
+    catch (Exception ex)
+    {
+        string details = System.Text.Json.JsonSerializer.Serialize(new { FileName = file.FileName, FileSize = file.Length, Year = year });
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Upload details: {details}" });
+    }
+}
+
+
 
 
 

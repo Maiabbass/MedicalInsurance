@@ -602,7 +602,7 @@ public async Task<ActionResult> GetAllData(int year)
 
 
      
-
+/*
 
   [HttpPost("CopyAnnualDataForNewYear")]
 public async Task<ActionResult<Response>> CopyAnnualDataForNewYear(
@@ -644,6 +644,9 @@ public async Task<ActionResult<Response>> CopyAnnualDataForNewYear(
     }
 }
 
+*/
+
+
 
 [HttpGet("GetPayMethodByEngineerId")]
 public async Task<ActionResult<PayMethod>> GetPayMethodByEngineerId(int engineerId)
@@ -680,6 +683,99 @@ public async Task<ActionResult<PayMethod>> GetPayMethodByEngineerId(int engineer
             return BadRequest(ex.Message);
         }
     }
+
+
+
+
+
+   [HttpPost("RenewEngineerAnnualData")]
+public async Task<ActionResult<Response>> RenewEngineerAnnualData(
+    [FromQuery] int previousYear,
+    [FromQuery] int newYear,
+    [FromQuery] string insuranceNumber,
+    [FromQuery] bool waiting,
+    [FromQuery] bool cardStatus)
+{
+    try
+    {
+        var response = await _AnnualDataService.RenewEngineerAnnualData(
+            previousYear, newYear, insuranceNumber, waiting, cardStatus);
+
+        if (response.ErrorMessage != null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                new Response { ErrorMessage = response.ErrorMessage });
+        }
+
+        return Ok(response);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. InsuranceNumber: {insuranceNumber}, PreviousYear: {previousYear}, NewYear: {newYear}" });
+    }
+}
+
+
+
+
+
+[HttpPost("RenewFamilyMembersAnnualData")]
+public async Task<ActionResult<Response>> RenewFamilyMembersAnnualData(
+    [FromQuery] int engineerId,
+    [FromQuery] int previousYear,
+    [FromQuery] int newYear,
+    [FromBody] List<FamilyMemberRenewalDTO> familyMembersToRenew)
+{
+    try
+    {
+        var response = await _AnnualDataService.RenewFamilyMembersAnnualData(
+            engineerId, previousYear, newYear, familyMembersToRenew);
+
+        if (response.ErrorMessage != null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, 
+                new Response { ErrorMessage = response.ErrorMessage });
+        }
+
+        return Ok(response);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+            new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. EngineerId: {engineerId}, PreviousYear: {previousYear}, NewYear: {newYear}" });
+    }
+}
+
+
+
+
+ [HttpGet("GetEngineerStatus/{engineerId}")]
+    public async Task<IActionResult> GetEngineerStatusByYear(int engineerId)
+    {
+        var result = await _AnnualDataService.GetEngineerStatusByYear(engineerId);
+        if (result == null || result.Count == 0)
+        {
+            return NotFound("No data found for this engineer.");
+        }
+
+        return Ok(result);
+    }
+
+    
+
+
+    [HttpGet("GetFamilyMemberStatus/{personId}")]
+public async Task<IActionResult> GetFamilyMemberStatusByYear(int personId)
+{
+    var result = await _AnnualDataService.GetFamilyMemberStatusByYear(personId);
+    if (result == null || result.Count == 0)
+    {
+        return NotFound("No data found for this family member.");
+    }
+
+    return Ok(result);
+}
 
 
    

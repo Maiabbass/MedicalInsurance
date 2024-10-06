@@ -45,7 +45,7 @@ namespace api.Services
          Task<Entities.AnnualData> GetByEngineerIdAndYear(int engineerId, int year);
 
          Task<List<AnnualDataDetail>> GetAnnualDataDetails(int annualDataId);
-
+/*
         Task<Response> CopyAnnualDataForNewYear(
             int previousYear, 
             int newYear, 
@@ -56,12 +56,37 @@ namespace api.Services
             bool copyAnnualDataDetails,
             List<AnnualNewDTO> detailIdsToCopy // استخدام DTO هنا
         );
+        */
 
             Task<PayMethod> GetPayMethodByEngineerIdAsync(int engineerId);
 
             Task UpdateYearConfigurationAsync(YearConfiguration yearConfiguration);
 
             Task AddNoteToYearConfigAsync(int yearConfigId, NoteCreateDTO noteDto);
+
+
+
+
+            Task<Response> RenewEngineerAnnualData(
+            int previousYear, 
+            int newYear, 
+            string insuranceNumber, 
+            bool waiting, 
+            bool cardStatus);
+
+
+            Task<Response> RenewFamilyMembersAnnualData(
+    int engineerId,
+    int previousYear,
+    int newYear,
+    List<FamilyMemberRenewalDTO> familyMembersToRenew);
+
+
+    Task<Response> UpdateBeneficiaryStatus(int year);
+
+    Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId);
+
+    Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId);
 
     }
 }

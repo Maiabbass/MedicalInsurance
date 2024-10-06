@@ -45,11 +45,51 @@ namespace api.Controllers
     return Ok( await _searchService.GetWithNameAsync(userSearch));
     }
 
+
+/*
     [HttpGet]
     [Route("find/ByNationalId/{NationalId}")]   
-    public async Task<ActionResult<PersonWithEngineereDTO>> GetByNationalIdAsync(string nationalId){
-    return Ok(await _searchService.GetByNationalIdAsync(nationalId));
+   
+    public async Task<ActionResult<PersonWithEngineereDTO>> GetByNationalIdAsync(string nationalId)
+    {
+        try
+        {
+            var result = await _searchService.GetByNationalIdAsync(nationalId);
+            if (result == null)
+            {
+                return NotFound($"No person found with the NationalId: {nationalId}");
+            }
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception here if you have logging configured
+            return StatusCode(500, $"An error occurred while processing your request: {ex.Message}");
+        }
     }
+
+    */
+
+
+
+
+    [HttpGet("find/Search-By-National-Id")]
+public async Task<IActionResult> SearchByNationalId(string nationalId)
+{
+    var result = await _searchService.GetPersonWithEngineerByNationalIdAsync(nationalId);
+    if (result == null)
+    {
+        return NotFound("Person not found with the provided National ID.");
+    }
+    return Ok(result);
+}
+
+
+
 
     [HttpGet]
     [Route("find/ByEngNumber/{engNumber}")]   
@@ -156,6 +196,10 @@ public async Task<ActionResult<PersonWithEngineereDTO>> GetByEngNumberAndSupNumb
     }
 
 
+
+
+
+ 
 
 
         

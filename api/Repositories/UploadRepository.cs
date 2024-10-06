@@ -8,6 +8,8 @@ using api.Entities;
 using OfficeOpenXml;
 using Microsoft.EntityFrameworkCore;
 using api.Services;
+using System.Text;
+using System.Data;
 
 
 namespace api.Repositories
@@ -51,16 +53,19 @@ namespace api.Repositories
 
 
 
-       public async Task<List<Person>> ReadExcelFileCash(Stream fileStream)
+      public async Task<List<Person>> ReadExcelFileCash(Stream fileStream)
 {
     using var package = new ExcelPackage(fileStream);
     var worksheet = package.Workbook.Worksheets[0];
     var rowCount = worksheet.Dimension.Rows;
     var people = new List<Person>();
+    
+    // Define possible date formats
+    var dateFormats = new[] { "yyyy", "M/d/yyyy", "d/M/yyyy", "MMMM d, yyyy", "dd-MMM-yyyy" };
 
     for (int row = 2; row <= rowCount; row++)
     {
-        var genderText = worksheet.Cells[row, 9].Text.ToLower(); // اقرأ الجنس من العمود المناسب
+        var genderText = worksheet.Cells[row, 9].Text.ToLower(); // Read gender from the appropriate column
         int genderId = (genderText.Trim() == "ذكر" || genderText.Trim() == "male") ? 1 : 2;
 
         var person = new Person
@@ -72,19 +77,24 @@ namespace api.Repositories
             NationalId = worksheet.Cells[row, 12].Text.Length > 11 ? worksheet.Cells[row, 12].Text.Substring(0, 11) : worksheet.Cells[row, 12].Text,
             EnsuranceNumber = worksheet.Cells[row, 11].Text,
             Mobile = worksheet.Cells[row, 14].Text,
-            GenderId = genderId // تعيين GenderId هنا
+            GenderId = genderId, // Assign GenderId
+            PayMethodId = 1 // Set PayMethodId to 1 as per requirement
         };
 
-        // Handle birth date from cell 13
+        // Handle birth date with multiple formats
         var birthDateText = worksheet.Cells[row, 13].Text;
-        if (!string.IsNullOrEmpty(birthDateText) && DateTime.TryParseExact(birthDateText, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+        if (!string.IsNullOrEmpty(birthDateText))
         {
-            person.BirthDate = birthDate;
-        }
-        else
-        {
-            // If parsing fails or birth date is missing, set it to null or handle accordingly
-            person.BirthDate = null;
+            if (DateTime.TryParseExact(birthDateText, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+            {
+                // Format birth date as dd-MMM-yyyy
+                person.BirthDate = birthDate;
+            }
+            else
+            {
+                // Handle invalid or unrecognized date formats, setting birth date to null or default
+                person.BirthDate = null;
+            }
         }
 
         var engineere = new Engineere
@@ -116,6 +126,7 @@ namespace api.Repositories
 
     return people;
 }
+
     
 
 
@@ -127,12 +138,12 @@ namespace api.Repositories
     var rowCount = worksheet.Dimension.Rows;
     var people = new List<Person>();
 
-    for (int row = 2; row <= rowCount; row++)
+    for (int row = 2; row <= rowCount; row++) // Assuming row 1 is the header
     {
-        if (worksheet.Cells[row, 10].Text == "م") // تحقق من الحالة المطلوبة
+        if (true) // تحقق من الحالة المطلوبة
         {
             var genderText = worksheet.Cells[row, 9].Text.ToLower(); // اقرأ الجنس من العمود المناسب
-            int genderId =( genderText.Trim() == "ذكر" || genderText.Trim() == "Male") ? 1 : 2;
+            int genderId = (genderText.Trim() == "ذكر" || genderText.Trim() == "male") ? 1 : 2;
 
             var person = new Person
             {
@@ -144,18 +155,22 @@ namespace api.Repositories
                 EnsuranceNumber = worksheet.Cells[row, 11].Text,
                 Mobile = worksheet.Cells[row, 15].Text,
                 GenderId = genderId, // تعيين GenderId هنا
+                PayMethodId = 3 // تعيين PayMethodId إلى 3
             };
-/*
-            var birthDateText = worksheet.Cells[row, 13].Text;
-            if (DateTime.TryParseExact(birthDateText, "dd-MMM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+
+            // Parse the birth date with multiple formats, including "dd-MMM-yyyy" (e.g., "20-Mar-1965")
+            var birthDateText = worksheet.Cells[row, 13].Text.Trim();
+            var dateFormats = new[] { "dd/MM/yyyy", "M/d/yyyy", "yyyy", "MMMM d, yyyy", "d/M/yyyy", "dd-MMM-yyyy" }; // Date formats including "dd-MMM-yyyy"
+
+            if (DateTime.TryParseExact(birthDateText, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
             {
-                person.BirthDate = birthDate;
+                person.BirthDate = birthDate; // Store DateTime directly
             }
             else
             {
-                person.BirthDate = null;
+                person.BirthDate = null; // Handle invalid or missing dates
             }
-*/
+
             var engineere = new Engineere
             {
                 EngNumber = worksheet.Cells[row, 3].Text,
@@ -186,7 +201,6 @@ namespace api.Repositories
 
     return people;
 }
-        
 
 
 
@@ -194,29 +208,28 @@ namespace api.Repositories
 
 
 
-   public async Task<List<Person>> ReadExcelFileBox(Stream fileStream)
+
+
+  public async Task<List<Person>> ReadExcelFileBox(Stream fileStream)
 {
     var people = new List<Person>();
 
-    
-        using var package = new ExcelPackage(fileStream);
-        var worksheet = package.Workbook.Worksheets[0]; // تحديد الورقة الأولى
+    using var package = new ExcelPackage(fileStream);
+    var worksheet = package.Workbook.Worksheets[0]; // تحديد الورقة الأولى
 
-        if (worksheet == null)
-        {
-            throw new CustomException("Worksheet not found in the Excel file.");
-        }
- if (worksheet.Dimension == null || worksheet.Dimension.Rows < 2)
+    if (worksheet == null)
+    {
+        throw new CustomException("Worksheet not found in the Excel file.");
+    }
+
+    if (worksheet.Dimension == null || worksheet.Dimension.Rows < 2)
     {
         throw new CustomException("Worksheet is empty or does not contain data.");
     }
-        var rowCount = worksheet.Dimension.Rows ;
-        
-  
-   
-        for (int row = 2; row <= rowCount; row++)
-{
-    if (worksheet.Cells[row, 9] != null && worksheet.Cells[row, 9]?.Text == "م")
+
+    var rowCount = worksheet.Dimension.Rows;
+
+    for (int row = 2; row <= rowCount; row++)
     {
         var genderText = GetCellTextOrNull(worksheet.Cells[row, 8]);
         int genderId = (genderText?.Trim() == "ذكر" || genderText?.Trim() == "Male") ? 1 : 2;
@@ -225,6 +238,10 @@ namespace api.Repositories
         {
             throw new CustomException($"Data missing in row {row}.");
         }
+
+        // Attempt to parse the date in cell number 12
+        var dateOfBirthText = GetCellTextOrNull(worksheet.Cells[row, 12]);
+        DateTime? dateOfBirth = ParseDate(dateOfBirthText);
 
         var person = new Person
         {
@@ -238,6 +255,8 @@ namespace api.Repositories
             EnsuranceNumber = GetCellTextOrNull(worksheet.Cells[row, 10]),
             Mobile = GetCellTextOrNull(worksheet.Cells[row, 14]),
             GenderId = genderId,
+            BirthDate = dateOfBirth,
+            PayMethodId=2
         };
 
         var engineere = new Engineere
@@ -247,39 +266,75 @@ namespace api.Repositories
             Person = person
         };
 
+        try
+        {
+            _dataContext.Persons.Add(person);
+            await _dataContext.SaveChangesAsync();
 
-
-         try
-         {
- _dataContext.Persons.Add(person);
-        await _dataContext.SaveChangesAsync();
-
-        _dataContext.Engineeres.Add(engineere);
-        await _dataContext.SaveChangesAsync();
-         }
-         catch (DbUpdateException ex)
-            {
-                throw new CustomException($"Database update error occurred while processing row {row}", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new CustomException($"Error occurred while processing row {row}", ex);
-            }
-
-       
+            _dataContext.Engineeres.Add(engineere);
+            await _dataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new CustomException($"Database update error occurred while processing row {row}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new CustomException($"Error occurred while processing row {row}", ex);
+        }
 
         people.Add(person);
     }
+
+    return people;
 }
 
 
-return people;
 
+// Helper method to parse different date formats
+private DateTime? ParseDate(string dateText)
+{
+    if (string.IsNullOrWhiteSpace(dateText)) return null;
+
+     string[] formats = { 
+        "dd-MMM-yyyy",    // e.g., 06-Aug-1962
+        "d-M-yyyy",       // e.g., 10-8-1968
+        "dd-M-yyyy",      // e.g., 10-08-1968
+        "M/d/yyyy",       // e.g., 1/17/1968
+        "yyyy",           // e.g., 2004
+        "MM/dd/yyyy"      // e.g., 10/08/1968
+    };
+    DateTime parsedDate;
+
+    
+    if (DateTime.TryParseExact(dateText, formats, null, System.Globalization.DateTimeStyles.None, out parsedDate))
+    {
+        return parsedDate;
+    }
+    
+    
+    if (int.TryParse(dateText, out int year))
+    {
+        return new DateTime(year, 1, 1);
+    }
+
+    
+    throw new CustomException($"Invalid date format: {dateText}");
 }
+
+
+
 private string GetCellTextOrNull(ExcelRange cell)
 {
-    return string.IsNullOrWhiteSpace(cell?.Text) ? null : cell.Text.Trim();
+    return cell?.Text?.Trim();
 }
+
+
+
+
+
+
+
 
 
 
@@ -427,7 +482,312 @@ public async Task<List<SurgicalProcedures>> ReadExcelFileSurgical(Stream fileStr
                 throw new CustomException("An unexpected error occurred while saving the data", ex);
             }
         }
+
+
+
+
+           public async Task<List<Subscribers2024>> ImportSubscribersAsync(Stream stream)
+    {
+        List<Subscribers2024> subscribers = new List<Subscribers2024>();
+
+        try
+        {
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets["Sheet1"];
+                if (worksheet == null)
+                {
+                    throw new CustomException("Worksheet not found in the Excel file.");
+                }
+
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+
+                // Assuming the first row is the header
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    var subscriber = new Subscribers2024
+                    {
+                        EnsuranceNumber = GetCellValue(worksheet, row, "الرقم التأميني"),
+                        FullName = GetCellValue(worksheet, row, "الاسم"),
+                        NationalId = GetCellValue(worksheet, row, "الرقم الوطني"),
+                        BirthDate = ConvertToFullDate(GetCellValue(worksheet, row, "المواليد"))
+                    };
+
+                    subscribers.Add(subscriber);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new CustomException($"Error processing Excel file: {ex.Message}", ex);
+        }
+
+        return subscribers;
+    }
+
+    private string GetCellValue(ExcelWorksheet worksheet, int row, string columnName)
+    {
+        var columnIndex = worksheet.Cells["1:1"].FirstOrDefault(c => c.Value?.ToString().Equals(columnName, StringComparison.OrdinalIgnoreCase) == true)?.Start.Column;
+        
+        if (!columnIndex.HasValue)
+        {
+            throw new CustomException($"Column '{columnName}' not found in the Excel file.");
+        }
+
+        return worksheet.Cells[row, columnIndex.Value].Value?.ToString();
+    }
+
+    private DateTime? ConvertToFullDate(string yearString)
+    {
+        if (int.TryParse(yearString, out int year))
+        {
+            return new DateTime(year, 1, 1);
+        }
+        return null;
+    }
+
+
+
+
+    public async Task LoadSubToDatabase2024(List<Subscribers2024> list)
+        {
+            try
+            {
+                _dataContext.subscribers2024s.AddRange(list);
+                await _dataContext.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new CustomException("An error occurred while saving the data to the database", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException("An unexpected error occurred while saving the data", ex);
+            }
+        }
+
+
+
+
+
+
+      public async Task<List<Person>> ReadExcelFileUnits(Stream fileStream)
+{
+    using var package = new ExcelPackage(fileStream);
+    var worksheet = package.Workbook.Worksheets[0];
+    var rowCount = worksheet.Dimension.Rows;
+    var people = new List<Person>();
+
+    for (int row = 2; row <= rowCount; row++) // Assuming row 1 is the header
+    {
+        try
+        {
+            // Read gender and convert to GenderId
+            var genderText = worksheet.Cells[row, 9].Text.ToLower();
+            int genderId = (genderText.Trim() == "ذكر" || genderText.Trim() == "male") ? 1 : 2;
+
+            // Create Person object with basic data
+            var person = new Person
+            {
+                FirstName = worksheet.Cells[row, 5].Text,
+                FatherName = worksheet.Cells[row, 6].Text,
+                LastName = worksheet.Cells[row, 7].Text,
+                MotherName = worksheet.Cells[row, 8].Text,
+                NationalId = worksheet.Cells[row, 12].Text.Length > 11 ? worksheet.Cells[row, 12].Text.Substring(0, 11) : worksheet.Cells[row, 12].Text,
+                EnsuranceNumber = worksheet.Cells[row, 11].Text,
+                Mobile = worksheet.Cells[row, 13].Text,
+                GenderId = genderId, // Assign GenderId here
+                //EngineeringUnitsId = 10
+            };
     
+           /*
+            // Check for missing critical data (NationalId and EnsuranceNumber)
+            if (string.IsNullOrWhiteSpace(person.NationalId) || string.IsNullOrWhiteSpace(person.EnsuranceNumber))
+            {
+                Console.WriteLine($"Skipping row {row} due to missing National ID or Insurance Number.");
+                continue; // Skip this row
+            }
+           */
+
+
+            // Parse birth date with multiple formats
+            var birthDateText = worksheet.Cells[row, 14].Text.Trim();
+            var dateFormats = new[] { "dd/MM/yyyy", "M/d/yyyy", "yyyy", "MMMM d, yyyy", "d/M/yyyy", "dd-MMM-yyyy" }; // Multiple formats
+
+            if (DateTime.TryParseExact(birthDateText, dateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var birthDate))
+            {
+                person.BirthDate = birthDate; // Store valid date
+            }
+            else
+            {
+                person.BirthDate = null; // Handle invalid or missing dates
+            }
+
+            // Create Engineer object
+            var engineere = new Engineere
+            {
+                EngNumber = worksheet.Cells[row, 3].Text,
+                SubNumber = worksheet.Cells[row, 4].Text,
+                Person = person
+            };
+
+            // Log row data for debugging
+            Console.WriteLine($"Processing row {row}: EngNumber = {engineere.EngNumber}, SubNumber = {engineere.SubNumber}, FirstName = {person.FirstName}, NationalId = {person.NationalId}");
+
+            // Save person and engineer entities to the database
+            _dataContext.Persons.Add(person);
+            await _dataContext.SaveChangesAsync(); // Save person first
+
+            _dataContext.Engineeres.Add(engineere);
+            await _dataContext.SaveChangesAsync(); // Save engineer
+
+            // Add to people list
+            people.Add(person);
+        }
+        catch (DbUpdateException ex)
+        {
+            var innerExceptionMessage = ex.InnerException?.Message ?? "No additional details";
+            throw new CustomException($"Database update error occurred while processing row {row}. Details: {innerExceptionMessage}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new CustomException($"Error occurred while processing row {row}", ex);
+        }
+    }
+
+    return people;
+}
+
+
+
+
+
+
+
+
+
+ public async Task<List<Person>> ReadExcelFileUnits2(Stream fileStream)
+{
+    var people = new List<Person>();
+
+    using var package = new ExcelPackage(fileStream);
+    var worksheet = package.Workbook.Worksheets[0]; // تحديد الورقة الأولى
+
+    if (worksheet == null)
+    {
+        throw new CustomException("Worksheet not found in the Excel file.");
+    }
+
+    if (worksheet.Dimension == null || worksheet.Dimension.Rows < 2)
+    {
+        throw new CustomException("Worksheet is empty or does not contain data.");
+    }
+
+    var rowCount = worksheet.Dimension.Rows;
+
+    for (int row = 2; row <= rowCount; row++)
+    {
+        var genderText = GetCellTextOrNull(worksheet.Cells[row, 9]);
+        int genderId = (genderText?.Trim() == "ذكر" || genderText?.Trim() == "Male") ? 1 : 2;
+
+        
+        // Attempt to parse the date in cell number 12
+        var dateOfBirthText = GetCellTextOrNull(worksheet.Cells[row, 14]);
+        DateTime? dateOfBirth = ParseDate2(dateOfBirthText);
+
+        var person = new Person
+        {
+            FirstName = GetCellTextOrNull(worksheet.Cells[row, 5]),
+            FatherName = GetCellTextOrNull(worksheet.Cells[row, 6]),
+            LastName = GetCellTextOrNull(worksheet.Cells[row, 7]),
+            MotherName = GetCellTextOrNull(worksheet.Cells[row, 8]),
+            NationalId = GetCellTextOrNull(worksheet.Cells[row, 12])?.Length > 11 
+                ? GetCellTextOrNull(worksheet.Cells[row, 12])?.Substring(0, 11) 
+                : GetCellTextOrNull(worksheet.Cells[row, 12]),
+            EnsuranceNumber = GetCellTextOrNull(worksheet.Cells[row, 11]),
+            //Mobile = GetCellTextOrNull(worksheet.Cells[row, 15]),
+            GenderId = genderId,
+            BirthDate = dateOfBirth,
+           // PayMethodId=2
+        };
+
+        var engineere = new Engineere
+        {
+            EngNumber = GetCellTextOrNull(worksheet.Cells[row, 3]),
+            SubNumber = GetCellTextOrNull(worksheet.Cells[row, 4]),
+            Person = person
+        };
+
+        try
+        {
+            _dataContext.Persons.Add(person);
+            await _dataContext.SaveChangesAsync();
+
+            _dataContext.Engineeres.Add(engineere);
+            await _dataContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new CustomException($"Database update error occurred while processing row {row}", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new CustomException($"Error occurred while processing row {row}", ex);
+        }
+
+        people.Add(person);
+    }
+
+    return people;
+}
+
+
+
+
+
+private DateTime? ParseDate2(string dateText)
+{
+    if (string.IsNullOrWhiteSpace(dateText)) return null;
+
+    // Add formats for parsing date and time
+    string[] formats = { 
+        "dd-MMM-yyyy",       // e.g., 06-Aug-1962
+        "d-M-yyyy",          // e.g., 10-8-1968
+        "dd-M-yyyy",         // e.g., 10-08-1968
+        "M/d/yyyy",          // e.g., 1/17/1968
+        "yyyy",              // e.g., 2004
+        "MM/dd/yyyy",        // e.g., 10/08/1968
+        "dd-MMM-yyyy HH:mm", // e.g., 17-Mar-1972 00:00
+        "dd-MM-yyyy HH:mm"   // For potential other formats like 17-03-1972 00:00
+    };
+    
+    DateTime parsedDate;
+
+    // Try to parse the exact date and time using the specified formats
+    if (DateTime.TryParseExact(dateText, formats, null, System.Globalization.DateTimeStyles.None, out parsedDate))
+    {
+        return parsedDate;
+    }
+
+    // Check if the input is a year and construct a date (January 1st of the given year)
+    if (int.TryParse(dateText, out int year) && year >= 1900 && year <= DateTime.Now.Year)
+    {
+        return new DateTime(year, 1, 1);
+    }
+
+    // Log the invalid date format for debugging
+    Console.WriteLine($"Invalid date format in the input: {dateText}. Row will be skipped or handled.");
+    
+    // Return null if the date is invalid
+    return null;
+}
+
+
+
+
+
+
 
 
         }

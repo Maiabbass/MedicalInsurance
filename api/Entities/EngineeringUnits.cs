@@ -35,12 +35,14 @@ namespace api.Entities
       //  public Engineere Engineere{ get; set;}
       public string  Namepresident { get; set; }
 
-      public string Phonepresident { get; set; }
+      public string? Phonepresident { get; set; }
 
-      public string Emailpresident { get; set; }
+      public string? Emailpresident { get; set; }
 
         public ICollection<AnnualData>AnnualDatas { get; set;}
 
         public ICollection<WorkPlace> WorkPlaces { get; set; }
+
+        public ICollection<Person> Persons { get; set; }
     }
 }

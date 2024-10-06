@@ -54,6 +54,8 @@ namespace api.Data
 
         public DbSet<Note>Notes{ get ; set ;}
 
+        public DbSet<Subscribers2024> subscribers2024s{ get ; set;}
+
          
         protected override void OnModelCreating(ModelBuilder builder)
         {

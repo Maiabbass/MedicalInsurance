@@ -56,6 +56,47 @@ namespace api.Services
             PersonId = (int)note.PersonId
         }).ToList();
     }
+
+
+     public async Task<string> DeleteNoteByIdAsync(int? personId, int? ageSegmentId, int? relationId, int? hospitalId, int? surgicalProcedureId)
+    {
+        bool isDeleted = await _noteRepository.DeleteNoteAsync(personId, ageSegmentId, relationId, hospitalId, surgicalProcedureId);
+        
+        if (!isDeleted)
+        {
+            return "Note not found.";
+        }
+
+        return "Note deleted successfully.";
+    }
+
+
+
+    public async Task<string> DeleteNoteAsync(int id)
+    {
+        bool isDeleted = await _noteRepository.DeleteNoteByIdAsync(id);
+        
+        if (!isDeleted)
+        {
+            return "Note not found.";
+        }
+
+        return "Note deleted successfully.";
+    }
+
+
+
+     public async Task<string> EditNoteAsync(int id, string newContent)
+    {
+        bool isEdited = await _noteRepository.EditNoteAsync(id, newContent);
+        
+        if (!isEdited)
+        {
+            return "Note not found.";
+        }
+
+        return "Note updated successfully.";
+    }
 }
 }
         

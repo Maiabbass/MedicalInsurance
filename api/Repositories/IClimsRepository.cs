@@ -9,7 +9,8 @@ namespace api.Repositories
 {
     public interface IClimsRepository
     {
-         List<Claims> ReadDataFromExcel(Stream fileStream);
+        
+         public List<Claims> ReadDataFromExcel(Stream fileStream, int year);
         Task LoadClaimsToDatabase(List<Claims> claimsList);
         Task<bool> ExistsAsync(int engineerId, int year);
        public bool UpdateClaim(int id, ClaimEditDTO claimEditDTO);

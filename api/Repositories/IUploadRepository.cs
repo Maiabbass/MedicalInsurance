@@ -19,6 +19,13 @@ namespace api.Repositories
         Task LoadSubToHospital(List<Hospital> list);
         Task<List<SurgicalProcedures>> ReadExcelFileSurgical(Stream fileStream);
         Task LoadSubToSurgical(List<SurgicalProcedures> list);
+        Task<List<Subscribers2024>> ImportSubscribersAsync(Stream stream);
+        Task LoadSubToDatabase2024(List<Subscribers2024> list);
+
+          Task<List<Person>> ReadExcelFileUnits(Stream fileStream);
+
+          Task<List<Person>> ReadExcelFileUnits2(Stream fileStream);
+          
         
     }
 }

@@ -28,5 +28,6 @@ namespace api.Entities
         public string NameMethod { get; set; }
         
         public ICollection<AnnualData> AnnualDatas{get; set;}
+        public ICollection<Person> Persons { get; set; }
     }
 }

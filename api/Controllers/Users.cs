@@ -541,8 +541,8 @@ public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO reset
 
 
 
-[HttpPost]
-[Route("RegisterManger")]
+ [HttpPost]
+[Route("Reset_PassWord_Manger")]
 public async Task<IActionResult> StoreUserCredentials(string userName, string email, string password)
 {
     // التحقق مما إذا كان المستخدم موجودًا بالفعل
@@ -580,6 +580,9 @@ public async Task<IActionResult> StoreUserCredentials(string userName, string em
 }
 
 
+
+
+
 [HttpPost]
 [Route("LoginManger")]
 public async Task<IActionResult> Login(string userName, string password)
@@ -598,9 +601,31 @@ public async Task<IActionResult> Login(string userName, string password)
         return Unauthorized("Invalid username or password.");
     }
 
-    // إذا كانت البيانات صحيحة، يمكن السماح بالدخول
-    return Ok("Login successful.");
+    // إنشاء قائمة الـ Claims
+    var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    };
+
+    // توليد Token باستخدام دالة GetToken
+    var token = GetToken(authClaims);
+
+    // تحويل Token إلى نص
+    var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+    // إنشاء DTO لإرجاع البيانات
+    var loginResponseDto = new LoginResponseDTO
+    {
+        Token = tokenString,
+        Expiration = token.ValidTo
+    };
+
+    // إعادة الـ Token والبيانات الأخرى
+    return Ok(loginResponseDto);
 }
+
 
 
 

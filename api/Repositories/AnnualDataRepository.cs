@@ -592,8 +592,160 @@ namespace api.Repositories
 
 
 
+     public async Task<AnnualDataDetail> GetAnnualDataDetailByPersonIdAndYear(int personId, int year)
+    {
+        return await _dataContext.AnnualDataDetails
+            .FirstOrDefaultAsync(detail => detail.PersonId == personId && detail.Year == year);
+    }
+
+
+    public async Task<List<int>> GetPersonsWithClaimsByYearAsync(int year)
+{
+    return await _dataContext.Claims
+        .Where(c => c.Year == year)
+        .Select(c => c.PersonId)
+        .Distinct()
+        .ToListAsync();
+}
+
+
+public async Task UpdateAnnualData(AnnualData annualData)
+{
+    _dataContext.AnnualDatas.Update(annualData);
+    await _dataContext.SaveChangesAsync();
+}
+
+
+
+public async Task UpdateAnnualDataDetail(AnnualDataDetail annualDataDetail)
+{
+    _dataContext.AnnualDataDetails.Update(annualDataDetail);
+    await _dataContext.SaveChangesAsync();
+}
+
+
+
+
+
+
+
+
+     public async Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId)
+    {
+        var annualDataList = await _dataContext.AnnualDatas
+            .Where(ad => ad.EngineereId == engineerId)
+            .Include(ad => ad.Engineere)
+            .ThenInclude(e => e.Person)
+            .ToListAsync();
+
+        if (annualDataList == null || annualDataList.Count == 0)
+        {
+            return new List<EngineerStatusDto>();
+        }
+
+        var result = new List<EngineerStatusDto>();
+
+        foreach (var data in annualDataList)
+        {
+            if (data.Engineere == null || data.Engineere.Person == null)
+            {
+                continue;
+            }
+
+            string status = "";
+            decimal? nonAddForPersonSum = null; // Nullable decimal for the sum
+
+            if (data.Subscrib && data.Affiliate && !data.Beneficiary)
+            {
+                status = "Registered";
+            }
+            else if (data.Subscrib && data.Affiliate && data.Beneficiary)
+            {
+                status = "Beneficiary";
+
+                // Get the sum of non_AddForPerson from Clims table
+                nonAddForPersonSum = await _dataContext.Claims
+                    .Where(c => c.PersonId == data.Engineere.Person.Id)
+                    .SumAsync(c => (decimal?)c.non_AddForPerson) ?? 0;
+            }
+
+            result.Add(new EngineerStatusDto
+            {
+                Year = data.Year,
+                InsuranceNumber = data.Engineere.Person.EnsuranceNumber ?? "Unknown",
+                Status = status,
+                NonAddForPersonSum = nonAddForPersonSum // Set the sum here
+            });
+        }
+
+        return result;
+    }
+
+
+
+
+
+
+    public async Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId)
+    {
+        // Get AnnualDataDetail for the given PersonId and where IsEngineer is false
+        var annualDataDetailList = await _dataContext.AnnualDataDetails
+            .Where(add => add.PersonId == personId && !add.IsEngineer)
+            .Include(add => add.Person)
+            .ToListAsync();
+
+        if (annualDataDetailList == null || annualDataDetailList.Count == 0)
+        {
+            return new List<AnnualDataDetailStatusDto>();
+        }
+
+        var result = new List<AnnualDataDetailStatusDto>();
+
+        foreach (var data in annualDataDetailList)
+        {
+            if (data.Person == null)
+            {
+                continue;
+            }
+
+            string status = "";
+            decimal? nonAddForPersonSum = null;
+
+            // Logic for determining status based on Subscrib, Affiliate, and Beneficiary
+            if (data.Subscrib && data.Affiliate && !data.Beneficiary)
+            {
+                status = "Registered";
+            }
+            else if (data.Subscrib && data.Affiliate && data.Beneficiary)
+            {
+                status = "Beneficiary";
+
+                // Get the sum of non_AddForPerson from Clims table for this person
+                nonAddForPersonSum = await _dataContext.Claims
+                    .Where(c => c.PersonId == data.PersonId)
+                    .SumAsync(c => (decimal?)c.non_AddForPerson) ?? 0;
+            }
+
+            result.Add(new AnnualDataDetailStatusDto
+            {
+                Year = data.Year,
+                InsuranceNumber = data.Person.EnsuranceNumber ?? "Unknown",
+                Status = status,
+                NonAddForPersonSum = nonAddForPersonSum // Set the sum here
+            });
+        }
+
+        return result;
+    }
+}
+}
+
+
+
+
+
   
         
-    }}
+    
 
     
