@@ -3,9 +3,11 @@ using System.Collections.Generic;
 
 using System.Linq;
 using System.Threading.Tasks;
+using api.Data;
 using api.DTOS;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -16,11 +18,14 @@ namespace api.Controllers
         
 
     private readonly IHospitalService _hospitalService;
+
+    private readonly DataContext _dataContext;
           
         
-    public Hospitals(IHospitalService hospitalService)
+    public Hospitals(IHospitalService hospitalService , DataContext dataContext)
       {
       _hospitalService= hospitalService;
+      _dataContext= dataContext;
          }
         
 
@@ -111,6 +116,57 @@ return  Ok(result);
 
             return Ok(hospitals);
         }
+
+
+
+
+
+      [HttpGet("GetHospitals-With-Year/{year}")]
+public async Task<IActionResult> GetHospitals(int year)
+{
+    // جلب المستشفيات بناءً على السنة
+    var hospitals = await _dataContext.Hospitals
+                                      .Where(h => h.Year == year)
+                                      .ToListAsync();
+
+    if (hospitals == null || !hospitals.Any())
+    {
+        return NotFound(new { message = $"No hospitals found for year {year}." });
+    }
+
+    var hospitalIds = hospitals.Select(h => h.Id).ToList();
+
+    // جلب الملاحظات المرتبطة بالمستشفيات
+    var notes = await _dataContext.Notes
+                                  .Where(n => hospitalIds.Contains(n.HospitalId.Value))
+                                  .ToListAsync();
+
+    var result = hospitals.Select(h => new
+    {
+        HospitalId = h.Id,
+        HospitalName = h.Name,
+        Adress=h.Address,
+        Enabled=h.Enabled,
+        Inside=h.Inside,
+        Phone=h.Phone,
+        Email=h.Email,
+        CityId=h.CityId,
+        Latitude=h.latitude,
+        Longitude=h.Longitude,
+
+        Year = h.Year,
+        Notes = notes
+            .Where(note => note.HospitalId == h.Id)
+            .Select(note => new
+            {
+                note.Id,
+                note.Content
+            })
+    });
+
+    return Ok(result);
+}
+
 
         
     }

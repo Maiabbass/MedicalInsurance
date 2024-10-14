@@ -13,5 +13,7 @@ namespace api.Repositories
         Task Delete_AgeSegmentsByYear(int year);
 
         Task Update_Age_Segment(AgeSegments ageSegment);
+
+        Task<bool> DeleteAgeSegmentAsync(int id);
     }
 }

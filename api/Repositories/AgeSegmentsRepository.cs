@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using api.Data;
 using api.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace api.Repositories
         {
         return  await _dataContext.AgeSegments.Where(x=>x.Year==year).ToListAsync();
         }
+
         public async Task<bool> Add_Age_Segments(List<AgeSegments> ageSegments)
         {
             
@@ -64,7 +66,44 @@ namespace api.Repositories
     }
 }
 
+ 
+
+
+
+ 
+    public async Task<bool> DeleteAgeSegmentAsync(int id)
+    {
+        try
+        {
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+
+                var notes = _dataContext.Notes.Where(n => n.AgeSegmentId == id);
+                _dataContext.Notes.RemoveRange(notes);
+
+              
+                var ageSegment = await _dataContext.AgeSegments.FindAsync(id);
+                if (ageSegment == null)
+                {
+                    return false; 
+                }
+
+                _dataContext.AgeSegments.Remove(ageSegment);
+                await _dataContext.SaveChangesAsync(); // حفظ التغييرات في قاعدة البيانات
+
+
+                scope.Complete();
+                return true; // تم الحذف بنجاح
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+}
+
+
 
 
     }
-}

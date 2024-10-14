@@ -737,6 +737,15 @@ public async Task UpdateAnnualDataDetail(AnnualDataDetail annualDataDetail)
 
         return result;
     }
+
+
+
+    public async Task<YearConfiguration> GetYearConfigurationByYear(int year)
+{
+    return await _dataContext.YearConfigurations
+        .FirstOrDefaultAsync(y => y.Year == year);
+}
+
 }
 }
 

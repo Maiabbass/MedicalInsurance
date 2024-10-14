@@ -15,6 +15,7 @@ namespace api.Repositories
         Task<bool> Add_RelationType(List<RelationType> ealationType);
         Task Update_RelationType(RelationType relationType);
         Task Delete_RelationTypesByYear(int year);
+        Task<bool> DeleteRelationTypeAsync(int id);
        
        
     }

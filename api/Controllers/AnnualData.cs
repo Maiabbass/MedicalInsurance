@@ -248,18 +248,21 @@ public async Task<ActionResult> DeleteAnnualSetting(int year)
 
 
 
-          [HttpPost]
-          [Route("AnnualSetting")]
-        public async Task<ActionResult< Response>> AddAnnualSetting([FromBody] AnnualSettingDTO annualSettingDTO)
-        {
-                var response =await _AnnualDataService.AddAnnualSettings(annualSettingDTO);
-                  if (response.ErrorMessage!=null)
-               {
-                    return StatusCode(StatusCodes.Status500InternalServerError,
-                       new Response {  ErrorMessage =response.ErrorMessage});
-               }
-                return Ok(response);
-        } 
+ [HttpPost]
+[Route("AnnualSetting/{title}")]
+public async Task<ActionResult<Response>> AddAnnualSetting(string title, [FromBody] AnnualSettingDTO annualSettingDTO)
+{
+    var response = await _AnnualDataService.AddAnnualSettings(title, annualSettingDTO);
+
+    if (response.ErrorMessage != null)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { ErrorMessage = response.ErrorMessage });
+    }
+
+    return Ok(response);
+}
+
 
 
 
@@ -778,8 +781,173 @@ public async Task<IActionResult> GetFamilyMemberStatusByYear(int personId)
 }
 
 
-   
 
+
+[HttpGet("GetYearConfigurations/{year}")]
+public async Task<ActionResult<List<YearConfigurationDTO>>> GetYearConfigurations(int year)
+{
+    var yearConfigurations = await _dataContext.YearConfigurations
+                                               .Where(yc => yc.Year == year)
+                                               .Select(yc => new YearConfigurationDTO
+                                               {
+                                                   Id = yc.Id,
+                                                   CardPrice= (decimal)yc.CardPrice,
+                                                  
+                                               })
+                                               .ToListAsync();
+
+    if (yearConfigurations == null || yearConfigurations.Count == 0)
+    {
+        return NotFound($"No year configurations found for year {year}.");
     }
+
+    return Ok(yearConfigurations);
+}
+
+
+
+
+
+
+ [HttpGet("GetAgeSegments-With-Nots/{year}")]
+public async Task<IActionResult> GetAgeSegments(int year)
+{
+    // جلب الشرائح العمرية بناءً على السنة
+    var ageSegments = await _dataContext.AgeSegments
+                                        .Where(asg => asg.Year == year)
+                                        .ToListAsync();
+
+    if (ageSegments == null || !ageSegments.Any())
+    {
+        return NotFound(new { message = $"No age segments found for year {year}." });
+    }
+
+    var ageSegmentIds = ageSegments.Select(asg => asg.Id).ToList();
+
+    // جلب الملاحظات المرتبطة بالشرائح العمرية
+    var notes = await _dataContext.Notes
+                                  .Where(n => ageSegmentIds.Contains(n.AgeSegmentId.Value))
+                                  .ToListAsync();
+
+    var result = ageSegments.Select(asg => new
+    {
+        AgeSegmentId = asg.Id,
+        Year = asg.Year,
+        FromYear=asg.FromYear,
+        ToYear=asg.ToYear,
+        TheAmount=asg.TheAmount,
+        EnduranceRatio=asg.EnduranceRatio,
+        Notes = notes
+            .Where(note => note.AgeSegmentId == asg.Id)
+            .Select(note => new
+            {
+                note.Id,
+                note.Content
+            })
+    });
+
+    return Ok(result);
+}
+
+
+
+
+
+  [HttpGet("RelationType-With-Notes/{year}")]
+    public async Task<IActionResult> GetRelationsAndNotesByYear(int year)
+    {
+        // الخطوة الأولى: جلب العلاقات بناءً على السنة
+        var relations = await _dataContext.RelationTypes
+            .Where(r => r.Year == year)
+            .ToListAsync();
+
+        if (relations == null || !relations.Any())
+        {
+            return NotFound(new { message = "لم يتم العثور على علاقات لهذه السنة." });
+        }
+
+        var relationIds = relations.Select(r => r.Id).ToList();
+
+
+        var notes = await _dataContext.Notes
+            .Where(n => relationIds.Contains(n.RelationId.Value)) // جلب الملاحظات التي لها RelationId مطابق
+             .ToListAsync();
+
+
+ 
+        var result = relations.Select(relation => new
+        {
+            RelationId = relation.Id,
+            RelationName = relation.Name,
+            Year = relation.Year,
+            Notes = notes
+                .Where(note => note.RelationId == relation.Id) // ربط الملاحظات بالعلاقة بناءً على RelationId
+                .Select(note => new
+                {
+                    note.Id,
+                    note.Content
+                })
+        });
+
+        return Ok(result);
+    }
+
+
+
+
+
+
+ [HttpDelete("DeleteRelationType/{id}")]
+    public async Task<IActionResult> DeleteRelationType(int id)
+    {
+        var result = await _relationRepository.DeleteRelationTypeAsync(id);
+
+        if (!result)
+        {
+            return NotFound(); // لم يتم العثور على العنصر
+        }
+
+        return NoContent(); // تم الحذف بنجاح
+    }
+
+
+
+
+
+     [HttpDelete("DeleteAgeSegment/{id}")]
+  
+    public async Task<IActionResult> DeleteAgeSegment(int id)
+    {
+        var result = await _ageSegmentsRepository.DeleteAgeSegmentAsync(id);
+
+        if (!result)
+        {
+            return NotFound(); // لم يتم العثور على العنصر
+        }
+
+        return NoContent(); // تم الحذف بنجاح
+    }
+
+
+
+
+
+      [HttpDelete("DeleteYearConfigcuration{id}")]
+    public async Task<IActionResult> DeleteYearConfiguration(int id)
+    {
+        var yearConfig = await _dataContext.YearConfigurations.FindAsync(id);
+
+        if (yearConfig == null)
+        {
+            return NotFound(); // لم يتم العثور على العنصر
+        }
+
+        _dataContext.YearConfigurations.Remove(yearConfig);
+        await _dataContext.SaveChangesAsync();
+
+        return NoContent(); // تم الحذف بنجاح
+    }
+}
+}
+
    
-   }

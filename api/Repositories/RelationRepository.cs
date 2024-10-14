@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using api.Data;
 using api.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -89,5 +90,38 @@ namespace api.Repositories
        
 
 
+       public async Task<bool> DeleteRelationTypeAsync(int id)
+    {
+        try
+        {
+            using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+
+                 var notes = _dataContext.Notes.Where(n => n.RelationId == id);
+                _dataContext.Notes.RemoveRange(notes);
+
+                var relations = _dataContext.Relations.Where(r => r.RelationTypeId == id);
+                _dataContext.Relations.RemoveRange(relations);
+
+                var relationType = await _dataContext.RelationTypes.FindAsync(id);
+                if (relationType == null)
+                {
+                    return false; // لم يتم العثور على العنصر
+                }
+
+                _dataContext.RelationTypes.Remove(relationType);
+                await _dataContext.SaveChangesAsync(); 
+
+                scope.Complete();
+                return true; // تم الحذف بنجاح
+            }
         }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
 }
+
+
+        }

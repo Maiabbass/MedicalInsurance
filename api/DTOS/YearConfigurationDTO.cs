@@ -10,5 +10,6 @@ namespace api.DTOS
     public int Id { get; set; }
     public int Year { get; set; }
     public decimal CardPrice { get; set; }
+    public List<NoteCreateDTO> Notes { get; set; } 
 }
 }

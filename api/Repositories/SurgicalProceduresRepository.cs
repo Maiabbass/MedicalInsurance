@@ -28,6 +28,9 @@ namespace api.Repositories
                Pathological_specialization=surgicalProcedures.Pathological_specialization,
                Price=surgicalProcedures.Price,
                Year=surgicalProcedures.Year,
+               Ceiling=surgicalProcedures.Ceiling,
+               OUT = surgicalProcedures.OUT,
+               IN= surgicalProcedures.IN
               
                //Date=surgicalProcedures.Date,
 
@@ -67,6 +70,9 @@ namespace api.Repositories
        databaseEntity.Pathological_specialization=surgicalProceduresEditDTO.Pathological_specialization;
        databaseEntity.Price=surgicalProceduresEditDTO.Price;
        databaseEntity.Year= (int)surgicalProceduresEditDTO.Year;
+       databaseEntity.Ceiling=surgicalProceduresEditDTO.Ceiling;
+       databaseEntity.IN=surgicalProceduresEditDTO.IN;
+       databaseEntity.OUT=surgicalProceduresEditDTO.OUT;
        
       // databaseEntity.Date=surgicalProceduresEditDTO.Date;
   

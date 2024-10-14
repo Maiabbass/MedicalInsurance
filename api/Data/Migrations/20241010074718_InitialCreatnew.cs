@@ -205,7 +205,10 @@ namespace api.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Year = table.Column<int>(type: "int", nullable: false),
                     Pathological_specialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Ceiling = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    IN = table.Column<bool>(type: "bit", nullable: false),
+                    OUT = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

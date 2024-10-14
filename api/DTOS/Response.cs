@@ -15,5 +15,6 @@ namespace api.DTOS
         public bool Success { get; internal set; }
         public string Message { get; internal set; }
         public List<int> Data { get; internal set; }
+        public bool IsSuccess { get; internal set; }
     }
 }

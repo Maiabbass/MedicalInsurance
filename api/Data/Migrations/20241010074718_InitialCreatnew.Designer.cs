@@ -12,7 +12,7 @@ using api.Data;
 namespace api.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20240923090755_InitialCreatnew")]
+    [Migration("20241010074718_InitialCreatnew")]
     partial class InitialCreatnew
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -880,8 +880,17 @@ namespace api.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<decimal>("Ceiling")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IN")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("OUT")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Pathological_specialization")
                         .HasColumnType("nvarchar(max)");

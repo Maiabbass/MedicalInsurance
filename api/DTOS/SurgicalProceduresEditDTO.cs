@@ -10,13 +10,14 @@ namespace api.DTOS
         #nullable disable
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool Technical{get ; set ;}
+      
 
-        public bool Financial {get ; set ; }
-
-        public string Pathological_specialization { get; set; }
+        public string? Pathological_specialization { get; set; }
 
         public decimal Price { get ; set;}
+        public  decimal Ceiling{ get ; set ;}
+        public  decimal IN{ get ; set;}
+        public  decimal OUT { get ; set ;}
 
        public string? NoteContent { get; set; } 
 

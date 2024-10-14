@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.Data;
 using api.DTOS;
 using api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
@@ -18,11 +20,13 @@ namespace api.Controllers
         
 
     private readonly ISurgicalProceduresServices _SurgicalProceduresServices;
+    private readonly DataContext _dataContext;
           
         
-    public SurgicalProcedures(ISurgicalProceduresServices SurgicalProceduresServices)
+    public SurgicalProcedures(ISurgicalProceduresServices SurgicalProceduresServices , DataContext dataContext)
       {
       _SurgicalProceduresServices= SurgicalProceduresServices;
+      _dataContext= dataContext;
          }
         
 
@@ -96,6 +100,49 @@ public async Task<IActionResult> Delete(int Id)
         return StatusCode(StatusCodes.Status500InternalServerError,
             new { Status = "Error", Message = ex.Message });
     }
+}
+
+
+ [HttpGet("GetSurgicals-With-Year/{year}")]
+public async Task<IActionResult> GetSurgicals(int year)
+{
+    // جلب العمليات الجراحية بناءً على السنة
+    var surgicals = await _dataContext.SurgicalProcedures
+                                      .Where(s => s.Year == year)
+                                      .ToListAsync();
+
+    if (surgicals == null || !surgicals.Any())
+    {
+        return NotFound(new { message = $"No surgicals found for year {year}." });
+    }
+
+    var surgicalIds = surgicals.Select(s => s.Id).ToList();
+
+    // جلب الملاحظات المرتبطة بالعمليات الجراحية
+    var notes = await _dataContext.Notes
+                                  .Where(n => surgicalIds.Contains(n.SurgicalProcedureId.Value))
+                                  .ToListAsync();
+
+    var result = surgicals.Select(s => new
+    {
+        SurgicalId = s.Id,
+        SurgicalName = s.Name,
+        Pathological_specialization=s.Pathological_specialization,
+        Price=s.Price,
+        Ceiling=s.Ceiling,
+        IN=s.IN,
+        OUT=s.OUT,
+        Year = s.Year,
+        Notes = notes
+            .Where(note => note.SurgicalProcedureId == s.Id)
+            .Select(note => new
+            {
+                note.Id,
+                note.Content
+            })
+    });
+
+    return Ok(result);
 }
 
     }

@@ -35,8 +35,12 @@ namespace api.Services
              Pathological_specialization=SurgicalProceduresEditDTO.Pathological_specialization,
              Price=SurgicalProceduresEditDTO.Price,
              Year= (int)SurgicalProceduresEditDTO.Year,
+             Ceiling=SurgicalProceduresEditDTO.Ceiling,
+             IN=SurgicalProceduresEditDTO.IN,
+             OUT=SurgicalProceduresEditDTO.OUT,
              
-             //Date=SurgicalProceduresEditDTO.Date,
+             
+             
              
             
            };

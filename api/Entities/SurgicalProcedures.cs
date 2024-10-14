@@ -16,11 +16,19 @@ namespace api.Entities
 
          public int Year { get ; set;}
 
-         public string Pathological_specialization { get; set; }
+         public string? Pathological_specialization { get; set; }
          
          [Column(TypeName = "decimal(18,2)")]
 
          public decimal Price { get; set; }
+
+         [Column(TypeName = "decimal(18,2)")]
+         public decimal Ceiling  { get ; set;} 
+         [Column(TypeName = "decimal(18,2)")]
+
+         public decimal IN {get ; set ;}
+         [Column(TypeName = "decimal(18,2)")]
+         public  decimal OUT {get ; set ;}
 
          public ICollection<Claims> Claims{get ; set; }
 

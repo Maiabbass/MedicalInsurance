@@ -55,6 +55,7 @@ namespace api.Repositories
        Task UpdateAnnualDataDetail(AnnualDataDetail annualDataDetail);
        Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId);
        Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId);
+       Task<YearConfiguration> GetYearConfigurationByYear(int year);
 
          
    

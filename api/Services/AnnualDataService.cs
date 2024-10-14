@@ -244,7 +244,8 @@ namespace api.Services
 
 
 
-  public async Task<Response> AddAnnualSettings(AnnualSettingDTO annualSettingDTO)
+
+public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO annualSettingDTO)
 {
     Response response = new Response();
 
@@ -252,136 +253,165 @@ namespace api.Services
     {
         using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            // إضافة YearConfiguration
-            YearConfiguration yearConfiguration = new YearConfiguration()
-            {
-                Id = 0,  // Ensure new record
-                Year = annualSettingDTO.Year,
-                CardPrice = annualSettingDTO.CardPrice
-            };
-            await _unitOfWork.AnnualDataRepository.Add_Year_Configuration(yearConfiguration);
+            // التحقق من وجود السنة مسبقاً
+            var existingYearConfig = await _unitOfWork.AnnualDataRepository.GetYearConfigurationByYear(annualSettingDTO.Year);
+            YearConfiguration yearConfiguration;
 
-            // تحقق من أن AgeSegments ليست null قبل التعامل معها
-            if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
+            if (existingYearConfig != null)
             {
-                var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
+                yearConfiguration = existingYearConfig; // استخدم السنة الموجودة
+            }
+            else
+            {
+                // إضافة YearConfiguration جديد في حالة عدم وجود السنة
+                yearConfiguration = new YearConfiguration()
                 {
-                    Id = 0,  // Set Id to 0 for new entries
-                    FromYear = dto.FromYear,
-                    ToYear = dto.ToYear,
-                    TheAmount = dto.TheAmount,
-                    EnduranceRatio = dto.EnduranceRatio,
-                    Year = annualSettingDTO.Year
-                }).ToList();
-
-                await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
+                    Id = 0,  // Ensure new record
+                    Year = annualSettingDTO.Year,
+                    CardPrice = annualSettingDTO.CardPrice
+                };
+                await _unitOfWork.AnnualDataRepository.Add_Year_Configuration(yearConfiguration);
             }
 
-            // تحقق من أن RelationTypes ليست null قبل التعامل معها
-            if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
+            // بناءً على العنوان الممرر، تنفيذ العملية المناسبة
+            switch (title.ToLower())
             {
-                var relationTypes = annualSettingDTO.RelationTypes.Select(dto => new RelationType
-                {
-                    Id = 0,  // Set Id to 0 for new entries
-                    Name = dto.Name,
-                    Relations = null,
-                    Year = annualSettingDTO.Year
-                }).ToList();
+                case "agesegment":
+                    if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
+                    {
+                        var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
+                        {
+                            Id = 0,
+                            FromYear = dto.FromYear,
+                            ToYear = dto.ToYear,
+                            TheAmount = dto.TheAmount,
+                            EnduranceRatio = dto.EnduranceRatio,
+                            Year = annualSettingDTO.Year
+                        }).ToList();
 
-                await _unitOfWork.RelationRepository.Add_RelationType(relationTypes);
-            }
+                        await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
 
-            // تحقق من أن Hospitals ليست null قبل التعامل معها
-            if (annualSettingDTO.Hospitals != null && annualSettingDTO.Hospitals.Any())
-            {
-                var hospitals = annualSettingDTO.Hospitals.Select(dto => new Hospital
-                {
-                    Id = 0,  // Set Id to 0 for new entries
-                    Name = dto.Name,
-                    Address = dto.Address,
-                    Enabled = dto.Enabled,
-                    Inside = dto.Inside,
-                    CityId = dto.CityId,
-                    Phone = dto.Phone,
-                    Email = dto.Email,
-                    Year = yearConfiguration.Year,
-                    latitude = dto.Latitude,
-                    Longitude = dto.Longitude
-                }).ToList();
+                      // تعديل إضافة الملاحظات الخاصة بـ AgeSegments
+                        var ageSegmentNotes = annualSettingDTO.AgeSegments
+                            .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))  // التحقق من وجود الملاحظة
+                            .Select(dto => new Note
+                            {
+                                Content = dto.NoteContent,
+                                AgeSegmentId = _dataContext.AgeSegments.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,
+                                YearConfigId = yearConfiguration.Id
+                            }).ToList();
 
-                await _unitOfWork.HospitalRepository.Add_Hospital(hospitals);
-            }
+                        if (ageSegmentNotes.Any())
+                        {
+                            await _unitOfWork.NoteRepository.AddNotesAsyncList(ageSegmentNotes);
+                        } }
+                    break;
 
-            // تحقق من أن SurgicalProcedures ليست null قبل التعامل معها
-            if (annualSettingDTO.Surgicals != null && annualSettingDTO.Surgicals.Any())
-            {
-                var surgicalProceduresEntities = annualSettingDTO.Surgicals.Select(dto => new SurgicalProcedures
-                {
-                    Id = 0,  // Set Id to 0 for new entries
-                    Name = dto.Name,
-                    Pathological_specialization = dto.Pathological_specialization,
-                    Price = dto.Price,
-                    Year = annualSettingDTO.Year
-                }).ToList();
+                case "relationtype":
+                    if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
+                    {
+                        var relationTypes = annualSettingDTO.RelationTypes.Select(dto => new RelationType
+                        {
+                            Id = 0,
+                            Name = dto.Name,
+                            Relations = null,
+                            Year = annualSettingDTO.Year
+                        }).ToList();
 
-                await _unitOfWork.SurgicalProceduresRepository.Add_SurgicalProceduers(surgicalProceduresEntities);
-            }
+                        await _unitOfWork.RelationRepository.Add_RelationType(relationTypes);
+                        // تعديل إضافة الملاحظات الخاصة بـ RelationTypes
+                        var relationNotes = annualSettingDTO.RelationTypes
+                            .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))  // التحقق من وجود الملاحظة
+                            .Select(dto => new Note
+                            {
+                                Content = dto.NoteContent,
+                                RelationId = _dataContext.RelationTypes.FirstOrDefault(r => r.Name == dto.Name)?.Id,
+                                YearConfigId = yearConfiguration.Id
+                            }).ToList();
 
-            // تجميع وإضافة جميع الملاحظات (Notes)
-            var notes = new List<Note>();
+                        if (relationNotes.Any())
+                        {
+                            await _unitOfWork.NoteRepository.AddNotesAsyncList(relationNotes);
+                        } }
+                    break;
 
-            // ملاحظات AgeSegments
-            if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
-            {
-                notes.AddRange(annualSettingDTO.AgeSegments.Select(dto => new Note
-                {
-                    Content = dto.NoteContent,
-                    AgeSegmentId = _dataContext.AgeSegments.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,  // Ensure correct ID mapping
-                    YearConfigId = yearConfiguration.Id
-                }));
-            }
+                case "hospitals":
+                    if (annualSettingDTO.Hospitals != null && annualSettingDTO.Hospitals.Any())
+                    {
+                        var hospitals = annualSettingDTO.Hospitals.Select(dto => new Hospital
+                        {
+                            Id = 0,
+                            Name = dto.Name,
+                            Address = dto.Address,
+                            Enabled = dto.Enabled,
+                            Inside = dto.Inside,
+                            CityId = dto.CityId,
+                            Phone = dto.Phone,
+                            Email = dto.Email,
+                            Year = yearConfiguration.Year,
+                            latitude = dto.Latitude,
+                            Longitude = dto.Longitude
+                        }).ToList();
 
-            // ملاحظات RelationTypes
-            if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
-            {
-                notes.AddRange(annualSettingDTO.RelationTypes.Select(dto => new Note
-                {
-                    Content = dto.NoteContent,
-                    RelationId = _dataContext.RelationTypes.FirstOrDefault(r => r.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                    YearConfigId = yearConfiguration.Id
-                }));
-            }
+                        await _unitOfWork.HospitalRepository.Add_Hospital(hospitals);
+                        // تعديل إضافة الملاحظات الخاصة بـ Hospitals
+                        var hospitalNotes = annualSettingDTO.Hospitals
+                            .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))  // التحقق من وجود الملاحظة
+                            .Select(dto => new Note
+                            {
+                                Content = dto.NoteContent,
+                                HospitalId = _dataContext.Hospitals.FirstOrDefault(h => h.Name == dto.Name)?.Id,
+                                YearConfigId = yearConfiguration.Id
+                            }).ToList();
 
-            // ملاحظات Hospitals
-            if (annualSettingDTO.Hospitals != null && annualSettingDTO.Hospitals.Any())
-            {
-                notes.AddRange(annualSettingDTO.Hospitals.Select(dto => new Note
-                {
-                    Content = dto.NoteContent,
-                    HospitalId = _dataContext.Hospitals.FirstOrDefault(h => h.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                    YearConfigId = yearConfiguration.Id
-                }));
-            }
+                        if (hospitalNotes.Any())
+                        {
+                            await _unitOfWork.NoteRepository.AddNotesAsyncList(hospitalNotes);
+                        } }
+                    break;
 
-            // ملاحظات SurgicalProcedures
-            if (annualSettingDTO.Surgicals != null && annualSettingDTO.Surgicals.Any())
-            {
-                notes.AddRange(annualSettingDTO.Surgicals.Select(dto => new Note
-                {
-                    Content = dto.NoteContent,
-                    SurgicalProcedureId = _dataContext.SurgicalProcedures.FirstOrDefault(s => s.Name == dto.Name)?.Id,  // Ensure correct ID mapping
-                    YearConfigId = yearConfiguration.Id
-                }));
-            }
+                case "surgicals":
+                    if (annualSettingDTO.Surgicals != null && annualSettingDTO.Surgicals.Any())
+                    {
+                        var surgicalProceduresEntities = annualSettingDTO.Surgicals.Select(dto => new SurgicalProcedures
+                        {
+                            Id = 0,
+                            Name = dto.Name,
+                            Pathological_specialization = dto.Pathological_specialization,
+                            Price = dto.Price,
+                            Year = annualSettingDTO.Year,
+                            Ceiling = dto.Ceiling,
+                            IN = dto.IN,
+                            OUT = dto.OUT
+                        }).ToList();
 
-            // إضافة جميع الملاحظات دفعة واحدة
-            if (notes.Any())
-            {
-                await _unitOfWork.NoteRepository.AddNotesAsyncList(notes);
+                        await _unitOfWork.SurgicalProceduresRepository.Add_SurgicalProceduers(surgicalProceduresEntities);
+
+                                                
+                        // تعديل إضافة الملاحظات الخاصة بـ SurgicalProcedures
+                        var surgicalNotes = annualSettingDTO.Surgicals
+                            .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))  // التحقق من وجود الملاحظة
+                            .Select(dto => new Note
+                            {
+                                Content = dto.NoteContent,
+                                SurgicalProcedureId = _dataContext.SurgicalProcedures.FirstOrDefault(s => s.Name == dto.Name)?.Id,
+                                YearConfigId = yearConfiguration.Id
+                            }).ToList();
+
+                        if (surgicalNotes.Any())
+                        {
+                            await _unitOfWork.NoteRepository.AddNotesAsyncList(surgicalNotes);
+                        } }
+                    break;
+
+                default:
+                    response.ErrorMessage = "Invalid title provided.";
+                    return response;
             }
 
             // إكمال المعاملة إذا تم كل شيء بنجاح
             scope.Complete();
+            response.IsSuccess = true;
         }
     }
     catch (TransactionAbortedException ex)
@@ -403,6 +433,8 @@ namespace api.Services
 
     return response;
 }
+
+
 
 
 

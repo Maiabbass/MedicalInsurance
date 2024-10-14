@@ -25,7 +25,7 @@ namespace api.Services
           public decimal calcualteAmount(DateTime? birthDate,int year);
 
          
-          Task <Response> AddAnnualSettings (AnnualSettingDTO annualSettingDTO); 
+           Task<Response> AddAnnualSettings(string title, AnnualSettingDTO annualSettingDTO); 
            Task<bool> DeleteAnnuaSetting(int year);
 
            //Task<Response> UpdateAnnualSettings( AnnualSettingDTO annualSettingDTO);
