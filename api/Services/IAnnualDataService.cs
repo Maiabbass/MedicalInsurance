@@ -87,6 +87,7 @@ namespace api.Services
     Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId);
 
     Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId);
+     Task UpdatePersonAmountsBasedOnNewAgeSegments(int year);
 
     }
 }

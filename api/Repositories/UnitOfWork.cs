@@ -43,7 +43,7 @@ namespace api.Repositories
 
         public IAnnualDataRepository AnnualDataRepository=>new AnnualDataRepository(_dataContext);
 
-        public IAgeSegmentsRepository AgeSegmentsRepository=>new AgeSegmentsRepository(_dataContext);
+        public IAgeSegmentsRepository AgeSegmentsRepository=>new AgeSegmentsRepository(_dataContext , annualDataService);
         
         public ICityRepository CityRepository=>new CityRepository(_dataContext);
         public IHospitalRepository HospitalRepository=>new HospitalRepository(_dataContext);

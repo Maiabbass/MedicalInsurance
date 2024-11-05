@@ -67,12 +67,16 @@ namespace api.Repositories
     }
 
 
-    public void DeleteByPersonId(int PersonId){
-         var rest=   _context.Words.Where(x=>x.PersonId==PersonId).ToList();
-         if(rest!=null){
-            _context.Words.RemoveRange(rest);
 
-         }
 
-    
-    }}}
+  public async Task DeleteByPersonIdAsync(int personId) {
+    var words = await _context.Words
+        .Where(x => x.PersonId == personId)
+        .ToListAsync();
+
+    if (words.Any()) {
+        _context.Words.RemoveRange(words);
+        await _context.SaveChangesAsync();
+    }
+}
+}}

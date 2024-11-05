@@ -24,13 +24,15 @@ namespace api.Controllers
 
    private readonly IWordRepository _wordRepository;
    private readonly IImageRepository _imageRepository;
+   private readonly INoteRepository _noteRepository;
           
         
- public Engineers(IEngineerService engineerService , IWordRepository wordRepository, IImageRepository imageRepository)
+ public Engineers(IEngineerService engineerService , IWordRepository wordRepository, IImageRepository imageRepository , INoteRepository noteRepository)
 {
   _engineerService= engineerService;
   _wordRepository=wordRepository;
   _imageRepository=imageRepository;
+  _noteRepository=noteRepository;
 
 }
         
@@ -38,12 +40,12 @@ namespace api.Controllers
 
 
 
-    [HttpPost]
-public async Task<ActionResult<Response>> AddEngineer([FromForm] EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[]? ContentImage , IFormFile[]? ContentFile)
+   [HttpPost]
+public async Task<ActionResult<Response>> AddEngineer([FromForm] EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[]? ContentImage, IFormFile[]? ContentFile, int year)
 {
     try
     {
-        var response = await _engineerService.Add(engineerPersonEditDTO, ContentImage, ContentFile);
+        var response = await _engineerService.Add(engineerPersonEditDTO, ContentImage, ContentFile, year);
         
         if (response.ErrorMessage != null)
         {
@@ -64,9 +66,9 @@ public async Task<ActionResult<Response>> AddEngineer([FromForm] EngineerPersonE
             new Response { ErrorMessage = $"An unexpected error occurred: {ex.Message}. Person details: {details}" });
     }
 }
-    
 
-        
+
+
 
         
 [HttpGet("{Id}")]
@@ -109,8 +111,8 @@ public async Task<ActionResult<PagedResult<PersonWithEngineereDTO>>> GetEngineer
 
 
  [HttpPut("{Id}/update-Eng-details")]
-        public  ActionResult<bool> Update(int Id,[FromBody] EngineerPersonEditDTO engineerPersonEditDTO){
-           bool result= _engineerService.Update(Id,engineerPersonEditDTO);
+        public  ActionResult<bool> Update(int Id,[FromBody] EngineerPersonEditDTO engineerPersonEditDTO  , int Year){
+           bool result= _engineerService.Update(Id,engineerPersonEditDTO , Year);
             if (result)
             {
 return  Ok(result);
@@ -122,20 +124,29 @@ return  Ok(result);
         }
 
 
-         [HttpDelete("{Id}")] 
-      public ActionResult Delete(int Id){
-      try{
-                 _imageRepository.DeleteByPersonId(Id);
-                 _wordRepository.DeleteByPersonId(Id);
-                  _engineerService.Delete(Id);
-                  return Ok("delete Successfully");}
 
-  catch (Exception ex){
-    return StatusCode(StatusCodes.Status500InternalServerError,
 
-                    new Response { Status = "Error", ErrorMessage = ex.Message }) ;}
-    
-  }
+        [HttpDelete("{Id}")]
+public async Task<ActionResult> DeleteAsync(int Id) {
+    try {
+        await _imageRepository.DeleteByPersonIdAsync(Id);
+        await _wordRepository.DeleteByPersonIdAsync(Id);
+        await _noteRepository.DeleteNotesByPersonIdAsync(Id);
+        var result = await _engineerService.DeleteAsync(Id);
+        
+        if (result) {
+            return Ok("Deleted Successfully");
+        } else {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new Response { Status = "Error", ErrorMessage = "Failed to delete" });
+        }
+    }
+    catch (Exception ex) {
+        return StatusCode(StatusCodes.Status500InternalServerError,
+            new Response { Status = "Error", ErrorMessage = ex.Message });
+    }
+}
+
 
      
 

@@ -231,15 +231,20 @@ namespace api.Repositories
 
        
 
-        public void DeleteByPersonId(int PersonId){
-         var rest=   _dataContext.AnnualDataDetails.Where(x=>x.PersonId==PersonId).ToList();
-         if(rest!=null){
-            _dataContext.AnnualDataDetails.RemoveRange(rest);
+       public async Task DeleteByPersonIdAsync(int personId) {
+    var rest = await _dataContext.AnnualDataDetails
+        .Where(x => x.PersonId == personId)
+        .ToListAsync();
 
-         }
+    if (rest.Any()) {
+        _dataContext.AnnualDataDetails.RemoveRange(rest);
+        await _dataContext.SaveChangesAsync();
+    }
+}
+
          
           
-        }
+        
         
         public void DeleteByAnnualDataId(int AnnualDataId){
          var rest=   _dataContext.AnnualDataDetails.Where(x=>x.AnnualDataId==AnnualDataId).ToList();
@@ -744,6 +749,19 @@ public async Task UpdateAnnualDataDetail(AnnualDataDetail annualDataDetail)
 {
     return await _dataContext.YearConfigurations
         .FirstOrDefaultAsync(y => y.Year == year);
+}
+
+
+  public  string GetInsuranceNumberByPersonId(int personId)
+{
+   
+        var person = _dataContext.Persons
+            .Where(p => p.Id == personId)
+            .Select(p => p.EnsuranceNumber)
+            .FirstOrDefault();
+
+        return person ?? "غير متوفر";
+    
 }
 
 }

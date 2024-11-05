@@ -160,7 +160,7 @@ namespace api.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Year = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -207,8 +207,8 @@ namespace api.Data.Migrations
                     Pathological_specialization = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ceiling = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    IN = table.Column<bool>(type: "bit", nullable: false),
-                    OUT = table.Column<bool>(type: "bit", nullable: false)
+                    IN = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OUT = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -468,7 +468,7 @@ namespace api.Data.Migrations
                     AgeSegmentId = table.Column<int>(type: "int", nullable: true),
                     AgeSegmentsId = table.Column<int>(type: "int", nullable: true),
                     RelationId = table.Column<int>(type: "int", nullable: true),
-                    RelationTypeId = table.Column<int>(type: "int", nullable: true),
+                    RelationTypeId1 = table.Column<int>(type: "int", nullable: true),
                     HospitalId = table.Column<int>(type: "int", nullable: true),
                     SurgicalProcedureId = table.Column<int>(type: "int", nullable: true),
                     YearConfigId = table.Column<int>(type: "int", nullable: true),
@@ -477,6 +477,12 @@ namespace api.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notes_AgeSegments_AgeSegmentId",
+                        column: x => x.AgeSegmentId,
+                        principalTable: "AgeSegments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Notes_AgeSegments_AgeSegmentsId",
                         column: x => x.AgeSegmentsId,
@@ -493,8 +499,14 @@ namespace api.Data.Migrations
                         principalTable: "Persons",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Notes_RelationTypes_RelationTypeId",
-                        column: x => x.RelationTypeId,
+                        name: "FK_Notes_RelationTypes_RelationId",
+                        column: x => x.RelationId,
+                        principalTable: "RelationTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Notes_RelationTypes_RelationTypeId1",
+                        column: x => x.RelationTypeId1,
                         principalTable: "RelationTypes",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -828,6 +840,12 @@ namespace api.Data.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AnnualDataDetails_Year_PersonId",
+                table: "AnnualDataDetails",
+                columns: new[] { "Year", "PersonId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AnnualDatas_EngineereId",
                 table: "AnnualDatas",
                 column: "EngineereId");
@@ -846,6 +864,12 @@ namespace api.Data.Migrations
                 name: "IX_AnnualDatas_WorkPlaceId",
                 table: "AnnualDatas",
                 column: "WorkPlaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnnualDatas_Year_EngineereId",
+                table: "AnnualDatas",
+                columns: new[] { "Year", "EngineereId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -958,6 +982,11 @@ namespace api.Data.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Notes_AgeSegmentId",
+                table: "Notes",
+                column: "AgeSegmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notes_AgeSegmentsId",
                 table: "Notes",
                 column: "AgeSegmentsId");
@@ -973,9 +1002,14 @@ namespace api.Data.Migrations
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notes_RelationTypeId",
+                name: "IX_Notes_RelationId",
                 table: "Notes",
-                column: "RelationTypeId");
+                column: "RelationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notes_RelationTypeId1",
+                table: "Notes",
+                column: "RelationTypeId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Notes_SurgicalProcedureId",
@@ -1048,6 +1082,13 @@ namespace api.Data.Migrations
                 name: "IX_Relations_RelationTypeId",
                 table: "Relations",
                 column: "RelationTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RelationTypes_Year_Name",
+                table: "RelationTypes",
+                columns: new[] { "Year", "Name" },
+                unique: true,
+                filter: "[Name] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Specializations_EngineeringeDeparId",

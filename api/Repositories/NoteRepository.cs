@@ -82,18 +82,21 @@ namespace api.Repositories
 
 
 
-      public async Task DeleteNotesByPersonId(int personId)
-{
+
+     public async Task DeleteNotesByPersonIdAsync(int personId) {
     var notesToDelete = await _dataContext.Notes
         .Where(note => note.PersonId == personId)
         .ToListAsync();
 
-    if (notesToDelete.Any())
-    {
+    if (notesToDelete.Any()) {
         _dataContext.Notes.RemoveRange(notesToDelete);
         await _dataContext.SaveChangesAsync();
     }
 }
+
+
+ 
+
 
   
 

@@ -56,10 +56,6 @@ namespace api.DTOS{
     
 
         public int WorkPlaceId{ get; set;}
-
-    
-    
-
-    
+        public decimal? Amount { get; internal set; }
     }
 }

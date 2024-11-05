@@ -101,12 +101,20 @@ namespace api.Data
             .OnDelete(DeleteBehavior.Cascade);
            
            // builder.Entity<AnnualData>().HasIndex(u => u.Year).IsUnique();
-            /*
-            builder.Entity<AnnualData>().HasIndex(u => u.EngineereId).IsUnique();
+            
+           // builder.Entity<AnnualData>().HasIndex(u => u.EngineereId).IsUnique();
             builder.Entity<AnnualData>()
             .HasIndex(a => new { a.Year, a.EngineereId })
             .IsUnique();
-*/
+            
+            builder.Entity<AnnualDataDetail>()
+            .HasIndex(a => new { a.Year, a.PersonId })
+            .IsUnique();
+
+            builder.Entity<RelationType>()
+            .HasIndex(a => new { a.Year, a.Name })
+            .IsUnique();
+
             builder.Entity<YearConfiguration>().HasIndex(u => u.Year).IsUnique();
             builder.Entity<PasswordEng>().HasIndex(u => u.EngineerNumber).IsUnique();
 
@@ -127,6 +135,20 @@ namespace api.Data
         .HasOne(n => n.SurgicalProcedures)
         .WithMany(s => s.Notes)
         .HasForeignKey(n => n.SurgicalProcedureId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+
+        builder.Entity<AgeSegments>()
+        .HasMany(a => a.Notes)
+        .WithOne()
+        .HasForeignKey(n => n.AgeSegmentId)
+        .OnDelete(DeleteBehavior.Cascade);
+        
+        
+         builder.Entity<RelationType>()
+        .HasMany(a => a.Notes)
+        .WithOne()
+        .HasForeignKey(n => n.RelationId)
         .OnDelete(DeleteBehavior.Cascade);
 
 

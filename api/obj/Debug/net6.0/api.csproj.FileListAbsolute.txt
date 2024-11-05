@@ -281,3 +281,8 @@ C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\MimeKit.dll
 C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\DocumentFormat.OpenXml.dll
 C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\DocumentFormat.OpenXml.Framework.dll
 C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\System.IO.Packaging.dll
+C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\publish\web.config
+C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\publish\api.deps.json
+C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\publish\api.runtimeconfig.json
+C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\publish\appsettings.Development.json
+C:\midpro\MedicalInsurance\api\bin\Debug\net6.0\publish\appsettings.json

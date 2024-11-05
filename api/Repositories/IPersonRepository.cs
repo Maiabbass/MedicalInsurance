@@ -13,11 +13,11 @@ namespace api.Repositories
 
         Task <Person?> Get(int Id);
 
-        Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles);
+        Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles , int Year);
         Task<int> Add(City city);
-        void Delete(int Id);
+        Task DeleteAsync(int Id);
 
-        Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO);
+        Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO, int year);
       //  Task<bool> Update(int id, PersonEditDTO personEditDTO);
         
         Task<AnnualData?> GetEngId(int EngineereId);
@@ -27,5 +27,8 @@ namespace api.Repositories
         Task SavePerson(PersonWithEngineereDTO person);
 
          Task<byte[]> ConvertFileToByteArray(IFormFile file);
+
+         Task UpdatePersonsAsync(IEnumerable<Person> persons);
+         Task<List<Person>> GetAllAsync();
     }
 }

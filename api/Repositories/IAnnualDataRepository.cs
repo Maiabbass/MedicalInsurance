@@ -20,7 +20,8 @@ namespace api.Repositories
         Task<int>Add_AnnualData (AnnualData annualData);
 
         Task<int> Add_AnnualDataDetail(AnnualDataDetail annualDataDetail);
-         void DeleteByPersonId(int PersonId);
+        
+         Task DeleteByPersonIdAsync(int personId);
          void DeleteByAnnualDataId(int AnnualDataId);
 
          void Delete(int Id);
@@ -56,6 +57,8 @@ namespace api.Repositories
        Task<List<EngineerStatusDto>> GetEngineerStatusByYear(int engineerId);
        Task<List<AnnualDataDetailStatusDto>> GetFamilyMemberStatusByYear(int personId);
        Task<YearConfiguration> GetYearConfigurationByYear(int year);
+       public  string GetInsuranceNumberByPersonId(int personId);
+
 
          
    

@@ -33,6 +33,11 @@ namespace api.Services
           }
 
 
+          public async Task<EngineerFamilyFullDataDTO> GetEngineerWithFamilyAnnualFullData(string engineerNumber, int year){
+            return await _unitOfWork.QuiriesRepositories.GetEngineerWithFamilyAnnualFullData(engineerNumber,year);
+          }
+
+
         
     }
 }

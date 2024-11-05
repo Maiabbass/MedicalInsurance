@@ -14,7 +14,8 @@ namespace api.DTOS
 
          public bool EngineerIsRegistered { get; set; }
          
-         public List<PersonDetailDTO>? Persons { get; set; } 
+         
+          public List<PersonDetailDTO>? Persons { get; set; } = new List<PersonDetailDTO>();
 
          public decimal  ExAmount { get; set; }
        

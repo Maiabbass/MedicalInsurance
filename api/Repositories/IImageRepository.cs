@@ -11,6 +11,6 @@ namespace api.Repositories
          Task<int> AddImageAsync(Images image);
          Task<byte[]> ConvertImageToByteArrayAsync(IFormFile image);
          Task<bool> UpdateImagesAsync(int personId, List<string> newImages);
-         public void DeleteByPersonId(int PersonId);
+         Task DeleteByPersonIdAsync(int personId);
     }
 }

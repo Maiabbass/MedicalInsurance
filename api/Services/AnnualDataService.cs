@@ -178,22 +178,24 @@ namespace api.Services
 
 
         // helper method to calculate the register annual amount based on birth date and current year...
-        public decimal calcualteAmount(DateTime? birthDate,int year)
-        {
-         
-         
-          decimal amount=0m;
-          var  ageSegments=   _unitOfWork.AgeSegmentsRepository.Get(year).GetAwaiter().GetResult();
-           var age=  birthDate.GetAge();
-                            var segment= ageSegments.Where(x=> age>=x.FromYear&&age<=x.ToYear
-                            ).FirstOrDefault();
-                            if (segment!=null)
-                            {
-                                amount= segment.TheAmount;
-                            }
+       public decimal calcualteAmount(DateTime? birthDate, int year)
+{
+    decimal amount = 0m;
 
-                            return amount;
-        }
+    var ageSegments = _unitOfWork.AgeSegmentsRepository.Get(year).GetAwaiter().GetResult();
+
+    int birthYear = birthDate?.Year ?? 0;
+
+    var segment = ageSegments.FirstOrDefault(x => birthYear >= x.FromYear && birthYear <= x.ToYear);
+
+    if (segment != null)
+    {
+        amount = segment.TheAmount;
+    }
+
+    return amount;
+}
+
          
 
 
@@ -242,6 +244,36 @@ namespace api.Services
 
 
 
+// دالة تحديث الاقساط 
+
+public async Task UpdatePersonAmountsBasedOnNewAgeSegments(int year)
+{
+    // الحصول على الشرائح العمرية الجديدة لهذا العام
+    var ageSegments = await _unitOfWork.AgeSegmentsRepository.Get(year);
+
+    // جلب جميع الأشخاص وتحديث القسط الخاص بهم
+    var persons = await _unitOfWork.PersonRepository.GetAllAsync();
+    foreach (var person in persons)
+    {
+        int birthYear = person.BirthDate?.Year ?? 0;
+        
+        // تحديد الشريحة العمرية المناسبة للشخص
+        var segment = ageSegments.FirstOrDefault(x => birthYear >= x.FromYear && birthYear <= x.ToYear);
+        if (segment != null)
+        {
+            person.Amount = segment.TheAmount;
+        }
+    }
+
+    // تحديث التغييرات في قاعدة البيانات
+    await _unitOfWork.PersonRepository.UpdatePersonsAsync(persons);
+}
+
+
+
+// ----------------------------------------------------
+
+
 
 
 
@@ -276,36 +308,41 @@ public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO ann
             // بناءً على العنوان الممرر، تنفيذ العملية المناسبة
             switch (title.ToLower())
             {
-                case "agesegment":
-                    if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
+               case "agesegment":
+                if (annualSettingDTO.AgeSegments != null && annualSettingDTO.AgeSegments.Any())
+                {
+                    var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
                     {
-                        var ageSegmentsEntities = annualSettingDTO.AgeSegments.Select(dto => new AgeSegments
+                        Id = 0,
+                        FromYear = dto.FromYear,
+                        ToYear = dto.ToYear,
+                        TheAmount = dto.TheAmount,
+                        EnduranceRatio = dto.EnduranceRatio,
+                        Year = annualSettingDTO.Year
+                    }).ToList();
+
+                    await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
+
+                    // تعديل إضافة الملاحظات الخاصة بـ AgeSegments
+                    var ageSegmentNotes = annualSettingDTO.AgeSegments
+                        .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))
+                        .Select(dto => new Note
                         {
-                            Id = 0,
-                            FromYear = dto.FromYear,
-                            ToYear = dto.ToYear,
-                            TheAmount = dto.TheAmount,
-                            EnduranceRatio = dto.EnduranceRatio,
-                            Year = annualSettingDTO.Year
+                            Content = dto.NoteContent,
+                            AgeSegmentId = _dataContext.AgeSegments.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,
+                            YearConfigId = yearConfiguration.Id
                         }).ToList();
 
-                        await _unitOfWork.AgeSegmentsRepository.Add_Age_Segments(ageSegmentsEntities);
+                    if (ageSegmentNotes.Any())
+                    {
+                        await _unitOfWork.NoteRepository.AddNotesAsyncList(ageSegmentNotes);
+                    }
 
-                      // تعديل إضافة الملاحظات الخاصة بـ AgeSegments
-                        var ageSegmentNotes = annualSettingDTO.AgeSegments
-                            .Where(dto => !string.IsNullOrEmpty(dto.NoteContent))  // التحقق من وجود الملاحظة
-                            .Select(dto => new Note
-                            {
-                                Content = dto.NoteContent,
-                                AgeSegmentId = _dataContext.AgeSegments.FirstOrDefault(a => a.FromYear == dto.FromYear && a.ToYear == dto.ToYear)?.Id,
-                                YearConfigId = yearConfiguration.Id
-                            }).ToList();
-
-                        if (ageSegmentNotes.Any())
-                        {
-                            await _unitOfWork.NoteRepository.AddNotesAsyncList(ageSegmentNotes);
-                        } }
-                    break;
+                    // استدعاء الدالة لتحديث الأقساط بناءً على الشرائح الجديدة
+                    await UpdatePersonAmountsBasedOnNewAgeSegments(annualSettingDTO.Year);
+                }
+                break;
+ 
 
                 case "relationtype":
                     if (annualSettingDTO.RelationTypes != null && annualSettingDTO.RelationTypes.Any())
@@ -798,10 +835,10 @@ public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO ann
 
 
  public async Task<Response> RenewEngineerAnnualData(
-    int previousYear, 
-    int newYear, 
-    string insuranceNumber, 
-    bool waiting, 
+    int previousYear,
+    int newYear,
+    string insuranceNumber,
+    bool waiting,
     bool cardStatus)
 {
     Response response = new Response();
@@ -812,23 +849,41 @@ public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO ann
             var engineer = await _unitOfWork.AnnualDataRepository.GetByInsuranceNumber(insuranceNumber);
             if (engineer == null)
             {
-                response.ErrorMessage = "Engineer not found.";
+                response.ErrorMessage = "لايوجد مهندس  ";
                 return response;
             }
 
             var previousAnnualData = await _unitOfWork.AnnualDataRepository.GetByEngineerIdAndYear(engineer.Id, previousYear);
             if (previousAnnualData == null)
             {
-                response.ErrorMessage = "Previous annual data not found.";
+                response.ErrorMessage = "لا يوجد اشتراكات للسنة السابقة";
                 return response;
             }
 
             bool isBeneficiary = await _unitOfWork.ClimsRepository.CheckClaimExistsAsync(engineer.Id, previousYear);
 
+            // حساب القسط للمهندس ولأفراد العائلة
+            decimal totalAmount = 0;
+
+            // حساب القسط للمهندس
+            Person? engineerPerson = await _unitOfWork.PersonRepository.Get(engineer.Id);
+            if (engineerPerson != null)
+            {
+                totalAmount += calcualteAmount(engineerPerson.BirthDate, newYear);
+            }
+
+            // احصل على أفراد العائلة وحساب القسط لكل فرد
+            var familyMembers = await _unitOfWork.RelationRepository.GetFamilyMembersByEngineerId(engineer.Id);
+            foreach (var member in familyMembers)
+            {
+                totalAmount += calcualteAmount(member.BirthDate, newYear);
+            }
+
+            // إنشاء كائن AnnualData جديد باستخدام المبلغ الكلي المحسوب
             AnnualData newAnnualData = new AnnualData
             {
                 Year = newYear,
-                ExAmount = previousAnnualData.ExAmount,
+                ExAmount = 0,
                 HisDic = previousAnnualData.HisDic,
                 CardStatuse = cardStatus,
                 Subscrib = previousAnnualData.Subscrib,
@@ -838,8 +893,8 @@ public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO ann
                 EngineereId = previousAnnualData.EngineereId,
                 WorkPlaceId = previousAnnualData.WorkPlaceId,
                 PayMethodId = previousAnnualData.PayMethodId,
-                Amount = previousAnnualData.Amount,
-                TotalAmount = previousAnnualData.TotalAmount
+                Amount = totalAmount, // إجمالي المبلغ المحسوب
+                TotalAmount = totalAmount,
             };
 
             int newAnnualDataId = await _unitOfWork.AnnualDataRepository.Add_AnnualData(newAnnualData);
@@ -857,6 +912,11 @@ public async Task<Response> AddAnnualSettings(string title, AnnualSettingDTO ann
 
 
 
+
+
+
+
+
 public async Task<Response> RenewFamilyMembersAnnualData(
     int engineerId,
     int previousYear,
@@ -871,7 +931,7 @@ public async Task<Response> RenewFamilyMembersAnnualData(
             var engineerAnnualData = await _unitOfWork.AnnualDataRepository.GetByEngineerIdAndYear(engineerId, newYear);
             if (engineerAnnualData == null)
             {
-                response.ErrorMessage = $"Engineer's annual data for the year {newYear} not found. Please ensure the engineer's data is renewed first.";
+                response.ErrorMessage = $"لم يتم العثور على بيانات المهندس السنوية لعام {newYear}. يرجى التأكد من تجديد بيانات المهندس أولاً.";
                 return response;
             }
 
@@ -882,19 +942,28 @@ public async Task<Response> RenewFamilyMembersAnnualData(
                 var previousDetail = await _unitOfWork.AnnualDataRepository.GetAnnualDataDetailByPersonIdAndYear(familyMember.PersonId, previousYear);
                 if (previousDetail == null)
                 {
-                    response.ErrorMessage += $"No previous data found for family member with PersonId: {familyMember.PersonId}. Skipping this member. ";
+                    response.ErrorMessage += $"لم يتم العثور على بيانات سابقة للعضو العائلي الذي يحمل الرقم التعريفي: {familyMember.PersonId}. سيتم تخطي هذا العضو.";
                     continue;
                 }
 
-                // Check if the detail for the new year already exists
+                // التحقق من وجود بيانات للعام الجديد مسبقاً
                 var existingNewDetail = await _unitOfWork.AnnualDataRepository.GetAnnualDataDetailByPersonIdAndYear(familyMember.PersonId, newYear);
                 if (existingNewDetail != null)
                 {
-                    response.ErrorMessage += $"Data for year {newYear} already exists for family member with PersonId: {familyMember.PersonId}. Skipping this member. ";
+                    response.ErrorMessage += $"توجد بيانات لعام {newYear} بالفعل للعضو العائلي الذي يحمل الرقم التعريفي: {familyMember.PersonId}. سيتم تخطي هذا العضو.";
                     continue;
                 }
 
+                // التحقق من أهلية العضو للمنفعة
                 bool isDetailBeneficiary = await _unitOfWork.ClimsRepository.CheckClaimExistsAsync(familyMember.PersonId, previousYear);
+
+                // حساب القسط للعضو بناءً على سنة التجديد وتاريخ الميلاد
+                var familyMemberPerson = await _unitOfWork.PersonRepository.Get(familyMember.PersonId);
+                decimal amount = 0;
+                if (familyMemberPerson != null)
+                {
+                    amount = calcualteAmount(familyMemberPerson.BirthDate, newYear);
+                }
 
                 AnnualDataDetail newDetail = new AnnualDataDetail
                 {
@@ -902,12 +971,12 @@ public async Task<Response> RenewFamilyMembersAnnualData(
                     PersonId = familyMember.PersonId,
                     Year = newYear,
                     CardStatuse = familyMember.CardStatus,
-                    ExAmount = previousDetail.ExAmount,
+                    ExAmount = 0,
                     Subscrib = previousDetail.Subscrib,
-                    Affiliate = false,
+                    Affiliate = previousDetail.Affiliate,
                     Beneficiary = isDetailBeneficiary,
                     Waiting = familyMember.Waiting,
-                    Amount = previousDetail.Amount,
+                    Amount = amount,  // تعيين القسط المحسوب
                     IsEngineer = false
                 };
 
@@ -918,17 +987,20 @@ public async Task<Response> RenewFamilyMembersAnnualData(
             await _unitOfWork.SaveChangesAsync();
             scope.Complete();
 
-            response.Message = $"Successfully renewed data for {renewedMembers.Count} family members.";
+            response.Message = $"تم تجديد البيانات بنجاح لـ {renewedMembers.Count} من أفراد العائلة.";
             response.Data = renewedMembers;
         }
     }
     catch (Exception ex)
     {
-        response.ErrorMessage = $"An error occurred while renewing family members' data: {ex.Message}";
-        // Log the full exception details here
+        response.ErrorMessage = $"حدث خطأ أثناء تجديد بيانات أفراد العائلة: {ex.Message}";
+        // هنا يمكنك تسجيل تفاصيل الاستثناء
     }
     return response;
 }
+
+
+
 
 
 

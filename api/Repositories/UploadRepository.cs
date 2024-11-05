@@ -786,11 +786,49 @@ private DateTime? ParseDate2(string dateText)
 
 
 
+        public async Task ReadAndStoreSpecializations(string filePath)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // ضبط الترخيص لاستخدام غير التجاري
+            using var package = new ExcelPackage(new FileInfo(filePath));
+            var worksheet = package.Workbook.Worksheets[0]; // استخدام الورقة الأولى
 
+            int rowCount = worksheet.Dimension.Rows;
 
+            for (int row = 2; row <= rowCount; row++) // بدءًا من الصف الثاني لتخطي رؤوس الأعمدة
+            {
+                string specializationName = worksheet.Cells[row, 1].Text.Trim();
+                string departmentName = worksheet.Cells[row, 2].Text.Trim();
 
+                // البحث عن القسم الهندسي باستخدام الاسم للحصول على Id
+                var engineeringDept = await _dataContext.EngineeringeDepars
+                    .FirstOrDefaultAsync(d => d.Name == departmentName);
 
+                if (engineeringDept != null)
+                {
+                    var specialization = new Specialization
+                    {
+                        Name = specializationName,
+                        EngineeringeDeparId = engineeringDept.Id
+                    };
 
+                    // إضافة الاختصاص إلى قاعدة البيانات
+                    _dataContext.Specializations.Add(specialization);
+                }
+                else
+                {
+                    // لم يتم العثور على القسم الهندسي، تسجيل رسالة أو تخطي هذا الاختصاص
+                    Console.WriteLine($"القسم '{departmentName}' غير موجود في قاعدة البيانات، يتم تخطي الاختصاص '{specializationName}'.");
+                }
+            }
+
+            // حفظ التغييرات في قاعدة البيانات
+            await _dataContext.SaveChangesAsync();
         }
-    
     }
+}
+
+
+
+
+
+       

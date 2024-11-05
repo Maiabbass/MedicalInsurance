@@ -15,9 +15,9 @@ namespace api.Repositories
        Task<PersonWithEngineereDTO?> Get(int Id);
 
         Task <int> Add (Engineere person);
-         public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO);
-         public void Delete(int Id);
-         public void DeleteByEngId(int EngineereId);
-         public void DeleteByEngId2(int EngineereId);
+        public bool Update(int id, EngineerPersonEditDTO engineerPersonEditDTO, int year);
+         Task DeleteAsync(int id);
+         Task DeleteByEngIdAsync(int engineerId) ;
+         Task DeleteByEngId2Async(int id) ;
     }
 }

@@ -20,7 +20,7 @@ namespace api.Repositories
         Task DeleteNotesByHospitalId(int hospitalId);
         Task DeleteNotesBySurgicalProcedureId(int surgicalProcedureId);
 
-        Task DeleteNotesByPersonId(int personId);
+        Task DeleteNotesByPersonIdAsync(int personId) ;
         Task Delete_NotesByYearAsync(int year);
         Task<YearConfiguration> GetYearConfigurationByIdAsync(int yearConfigId);
         Task SaveChangesAsync();

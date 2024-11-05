@@ -27,11 +27,11 @@ namespace api.Repositories
         }
 
        
-       public async Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles)
+      public async Task<int> AddPerson(Person person, IFormFile[] imageFiles, IFormFile[] wordFiles, int year)
 {
     try
     {
-        var amount = _nnualDataService.calcualteAmount(person.BirthDate, 2024);
+        var amount = _nnualDataService.calcualteAmount(person.BirthDate, year); // استخدام السنة المدخلة
 
         // إنشاء كائن جديد من نوع Person
         Person newPerson = new Person()
@@ -56,7 +56,7 @@ namespace api.Repositories
         _dataContext.Persons.Add(newPerson);
         await _dataContext.SaveChangesAsync();
 
-        // حفظ الصور إذا كانت موجودة
+        // حفظ الصور وملفات Word إذا كانت موجودة
         if (imageFiles != null && imageFiles.Length > 0)
         {
             foreach (var imageFile in imageFiles)
@@ -73,7 +73,6 @@ namespace api.Repositories
             }
         }
 
-        // حفظ ملفات Word إذا كانت موجودة
         if (wordFiles != null && wordFiles.Length > 0)
         {
             foreach (var wordFile in wordFiles)
@@ -90,7 +89,6 @@ namespace api.Repositories
             }
         }
 
-        // حفظ التغييرات في قاعدة البيانات
         await _dataContext.SaveChangesAsync();
 
         return newPerson.Id;
@@ -100,6 +98,7 @@ namespace api.Repositories
         throw new Exception("Duplicate entry detected for unique index or constraint.", sqlEx);
     }
 }
+
 
 
 
@@ -128,7 +127,7 @@ namespace api.Repositories
         .Include(x => x.Words) // تضمين ملفات Word
         .Where(x => x.Id == Id)
         .FirstOrDefaultAsync();
-}
+} 
 
 
 
@@ -187,16 +186,14 @@ namespace api.Repositories
 
 
 
-        public void   Delete(int Id)
-        {
-            
-            var rest = _dataContext.Persons.FirstOrDefault(x=>x.Id==Id);
-            if(rest!=null)
-            {
-                _dataContext.Persons.Remove(rest);
-                _dataContext.SaveChanges();
-            }
-        }
+       public async Task DeleteAsync(int Id){
+    var person = await _dataContext.Persons.FirstOrDefaultAsync(x => x.Id == Id);
+    if(person != null){
+        _dataContext.Persons.Remove(person);
+        await _dataContext.SaveChangesAsync();
+    }
+}
+
 
 
 
@@ -212,8 +209,10 @@ namespace api.Repositories
 
 
 
- public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO)
+
+public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO, int year)
 {
+    // البحث عن الشخص في الجدول Persons
     var databaseEntity = await _dataContext.Persons
         .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -221,6 +220,9 @@ namespace api.Repositories
     {
         return false; // في حال عدم وجود الشخص، قم بإرجاع false
     }
+
+    // التحقق مما إذا كان تاريخ الميلاد قد تغير
+    bool isBirthDateChanged = databaseEntity.BirthDate != personEditDTO.BirthDate;
 
     // تحديث الحقول الخاصة بالشخص
     databaseEntity.FirstName = personEditDTO.FirstName;
@@ -237,10 +239,49 @@ namespace api.Repositories
     databaseEntity.GenderId = personEditDTO.GenderId;
     databaseEntity.StatusId = personEditDTO.StatusId;
 
-    // حفظ التغييرات الخاصة بالشخص
+    // تحديث أو إضافة العلاقة في جدول Relations
+    var relationEntity = await _dataContext.Relations
+        .FirstOrDefaultAsync(r => r.EngineereId == personEditDTO.EngineereId && r.PersonId == id);
+
+    if (relationEntity != null)
+    {
+        // تحديث RelationTypeId إذا كانت العلاقة موجودة
+        relationEntity.RelationTypeId = personEditDTO.RelationTypeId;
+    }
+    else
+    {
+        // إضافة علاقة جديدة إذا لم تكن موجودة
+        relationEntity = new Relation
+        {
+            EngineereId = personEditDTO.EngineereId,
+            PersonId = id,
+            RelationTypeId = personEditDTO.RelationTypeId
+        };
+        await _dataContext.Relations.AddAsync(relationEntity);
+    }
+
+    // تحديث القسط إذا تغير تاريخ الميلاد
+    if (isBirthDateChanged)
+    {
+        // حساب القسط الجديد بناءً على السنة المعطاة
+        decimal newAmount =_nnualDataService.calcualteAmount(personEditDTO.BirthDate, year);
+
+        // الحصول على سجل AnnualDataDetail المتعلق بالشخص وتحديث القسط
+        var annualDataDetail = await _dataContext.AnnualDataDetails
+            .FirstOrDefaultAsync(ad => ad.PersonId == id && ad.Year == year);
+
+        if (annualDataDetail != null)
+        {
+            annualDataDetail.Amount = newAmount; // تحديث القسط بالقيمة المحسوبة
+        }
+
+        // تحديث القيمة في جدول Persons
+        databaseEntity.Amount = newAmount; // تحديث Amount في جدول Persons
+    }
+
+    // حفظ التغييرات
     return await _dataContext.SaveChangesAsync() > 0;
 }
-
 
 
 
@@ -330,6 +371,20 @@ public async Task SavePerson(PersonWithEngineereDTO dto)
         throw new Exception(errorMessage, ex);
     }
 }
+
+
+public async Task UpdatePersonsAsync(IEnumerable<Person> persons)
+{
+    _dataContext.Persons.UpdateRange(persons);
+    await _dataContext.SaveChangesAsync();
+}
+
+
+public async Task<List<Person>> GetAllAsync()
+{
+    return await _dataContext.Persons.ToListAsync();
+}
+
 
 
   

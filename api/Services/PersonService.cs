@@ -25,7 +25,9 @@ namespace api.Services
 
         public object Person => throw new NotImplementedException();
 
-       public async Task<Response> Add(PersonEditDTO personEditDTO,  IFormFile[] imageFiles, IFormFile[] wordFiles)
+
+
+      public async Task<Response> Add(PersonEditDTO personEditDTO, IFormFile[] imageFiles, IFormFile[] wordFiles, int year)
 {
     Response response = new Response();
     int insertedId = 0;
@@ -34,7 +36,7 @@ namespace api.Services
     {
         using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
         {
-            // إضافة بيانات الشخص
+            // إعداد بيانات الشخص
             Person person = new Person()
             {
                 FirstName = personEditDTO.FirstName,
@@ -52,32 +54,8 @@ namespace api.Services
                 StatusId = personEditDTO.StatusId,
             };
 
-            insertedId = await _unitOfWork.PersonRepository.AddPerson(person,imageFiles,wordFiles);
- 
- /*
-            // حفظ الصورة إذا كانت موجودة
-            if (imageFile != null && imageFile.Length > 0)
-            {
-                var image = new Images
-                {
-                    Image = await _unitOfWork.PersonRepository.ConvertFileToByteArray(imageFile),
-                    PersonId = insertedId
-                };
-                //await _unitOfWork.ImageRepository.AddImageAsync(image);
-            }
-
-            // حفظ ملف Word إذا كان موجودًا
-            if (wordFile != null && wordFile.Length > 0)
-            {
-                var word = new Words
-                {
-                    Content = await _unitOfWork.PersonRepository.ConvertFileToByteArray(wordFile),
-                    PersonId = insertedId
-                };
-               // await _unitOfWork.WordRepository.AddWordAsync(word);
-            }
-
-*/            
+            // تمرير السنة إلى دالة AddPerson
+            insertedId = await _unitOfWork.PersonRepository.AddPerson(person, imageFiles, wordFiles, year);
 
             // إضافة بيانات العلاقة
             Relation relation = new Relation()
@@ -126,35 +104,26 @@ namespace api.Services
 
 
 
-     public bool Delete(int Id){
+    public async Task<bool> DeleteAsync(int Id){
+    try {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled)) {
+            await _unitOfWork.AnnualDataRepository.DeleteByPersonIdAsync(Id);
+            await _unitOfWork.RelationRepository.DeleteByPersonIdAsync(Id);
+            await _unitOfWork.NoteRepository.DeleteNotesByPersonIdAsync(Id);
+            await _unitOfWork.PersonRepository.DeleteAsync(Id);
 
-      try
-      {
-         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-         {
-         
-         _unitOfWork.AnnualDataRepository.DeleteByPersonId(Id);
-         _unitOfWork.RelationRepository.DeleteByPersonId(Id);
-        _unitOfWork.NoteRepository.DeleteNotesByPersonId(Id);
-         _unitOfWork.PersonRepository.Delete(Id);
             scope.Complete();
             return true;
-         }
-      } 
-          catch (TransactionAbortedException)
-            {
-
-                  
-                  return false;
-                 }
-                 
-    
-     }
+        }
+    } catch (TransactionAbortedException) {
+        return false;
+    }
+}
 
 
-     public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO)
+     public async Task<bool> UpdatePersonDetails(int id, PersonEditDTO personEditDTO, int year)
     {
-        return await _unitOfWork.PersonRepository.UpdatePersonDetails(id, personEditDTO);
+        return await _unitOfWork.PersonRepository.UpdatePersonDetails(id, personEditDTO, year);
     }
 
 

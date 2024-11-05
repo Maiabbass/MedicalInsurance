@@ -19,5 +19,6 @@ namespace api.DTOS
         public SimpleSpecialization Specialization { get; set; }
         public SimplePayMethod PayMethod { get; set; }
         public SimpleEngineeringUnit EngineeringUnit { get; set; }
-}
+        public decimal TotalRelationsAmount { get; internal set; }
+    }
     }

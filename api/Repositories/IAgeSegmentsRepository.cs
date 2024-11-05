@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api.DTOS;
 using api.Entities;
 
 namespace api.Repositories
@@ -15,5 +16,7 @@ namespace api.Repositories
         Task Update_Age_Segment(AgeSegments ageSegment);
 
         Task<bool> DeleteAgeSegmentAsync(int id);
+
+      Task Update_Age_Segments_With_Notes(List<AgeSegmentWithNotesDTO> ageSegmentsWithNotes);
     }
 }

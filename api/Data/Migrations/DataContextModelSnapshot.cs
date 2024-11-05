@@ -110,6 +110,9 @@ namespace api.Data.Migrations
 
                     b.HasIndex("WorkPlaceId");
 
+                    b.HasIndex("Year", "EngineereId")
+                        .IsUnique();
+
                     b.ToTable("AnnualDatas");
                 });
 
@@ -159,6 +162,9 @@ namespace api.Data.Migrations
                     b.HasIndex("AnnualDataId");
 
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("Year", "PersonId")
+                        .IsUnique();
 
                     b.ToTable("AnnualDataDetails");
                 });
@@ -524,7 +530,7 @@ namespace api.Data.Migrations
                     b.Property<int?>("RelationId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RelationTypeId")
+                    b.Property<int?>("RelationTypeId1")
                         .HasColumnType("int");
 
                     b.Property<int?>("SurgicalProcedureId")
@@ -538,13 +544,17 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AgeSegmentId");
+
                     b.HasIndex("AgeSegmentsId");
 
                     b.HasIndex("HospitalId");
 
                     b.HasIndex("PersonId");
 
-                    b.HasIndex("RelationTypeId");
+                    b.HasIndex("RelationId");
+
+                    b.HasIndex("RelationTypeId1");
 
                     b.HasIndex("SurgicalProcedureId");
 
@@ -796,12 +806,16 @@ namespace api.Data.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Year", "Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("RelationTypes");
                 });
@@ -1331,8 +1345,13 @@ namespace api.Data.Migrations
 
             modelBuilder.Entity("api.Entities.Note", b =>
                 {
-                    b.HasOne("api.Entities.AgeSegments", "AgeSegments")
+                    b.HasOne("api.Entities.AgeSegments", null)
                         .WithMany("Notes")
+                        .HasForeignKey("AgeSegmentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("api.Entities.AgeSegments", "AgeSegments")
+                        .WithMany()
                         .HasForeignKey("AgeSegmentsId");
 
                     b.HasOne("api.Entities.Hospital", "Hospital")
@@ -1343,9 +1362,14 @@ namespace api.Data.Migrations
                         .WithMany("Notes")
                         .HasForeignKey("PersonId");
 
-                    b.HasOne("api.Entities.RelationType", "RelationType")
+                    b.HasOne("api.Entities.RelationType", null)
                         .WithMany("Notes")
-                        .HasForeignKey("RelationTypeId");
+                        .HasForeignKey("RelationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("api.Entities.RelationType", "RelationType")
+                        .WithMany()
+                        .HasForeignKey("RelationTypeId1");
 
                     b.HasOne("api.Entities.SurgicalProcedures", "SurgicalProcedures")
                         .WithMany("Notes")

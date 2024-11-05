@@ -61,13 +61,17 @@ namespace api.Repositories
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public void DeleteByPersonId(int PersonId){
-         var rest=   _context.Images.Where(x=>x.PersonId==PersonId).ToList();
-         if(rest!=null){
-            _context.Images.RemoveRange(rest);
 
-         }
 
-    
+   public async Task DeleteByPersonIdAsync(int personId) {
+    var images = await _context.Images
+        .Where(x => x.PersonId == personId)
+        .ToListAsync();
+
+    if (images.Any()) {
+        _context.Images.RemoveRange(images);
+        await _context.SaveChangesAsync();
+    }
 }
+
 }}

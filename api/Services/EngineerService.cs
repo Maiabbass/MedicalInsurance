@@ -16,11 +16,16 @@ namespace api.Services
 
          private readonly IUnitOfWork _unitOfWork;
 
-         public EngineerService(IUnitOfWork unitOfWork)
+         private readonly IAnnualDataService _annualDataService;
+
+         public EngineerService(IUnitOfWork unitOfWork , IAnnualDataService annualDataService)
          {
             _unitOfWork=unitOfWork;
+            _annualDataService=annualDataService;
          }
-       public async Task<Response> Add(EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[] contentImage, IFormFile[] contentFile)
+
+
+     public async Task<Response> Add(EngineerPersonEditDTO engineerPersonEditDTO, IFormFile[] contentImage, IFormFile[] contentFile, int year)
 {
     Response response = new Response();
     int insertedId = 0;
@@ -44,35 +49,12 @@ namespace api.Services
                 Mobile = engineerPersonEditDTO.Mobile,
                 Email = engineerPersonEditDTO.Email,
                 GenderId = engineerPersonEditDTO.GenderId,
-                StatusId = engineerPersonEditDTO.statusId
+                StatusId = engineerPersonEditDTO.statusId,
+                Amount = _annualDataService.calcualteAmount(engineerPersonEditDTO.BirthDate, year)
             };
 
-            insertedId = await _unitOfWork.PersonRepository.AddPerson(person,contentImage, contentFile);
-/*
-            // إضافة بيانات الصورة (Image)
-            if (contentImage != null && contentImage.Length > 0)
-            {
-                Images image = new Images()
-                {
-                    PersonId = insertedId,
-                    Image = await _unitOfWork.ImageRepository.ConvertImageToByteArrayAsync(contentImage)
-                };
+            insertedId = await _unitOfWork.PersonRepository.AddPerson(person, contentImage, contentFile,year);
 
-               // await _unitOfWork.ImageRepository.AddImageAsync(image);
-            }
-
-            // إضافة بيانات الملف (Word)
-            if (contentFile != null && contentFile.Length > 0)
-            {
-                Words word = new Words()
-                {
-                    PersonId = insertedId,
-                    Content = await _unitOfWork.WordRepository.ConvertFileToByteArrayAsync(contentFile)
-                };
-
-               // await _unitOfWork.WordRepository.AddWordAsync(word);
-            }
-*/
             // إضافة بيانات المهندس
             Engineere engineer = new Engineere()
             {
@@ -117,27 +99,27 @@ public async Task<PagedResult<PersonWithEngineereDTO>> GetAll(int pageNumber, in
 
         
 
-           public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO){
-           return _unitOfWork.EngineerRepository.Update(Id, engineerPersonEditDTO);
+           public bool Update(int id, EngineerPersonEditDTO engineerPersonEditDTO, int year){
+           return _unitOfWork.EngineerRepository.Update(id, engineerPersonEditDTO , year);
         }
         
 
-         public bool Delete(int Id){
-      try
-      {
-         using(TransactionScope scope=new TransactionScope (TransactionScopeAsyncFlowOption.Enabled))
-         {
-        
-         _unitOfWork.EngineerRepository.DeleteByEngId(Id);
-         _unitOfWork.EngineerRepository.DeleteByEngId2(Id);
-         
-        _unitOfWork.EngineerRepository.Delete(Id);
+       public async Task<bool> DeleteAsync(int Id) {
+    try {
+        using (TransactionScope scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled)) {
+            await _unitOfWork.EngineerRepository.DeleteByEngIdAsync(Id);
+            await _unitOfWork.EngineerRepository.DeleteByEngId2Async(Id);
+           // await _unitOfWork.NoteRepository.DeleteNotesByPersonIdAsync(Id);
+            await _unitOfWork.EngineerRepository.DeleteAsync(Id);
+
             scope.Complete();
             return true;
-         }
-      } 
-          catch (TransactionAbortedException){
-                  return false;
-                 }}
+        }
+    }
+    catch (TransactionAbortedException) {
+        return false;
+    }
+}
+
     }
 }

@@ -13,6 +13,6 @@ namespace api.Repositories
 
         Task<bool> UpdateWordFilesAsync(int personId, List<string> newWordFiles);
 
-        public void DeleteByPersonId(int PersonId);
+        Task DeleteByPersonIdAsync(int personId);
     }
 }

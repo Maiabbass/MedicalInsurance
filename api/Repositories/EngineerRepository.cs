@@ -225,17 +225,13 @@ namespace api.Repositories
 
 
 
-
-          public bool Update(int Id, EngineerPersonEditDTO engineerPersonEditDTO)
+public bool Update(int id, EngineerPersonEditDTO engineerPersonEditDTO, int year)
 {
-    // حساب المبلغ الجديد بناءً على تاريخ الميلاد الجديد
-    var amount = _annualDataService.calcualteAmount(engineerPersonEditDTO.BirthDate, 2024);
-
     // البحث عن المهندس في قاعدة البيانات
-    var engineerEntity = _dataContext.Engineeres.FirstOrDefault(x => x.Id == Id);
+    var engineerEntity = _dataContext.Engineeres.FirstOrDefault(x => x.Id == id);
     if (engineerEntity == null)
     {
-        return false;
+        return false; // في حال عدم وجود المهندس
     }
 
     // تحديث الحقول الخاصة بالمهندس
@@ -243,13 +239,12 @@ namespace api.Repositories
     engineerEntity.SubNumber = engineerPersonEditDTO.SubNumber;
     engineerEntity.SpecializationId = engineerPersonEditDTO.SpecializationId;
     engineerEntity.WorkPlaceId = engineerPersonEditDTO.WorkPlaceId;
-    
 
     // البحث عن الشخص في قاعدة البيانات باستخدام نفس المعرف
-    var personEntity = _dataContext.Persons.FirstOrDefault(x => x.Id == Id);
+    var personEntity = _dataContext.Persons.FirstOrDefault(x => x.Id == id);
     if (personEntity == null)
     {
-        return false;
+        return false; // في حال عدم وجود الشخص
     }
 
     // تحديث الحقول الخاصة بالشخص
@@ -262,43 +257,71 @@ namespace api.Repositories
     personEntity.EnsuranceNumber = engineerPersonEditDTO.EnsuranceNumber;
     personEntity.Address = engineerPersonEditDTO.Address;
     personEntity.Phone = engineerPersonEditDTO.Phone;
-   
     personEntity.GenderId = engineerPersonEditDTO.GenderId;
     personEntity.StatusId = engineerPersonEditDTO.statusId;
-    personEntity.Amount = amount; // تحديث المبلغ الجديد
 
-    // حفظ التغييرات في قاعدة البيانات
-    return _dataContext.SaveChanges() > 0;
+    var newAmount = _annualDataService.calcualteAmount(engineerPersonEditDTO.BirthDate, year);
+    personEntity.Amount = newAmount; // تحديث المبلغ الجديد
+
+    var annualData = _dataContext.AnnualDatas.FirstOrDefault(ad => ad.EngineereId == id && ad.Year == year);
+    if (annualData != null)
+    {
+        annualData.Amount = newAmount; // تحديث المبلغ في AnnualData
+
+        // تحديث تفاصيل AnnualDataDetail
+        var annualDataDetails = _dataContext.AnnualDataDetails.Where(add => add.AnnualDataId == annualData.Id).ToList();
+        foreach (var detail in annualDataDetails)
+        {
+            detail.Amount = newAmount; // تحديث المبلغ في AnnualDataDetail
+        }
+    }
+
+    var changesSaved = _dataContext.SaveChanges() > 0;
+
+    return changesSaved; // إرجاع النتيجة النهائية لحفظ التغييرات
+}
+
+
+
+             public async Task DeleteByEngIdAsync(int engineerId) {
+    var relations = await _dataContext.Relations
+        .Where(x => x.EngineereId == engineerId)
+        .ToListAsync();
+
+    if (relations.Any()) {
+        _dataContext.Relations.RemoveRange(relations);
+        await _dataContext.SaveChangesAsync();
+    }
 }
 
 
 
 
-              public void DeleteByEngId(int EngineereId){
-         var rest=   _dataContext.Relations.Where(x=>x.EngineereId==EngineereId).ToList();
-         if(rest!=null){
-            _dataContext.Relations.RemoveRange(rest);
-            _dataContext.SaveChanges();
-         }}
+            public async Task DeleteByEngId2Async(int id) {
+    var persons = await _dataContext.Persons
+        .Where(x => x.Id == id)
+        .ToListAsync();
 
+    if (persons.Any()) {
+        _dataContext.Persons.RemoveRange(persons);
+        await _dataContext.SaveChangesAsync();
+    }
+}
 
-
-            public void DeleteByEngId2(int Id){
-         var rest=   _dataContext.Persons.Where(x=>x.Id==Id).ToList();
-         if(rest!=null){
-            _dataContext.Persons.RemoveRange(rest);
-            _dataContext.SaveChanges();
-         }}
            
 
 
-           public void Delete(int Id){
-            var result = _dataContext.Engineeres.Where(x=>x.Id==Id).ToList();
-            if (result!=null){
-                 _dataContext.Engineeres.RemoveRange(result);
-                 _dataContext.SaveChanges();
-            }
+           public async Task DeleteAsync(int id) {
+    var result = await _dataContext.Engineeres
+        .Where(x => x.Id == id)
+        .ToListAsync();
+
+    if (result.Any()) {
+        _dataContext.Engineeres.RemoveRange(result);
+        await _dataContext.SaveChangesAsync();
+    }
+}
+
         }
 
     }
-}

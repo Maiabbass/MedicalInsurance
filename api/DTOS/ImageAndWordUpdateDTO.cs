@@ -7,7 +7,7 @@ namespace api.DTOS
 {
     public class ImageAndWordUpdateDTO
     {
-        public List<IFormFile> Images { get; set; }
-        public List<IFormFile> Words { get ; set ;}
+        public List<IFormFile>? Images { get; set; }
+        public List<IFormFile>? Words { get ; set ;}
     }
 }

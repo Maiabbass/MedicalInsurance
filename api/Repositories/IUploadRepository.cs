@@ -25,6 +25,8 @@ namespace api.Repositories
           Task<List<Person>> ReadExcelFileUnits(Stream fileStream);
 
           Task<List<Person>> ReadExcelFileUnits2(Stream fileStream);
+
+          Task ReadAndStoreSpecializations(string filePath);
           
         
     }

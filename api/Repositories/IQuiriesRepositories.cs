@@ -14,6 +14,8 @@ namespace api.Repositories
     Task<IEnumerable<SimpleEngineer>> GetEngineers(int? workPlaceId ,int? specializationId , int? engineeringUnitsId , int? PayMethodId  );
 
     Task<List<Person>> GetPersonsByAgeSegment(int fromYear, int toYear);
+
+    Task<EngineerFamilyFullDataDTO> GetEngineerWithFamilyAnnualFullData(string engineerNumber, int year);
         
     }
 }

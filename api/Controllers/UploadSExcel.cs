@@ -340,8 +340,42 @@ public async Task<IActionResult> UploadSubSurgical(IFormFile file)
                 });
             }
         }
+
+
+
+
+        [HttpPost("importSplazation")]
+        public async Task<IActionResult> ImportSpecializations(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("الملف غير صالح.");
+            }
+
+            var filePath = Path.Combine(Path.GetTempPath(), file.FileName);
+
+            // حفظ الملف في المسار المؤقت
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // استدعاء دالة قراءة وتخزين الاختصاصات
+            await _uploadRepository.ReadAndStoreSpecializations(filePath);
+
+            // حذف الملف بعد الاستخدام (اختياري)
+            System.IO.File.Delete(filePath);
+
+            return Ok("تم استيراد الاختصاصات بنجاح.");
+        }
     }
+
+
+
+
+        
     }
+    
 
 
 

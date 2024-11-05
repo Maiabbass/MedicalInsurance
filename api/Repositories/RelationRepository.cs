@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using api.Data;
+using api.DTOS;
 using api.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,12 +33,19 @@ namespace api.Repositories
            return  newRelation.Id;
         }
 
-        public void DeleteByPersonId(int PersonId)  {
-         var ras= _dataContext.Relations.Where(x=>x.PersonId==PersonId).ToList();
-         if(ras!=null){
-            _dataContext.Relations.RemoveRange(ras) ; 
-         }
-        }  
+        
+
+       public async Task DeleteByPersonIdAsync(int personId) {
+    var ras = await _dataContext.Relations
+        .Where(x => x.PersonId == personId)
+        .ToListAsync();
+
+    if (ras.Any()) {
+        _dataContext.Relations.RemoveRange(ras);
+        await _dataContext.SaveChangesAsync();
+    }
+}
+ 
         
          public async Task<bool> Add_RelationType(List<RelationType> ealationType)
         {
@@ -121,6 +129,70 @@ namespace api.Repositories
             return false;
         }
     }
+
+
+
+
+
+
+ public async Task Update_Relation_Types_With_Notes(List<RelationTypeWithNotesDTO> relationTypesWithNotes)
+{
+    // جمع السنوات المدخلة حديثا
+    var yearsToUpdate = relationTypesWithNotes.Select(r => r.Year).Distinct().ToList();
+
+    // جلب العلاقات الحالية والملاحظات المرتبطة بها حسب السنوات المدخلة حديثا فقط
+    var existingRelationTypes = await _dataContext.RelationTypes
+        .Where(r => yearsToUpdate.Contains(r.Year))
+        .Include(r => r.Notes)
+        .ToListAsync();
+
+    if (existingRelationTypes.Any())
+    {
+        // حذف الملاحظات المرتبطة أولا
+        foreach (var relationType in existingRelationTypes)
+        {
+            if (relationType.Notes != null && relationType.Notes.Any())
+            {
+                _dataContext.Notes.RemoveRange(relationType.Notes);
+            }
+        }
+
+        // حذف العلاقات بعد حذف الملاحظات
+        _dataContext.RelationTypes.RemoveRange(existingRelationTypes);
+    }
+
+    // إضافة العلاقات والملاحظات الجديدة
+    foreach (var relationTypeWithNotes in relationTypesWithNotes)
+    {
+        var newRelationType = new RelationType
+        {
+            Name = relationTypeWithNotes.Name,
+            Year = relationTypeWithNotes.Year,
+            Notes = relationTypeWithNotes.Notes.Select(n => new Note
+            {
+                Content = n.Content, // الملاحظات التي سيتم إدخالها
+            }).ToList()
+        };
+
+        await _dataContext.RelationTypes.AddAsync(newRelationType);
+    }
+
+    await _dataContext.SaveChangesAsync();
+}
+
+
+
+
+
+public async Task<IEnumerable<Person>> GetFamilyMembersByEngineerId(int engineerId)
+{
+    return await _dataContext.Relations
+        .Where(r => r.EngineereId == engineerId)
+        .Select(r => r.Person)
+        .ToListAsync();
+}
+
+
 }
 
 

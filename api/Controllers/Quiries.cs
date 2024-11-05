@@ -85,6 +85,27 @@ public async Task<ActionResult<SimpleEngineer>> GetEngineerWithRelations(string 
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+
+
+        [HttpGet("GetEngineerWithFamilyData")]
+        public async Task<IActionResult> GetEngineerWithFamilyData([FromQuery] string engineerNumber, [FromQuery] int year)
+        {
+            if (string.IsNullOrEmpty(engineerNumber) || year <= 0)
+            {
+                return BadRequest("يرجى تقديم رقم هندسي وسنة صالحين.");
+            }
+
+            var engineerWithFamilyData = await _quirieService.GetEngineerWithFamilyAnnualFullData(engineerNumber, year);
+
+            if (engineerWithFamilyData == null)
+            {
+                return NotFound("لم يتم العثور على بيانات سنوية لهذا المهندس أو لعائلته للسنة المحددة.");
+            }
+
+            return Ok(engineerWithFamilyData);
+        }
         
     }
 }

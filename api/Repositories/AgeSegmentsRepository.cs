@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using api.Data;
+using api.DTOS;
 using api.Entities;
+using api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace api.Repositories
@@ -12,10 +14,15 @@ namespace api.Repositories
     public class AgeSegmentsRepository : IAgeSegmentsRepository
     {
          private readonly DataContext _dataContext;
+         private readonly IAnnualDataService _annualDataService ;
+         
+        
 
-         public AgeSegmentsRepository(DataContext dataContext)
+         public AgeSegmentsRepository(DataContext dataContext , IAnnualDataService annualDataService)
          {
             _dataContext=dataContext;
+           
+            _annualDataService=annualDataService ;
          }
         public async Task<IEnumerable<AgeSegments>> Get(int year)
         {
@@ -101,6 +108,80 @@ namespace api.Repositories
             return false;
         }
     }
+
+
+
+
+
+
+
+
+
+
+public async Task Update_Age_Segments_With_Notes(List<AgeSegmentWithNotesDTO> ageSegmentsWithNotes)
+{
+    // التحقق من وجود الشرائح في القائمة المدخلة
+    if (ageSegmentsWithNotes == null || !ageSegmentsWithNotes.Any())
+        return;
+
+    // تحديد السنة المدخلة حديثاً
+    var targetYear = ageSegmentsWithNotes.First().Year;
+
+    // جلب الشرائح العمرية الحالية والملاحظات المرتبطة بها للسنة المدخلة فقط
+    var existingSegments = await _dataContext.AgeSegments
+        .Include(a => a.Notes)
+        .Where(a => a.Year == targetYear)
+        .ToListAsync();
+
+    if (existingSegments.Any())
+    {
+        // حذف الملاحظات المرتبطة بالشرائح العمرية للسنة المدخلة فقط
+        foreach (var segment in existingSegments)
+        {
+            if (segment.Notes != null && segment.Notes.Any())
+            {
+                _dataContext.Notes.RemoveRange(segment.Notes);
+                await _dataContext.SaveChangesAsync();
+            }
+        }
+
+        // حذف الشرائح العمرية للسنة المحددة بعد حذف الملاحظات
+        _dataContext.AgeSegments.RemoveRange(existingSegments);
+
+    }
+
+    // إضافة الشرائح العمرية والملاحظات الجديدة
+    foreach (var segmentWithNotes in ageSegmentsWithNotes)
+    {
+        var newSegment = new AgeSegments
+        {
+            FromYear = segmentWithNotes.FromYear,
+            ToYear = segmentWithNotes.ToYear,
+            TheAmount = segmentWithNotes.TheAmount,
+            EnduranceRatio = (decimal?)segmentWithNotes.EnduranceRatio,
+            Year = segmentWithNotes.Year,
+            Notes = segmentWithNotes.Notes.Select(n => new Note
+            {
+                Content = n.Content // الملاحظات التي سيتم ادخالها
+            }).ToList()
+        };
+
+        await _dataContext.AgeSegments.AddAsync(newSegment);
+    }
+
+    // حفظ التغييرات في قاعدة البيانات بعد تحديث الشرائح والملاحظات
+    await _dataContext.SaveChangesAsync();
+
+    // استدعاء الدالة لتحديث الأقساط بناءً على الشرائح الجديدة للسنة المحددة
+    await _annualDataService.UpdatePersonAmountsBasedOnNewAgeSegments(targetYear);
+}
+
+
+
+
+
+
+
 }
 
 

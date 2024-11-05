@@ -325,7 +325,7 @@ public async Task<ActionResult<Response>> AddAnnualSetting(string title, [FromBo
 
 
 
-[HttpPut("update-relation-type")]
+ [HttpPut("update-relation-type")]
 public async Task<IActionResult> UpdateRelationType([FromBody] RelationTypeDTO relationTypeDTO)
 {
     if (relationTypeDTO == null)
@@ -798,7 +798,7 @@ public async Task<ActionResult<List<YearConfigurationDTO>>> GetYearConfiguration
 
     if (yearConfigurations == null || yearConfigurations.Count == 0)
     {
-        return NotFound($"No year configurations found for year {year}.");
+        return NotFound($"year_not_found {year}.");
     }
 
     return Ok(yearConfigurations);
@@ -947,6 +947,59 @@ public async Task<IActionResult> GetAgeSegments(int year)
 
         return NoContent(); // تم الحذف بنجاح
     }
+
+
+
+
+
+    [HttpPut]
+    [Route("UpdateAgeSegmentsList")]
+ 
+public async Task<IActionResult> UpdateAgeSegments([FromBody] List<AgeSegmentWithNotesDTO> ageSegmentsWithNotes)
+{
+    if (ageSegmentsWithNotes == null || !ageSegmentsWithNotes.Any())
+    {
+        return BadRequest("Invalid or empty age segment data.");
+    }
+
+    try
+    {
+        await _ageSegmentsRepository.Update_Age_Segments_With_Notes(ageSegmentsWithNotes);
+        return Ok("Age segments and their notes updated successfully.");
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+
+
+
+
+
+
+[HttpPut]
+[Route("UpdateRelationTypesList")]
+public async Task<IActionResult> UpdateRelationTypes([FromBody] List<RelationTypeWithNotesDTO> relationTypesWithNotes)
+{
+    if (relationTypesWithNotes == null || !relationTypesWithNotes.Any())
+    {
+        return BadRequest("Invalid or empty relation type data.");
+    }
+
+    try
+    {
+        await _relationRepository.Update_Relation_Types_With_Notes(relationTypesWithNotes);
+        return Ok("Relation types and their notes updated successfully.");
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"Internal server error: {ex.Message}");
+    }
+}
+
+
 }
 }
 

@@ -40,14 +40,14 @@ public class Persons : ControllerBase
 
 
    [HttpPost]
-public async Task<IActionResult> CreatePerson([FromForm] PersonEditDTO personEditDTO, IFormFile[]? ImageFiles, IFormFile[]? WordFiles)
+public async Task<IActionResult> CreatePerson([FromForm] PersonEditDTO personEditDTO, int year, IFormFile[]? ImageFiles, IFormFile[]? WordFiles)
 {
     if (!ModelState.IsValid)
     {
         return BadRequest(ModelState);
     }
 
-    var response = await _personService.Add(personEditDTO, ImageFiles, WordFiles);
+    var response = await _personService.Add(personEditDTO, ImageFiles, WordFiles, year);
 
     if (!string.IsNullOrEmpty(response.ErrorMessage))
     {
@@ -113,30 +113,35 @@ public async Task<ActionResult<Person?>> GetWithId(int Id)
 
 
 
- 
- [HttpDelete("{Id}")] 
-public ActionResult Delete(int Id){
-  try{
-   
-    _imageRepository.DeleteByPersonId(Id);
-    _wordRepository.DeleteByPersonId(Id);
-     _personService.Delete(Id);
-    return NoContent();
 
+ 
+[HttpDelete("{Id}")]
+public async Task<ActionResult> Delete(int Id){
+  try{
+    await _imageRepository.DeleteByPersonIdAsync(Id);
+    await _wordRepository.DeleteByPersonIdAsync(Id);
+    var result = await _personService.DeleteAsync(Id);
+    
+    if (result)
+        return NoContent();
+    else
+        return StatusCode(StatusCodes.Status500InternalServerError, 
+                          new Response { Status = "Error", ErrorMessage = "Failed to delete" });
   }
   catch (Exception ex){
     return StatusCode(StatusCodes.Status500InternalServerError,
-                      new Response { Status = "Error", ErrorMessage = ex.Message }) ;}}
-
+                      new Response { Status = "Error", ErrorMessage = ex.Message });
+  }
+}
 
 
 
 
 
    [HttpPut("{id}/update-person-details")]
-public async Task<IActionResult> UpdatePersonDetails(int id, [FromBody] PersonEditDTO personDetailsDTO)
+public async Task<IActionResult> UpdatePersonDetails(int id, [FromBody] PersonEditDTO personDetailsDTO, int Year  )
 {
-    var updatePersonResult = await _personService.UpdatePersonDetails(id, personDetailsDTO);
+    var updatePersonResult = await _personService.UpdatePersonDetails(id, personDetailsDTO, Year);
     
     if (!updatePersonResult)
     {
